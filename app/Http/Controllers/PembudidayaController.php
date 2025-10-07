@@ -11,10 +11,43 @@ class PembudidayaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pembudidayas = Pembudidaya::latest()->paginate(10); // Ambil data terbaru, 10 per halaman
-        return view('pages.pembudidaya.index', compact('pembudidayas'));
+        // Ambil parameter pencarian dan jumlah per halaman dari query string
+        $search = trim((string) $request->query('q', ''));
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPage = (int) $request->query('per_page', 10);
+        if (! in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 10;
+        }
+
+        $query = Pembudidaya::query()
+            ->with(['kecamatan', 'desa'])
+            ->orderByDesc('id_pembudidaya');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nama_usaha', 'like', "%{$search}%")
+                  ->orWhere('nik_pembudidaya', 'like', "%{$search}%")
+                  ->orWhere('jenis_budidaya', 'like', "%{$search}%")
+                  ->orWhereHas('kecamatan', function ($qq) use ($search) {
+                      $qq->where('nama_kecamatan', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('desa', function ($qq) use ($search) {
+                      $qq->where('nama_desa', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $pembudidayas = $query->paginate($perPage)->withQueryString();
+
+        return view('pages.pembudidaya.index', [
+            'pembudidayas' => $pembudidayas,
+            'q' => $search,
+            'perPage' => $perPage,
+            'allowedPerPage' => $allowedPerPage,
+        ]);
     }
 
     /**

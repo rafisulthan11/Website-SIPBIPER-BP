@@ -1,43 +1,73 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Data: ') . $pembudidaya->nama_lengkap }}
+        <h2 class="font-extrabold text-2xl sm:text-3xl text-slate-800 leading-tight">
+            {{ __('Edit Pembudidaya: ') . $pembudidaya->nama_lengkap }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('pembudidaya.update', $pembudidaya->id_pembudidaya) }}">
-                        @csrf
-                        @method('PUT')
+    @php
+        $stepMap = [
+            'jenis_kegiatan_usaha' => 0,
+            'jenis_budidaya' => 0,
+            'nama_lengkap' => 1,
+            'nik_pembudidaya' => 1,
+            'id_kecamatan' => 1,
+            'id_desa' => 1,
+        ];
+        $initialStep = 0;
+        if ($errors->any()) {
+            foreach ($errors->keys() as $key) {
+                if (array_key_exists($key, $stepMap)) { $initialStep = $stepMap[$key]; break; }
+            }
+        }
+    @endphp
 
-                        <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
-                            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Jenis Usaha</h3>
+    <div class="py-6">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div x-data="{ step: {{ $initialStep }}, maxStep: 7 }" class="bg-white border border-slate-200 rounded-md shadow">
+                <!-- Tabs -->
+                <div class="px-5 pt-5">
+                    <div class="flex flex-wrap gap-3">
+                        @php $tabs = ['Jenis Usaha','Profil Pemilik','Izin Usaha','Profil Usaha','Investasi','Produksi','Tenaga Kerja','Lampiran']; @endphp
+                        @foreach($tabs as $i => $tab)
+                            <button type="button" @click="step={{ $i }}" :class="step==={{ $i }} ? 'bg-blue-700 text-white' : 'bg-white text-slate-700'" class="px-4 py-2 rounded border shadow-sm text-sm font-medium">
+                                {{ $tab }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('pembudidaya.update', $pembudidaya->id_pembudidaya) }}" class="mt-5">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="px-5 pb-5">
+                        <!-- Step 0: Jenis Usaha -->
+                        <div x-show="step===0" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Jenis Usaha</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha*')" />
-                                    <select name="jenis_kegiatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
-                                        <option value="Pembenihan" {{ old('jenis_kegiatan_usaha', $pembudidaya->jenis_kegiatan_usaha) == 'Pembenihan' ? 'selected' : '' }}>Pembenihan</option>
-                                        <option value="Pembesaran" {{ old('jenis_kegiatan_usaha', $pembudidaya->jenis_kegiatan_usaha) == 'Pembesaran' ? 'selected' : '' }}>Pembesaran</option>
-                                        <option value="Tambak" {{ old('jenis_kegiatan_usaha', $pembudidaya->jenis_kegiatan_usaha) == 'Tambak' ? 'selected' : '' }}>Tambak</option>
+                                    <select name="jenis_kegiatan_usaha" id="jenis_kegiatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
+                                        @foreach(['Pembenihan','Pembesaran','Tambak'] as $opt)
+                                            <option value="{{ $opt }}" {{ old('jenis_kegiatan_usaha', $pembudidaya->jenis_kegiatan_usaha)===$opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div>
                                     <x-input-label for="jenis_budidaya" :value="__('Jenis Budidaya*')" />
-                                    <select name="jenis_budidaya" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
-                                        <option value="Kolam" {{ old('jenis_budidaya', $pembudidaya->jenis_budidaya) == 'Kolam' ? 'selected' : '' }}>Kolam</option>
-                                        <option value="Mina Padi" {{ old('jenis_budidaya', $pembudidaya->jenis_budidaya) == 'Mina Padi' ? 'selected' : '' }}>Mina Padi</option>
-                                        <option value="Keramba" {{ old('jenis_budidaya', $pembudidaya->jenis_budidaya) == 'Keramba' ? 'selected' : '' }}>Keramba</option>
-                                        <option value="Tambak" {{ old('jenis_budidaya', $pembudidaya->jenis_budidaya) == 'Tambak' ? 'selected' : '' }}>Tambak</option>
+                                    <select name="jenis_budidaya" id="jenis_budidaya" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
+                                        @foreach(['Kolam','Mina Padi','Keramba','Tambak'] as $opt)
+                                            <option value="{{ $opt }}" {{ old('jenis_budidaya', $pembudidaya->jenis_budidaya)===$opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
-                            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Profil Pemilik</h3>
+                        <!-- Step 1: Profil Pemilik -->
+                        <div x-show="step===1" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Profil Pemilik</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div>
                                     <x-input-label for="nama_lengkap" :value="__('Nama Lengkap (Sesuai KTP)*')" />
@@ -50,8 +80,9 @@
                                 <div>
                                     <x-input-label for="jenis_kelamin" :value="__('Jenis Kelamin')" />
                                     <select name="jenis_kelamin" id="jenis_kelamin" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                                        <option value="Laki-laki" {{ old('jenis_kelamin', $pembudidaya->jenis_kelamin) == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                        <option value="Perempuan" {{ old('jenis_kelamin', $pembudidaya->jenis_kelamin) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                        <option value="">Pilih Jenis Kelamin</option>
+                                        <option value="Laki-laki" {{ old('jenis_kelamin', $pembudidaya->jenis_kelamin)=='Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                        <option value="Perempuan" {{ old('jenis_kelamin', $pembudidaya->jenis_kelamin)=='Perempuan' ? 'selected' : '' }}>Perempuan</option>
                                     </select>
                                 </div>
                                 <div>
@@ -65,10 +96,9 @@
                                 <div>
                                     <x-input-label for="status_perkawinan" :value="__('Status Perkawinan')" />
                                     <select name="status_perkawinan" id="status_perkawinan" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                                        <option value="Belum Kawin" {{ old('status_perkawinan', $pembudidaya->status_perkawinan) == 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
-                                        <option value="Kawin" {{ old('status_perkawinan', $pembudidaya->status_perkawinan) == 'Kawin' ? 'selected' : '' }}>Kawin</option>
-                                        <option value="Cerai Hidup" {{ old('status_perkawinan', $pembudidaya->status_perkawinan) == 'Cerai Hidup' ? 'selected' : '' }}>Cerai Hidup</option>
-                                        <option value="Cerai Mati" {{ old('status_perkawinan', $pembudidaya->status_perkawinan) == 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
+                                        @foreach(['Belum Kawin','Kawin','Cerai Hidup','Cerai Mati'] as $opt)
+                                            <option value="{{ $opt }}" {{ old('status_perkawinan', $pembudidaya->status_perkawinan)===$opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="md:col-span-2 lg:col-span-3">
@@ -79,9 +109,7 @@
                                     <x-input-label for="id_kecamatan" :value="__('Kecamatan*')" />
                                     <select name="id_kecamatan" id="id_kecamatan" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
                                         @foreach ($kecamatans as $kecamatan)
-                                            <option value="{{ $kecamatan->id_kecamatan }}" {{ old('id_kecamatan', $pembudidaya->id_kecamatan) == $kecamatan->id_kecamatan ? 'selected' : '' }}>
-                                                {{ $kecamatan->nama_kecamatan }}
-                                            </option>
+                                            <option value="{{ $kecamatan->id_kecamatan }}" {{ old('id_kecamatan', $pembudidaya->id_kecamatan)==$kecamatan->id_kecamatan ? 'selected' : '' }}>{{ $kecamatan->nama_kecamatan }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -89,9 +117,7 @@
                                     <x-input-label for="id_desa" :value="__('Desa/Kelurahan*')" />
                                     <select name="id_desa" id="id_desa" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
                                         @foreach ($desas as $desa)
-                                             <option value="{{ $desa->id_desa }}" {{ old('id_desa', $pembudidaya->id_desa) == $desa->id_desa ? 'selected' : '' }}>
-                                                {{ $desa->nama_desa }}
-                                            </option>
+                                            <option value="{{ $desa->id_desa }}" {{ old('id_desa', $pembudidaya->id_desa)==$desa->id_desa ? 'selected' : '' }}>{{ $desa->nama_desa }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -110,8 +136,15 @@
                             </div>
                         </div>
 
-                        <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
-                            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Profil Usaha</h3>
+                        <!-- Step 2: Izin Usaha (placeholder) -->
+                        <div x-show="step===2" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Izin Usaha</h3>
+                            <p class="text-slate-600">Form Izin Usaha akan ditambahkan.</p>
+                        </div>
+
+                        <!-- Step 3: Profil Usaha -->
+                        <div x-show="step===3" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Profil Usaha</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div>
                                     <x-input-label for="nama_usaha" :value="__('Nama Usaha')" />
@@ -135,9 +168,9 @@
                                 </div>
                                 <div>
                                     <x-input-label for="status_usaha" :value="__('Status Usaha')" />
-                                    <select name="status_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                                        <option value="Aktif" {{ old('status_usaha', $pembudidaya->status_usaha) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                                        <option value="Tidak Aktif" {{ old('status_usaha', $pembudidaya->status_usaha) == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                                    <select name="status_usaha" id="status_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                                        <option value="Aktif" {{ old('status_usaha', $pembudidaya->status_usaha)=='Aktif' ? 'selected' : '' }}>Aktif</option>
+                                        <option value="Tidak Aktif" {{ old('status_usaha', $pembudidaya->status_usaha)=='Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
                                     </select>
                                 </div>
                                 <div class="lg:col-span-3">
@@ -146,15 +179,38 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="flex items-center justify-end mt-4">
-                            <a href="{{ route('pembudidaya.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">Batal</a>
-                            <x-primary-button>
+
+                        <!-- Step 4-7 placeholders -->
+                        <div x-show="step===4" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Investasi</h3>
+                            <p class="text-slate-600">Form Investasi akan ditambahkan.</p>
+                        </div>
+                        <div x-show="step===5" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Produksi</h3>
+                            <p class="text-slate-600">Form Produksi akan ditambahkan.</p>
+                        </div>
+                        <div x-show="step===6" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Tenaga Kerja</h3>
+                            <p class="text-slate-600">Form Tenaga Kerja akan ditambahkan.</p>
+                        </div>
+                        <div x-show="step===7" x-transition class="p-4 bg-gray-50 rounded border">
+                            <h3 class="text-lg font-semibold mb-4">Lampiran</h3>
+                            <p class="text-slate-600">Lampiran akan ditambahkan. Simpan data untuk menyelesaikan.</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation buttons -->
+                    <div class="px-5 pb-5 flex items-center justify-between">
+                        <a href="{{ route('pembudidaya.index') }}" class="text-base text-slate-700 hover:text-slate-900">Batal</a>
+                        <div class="flex items-center gap-3">
+                            <button type="button" class="px-4 py-2 rounded border bg-white hover:bg-gray-50 text-slate-700" @click="if(step>0) step--" x-show="step>0">Sebelumnya</button>
+                            <button type="button" class="px-4 py-2 rounded bg-blue-700 hover:bg-blue-800 text-white" @click="if(step<maxStep) step++" x-show="step<maxStep">Berikutnya</button>
+                            <x-primary-button x-show="step===maxStep">
                                 {{ __('Update Data') }}
                             </x-primary-button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
