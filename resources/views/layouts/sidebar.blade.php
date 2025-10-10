@@ -87,7 +87,7 @@
                 </button>
                 <ul x-show="open" x-transition.opacity class="ms-8 mt-1 space-y-1">
                     <li>
-                        <a href="#" class="block px-4 py-2 text-base rounded text-slate-700 hover:bg-blue-50">Sebaran Lokasi</a>
+                        <a href="{{ route('peta-lokasi.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('peta-lokasi.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Peta Interaktif Pembudidaya</a>
                     </li>
                 </ul>
             </li>

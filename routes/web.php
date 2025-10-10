@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\PembudidayaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PetaLokasiController;
 
 
 Route::get('/', function () {
@@ -30,6 +31,11 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::resource('pembudidaya', PembudidayaController::class);
+    
+    // Peta Lokasi Routes
+    Route::get('/peta-lokasi', [PetaLokasiController::class, 'index'])->name('peta-lokasi.index');
+    Route::get('/peta-lokasi/pengolah', [PetaLokasiController::class, 'pengolah'])->name('peta-lokasi.pengolah');
+    Route::get('/peta-lokasi/pemasar', [PetaLokasiController::class, 'pemasar'])->name('peta-lokasi.pemasar');
 });
 
 require __DIR__.'/auth.php';

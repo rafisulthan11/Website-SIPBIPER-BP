@@ -23,6 +23,10 @@
                     <x-nav-link :href="route('pembudidaya.index')" :active="request()->routeIs('pembudidaya.index*')">
                         {{ __('Data Pembudidaya') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('peta-lokasi.index')" :active="request()->routeIs('peta-lokasi.index*')">
+                        {{ __('Peta Interaktif Pembudidaya') }}
+                    </x-nav-link>
                 </div>
             </div>
 
