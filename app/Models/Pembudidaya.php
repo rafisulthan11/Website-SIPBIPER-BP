@@ -55,4 +55,14 @@ class Pembudidaya extends Model
     {
         return $this->belongsTo(MasterDesa::class, 'id_desa', 'id_desa');
     }
+
+    public function investasi()
+    {
+        return $this->hasOne(PembudidayaInvestasi::class, 'id_pembudidaya', 'id_pembudidaya');
+    }
+
+    public function izin()
+    {
+        return $this->hasOne(PembudidayaIzin::class, 'id_pembudidaya', 'id_pembudidaya');
+    }
 }

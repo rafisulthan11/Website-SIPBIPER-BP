@@ -136,10 +136,33 @@
                             </div>
                         </div>
 
-                        <!-- Step 2: Izin Usaha (placeholder) -->
+                        <!-- Step 2: Izin Usaha -->
                         <div x-show="step===2" x-transition class="p-4 bg-gray-50 rounded border">
                             <h3 class="text-lg font-semibold mb-4">Izin Usaha</h3>
-                            <p class="text-slate-600">Form Izin Usaha akan ditambahkan.</p>
+                            @php $iz = $pembudidaya->izin; @endphp
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                @php
+                                    $izinFields = [
+                                        'nib' => 'NIB',
+                                        'npwp' => 'NPWP',
+                                        'kusuka' => 'KUSUKA',
+                                        'pengesahan_menkumham' => 'Pengesahan MENKUMHAM',
+                                        'cbib' => 'CBIB',
+                                        'skai' => 'SKAI (Surat Keterangan Asal Ikan)',
+                                        'surat_ijin_pembudidayaan_ikan' => 'Surat Ijin Pembudidayaan Ikan',
+                                        'akta_pendirian_usaha' => 'AKTA PENDIRIAN USAHA',
+                                        'imb' => 'IMB',
+                                        'sup_perikanan' => 'SUP Perikanan',
+                                        'sup_perdagangan' => 'SUP Perdagangan',
+                                    ];
+                                @endphp
+                                @foreach($izinFields as $name => $label)
+                                    <div class="md:col-span-2">
+                                        <x-input-label :for="'izin_' . $name" :value="$label" />
+                                        <x-text-input :id="'izin_' . $name" class="block mt-1 w-full" type="text" :name="'izin['.$name.']'" :value="old('izin.'.$name, optional($iz)->{$name})" />
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
 
                         <!-- Step 3: Profil Usaha -->
@@ -180,11 +203,97 @@
                             </div>
                         </div>
 
-                        <!-- Step 4-7 placeholders -->
+                        <!-- Step 4: Investasi -->
                         <div x-show="step===4" x-transition class="p-4 bg-gray-50 rounded border">
                             <h3 class="text-lg font-semibold mb-4">Investasi</h3>
-                            <p class="text-slate-600">Form Investasi akan ditambahkan.</p>
+                            @php
+                                $inv = $pembudidaya->investasi;
+                                $lahanChecked = [];
+                                if ($inv && $inv->lahan_status) {
+                                    if (is_string($inv->lahan_status)) {
+                                        $decoded = json_decode($inv->lahan_status, true);
+                                        if (is_array($decoded)) { $lahanChecked = $decoded; }
+                                    } elseif (is_array($inv->lahan_status)) {
+                                        $lahanChecked = $inv->lahan_status;
+                                    }
+                                }
+                            @endphp
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="investasi_nilai_asset" :value="__('Nilai Asset (Rp)')" />
+                                    <x-text-input id="investasi_nilai_asset" class="block mt-1 w-full" type="number" step="0.01" name="investasi[nilai_asset]" :value="old('investasi.nilai_asset', optional($inv)->nilai_asset)" />
+                                </div>
+                                <div>
+                                    <x-input-label for="investasi_laba_ditanam" :value="__('Laba Ditanam (Rp)')" />
+                                    <x-text-input id="investasi_laba_ditanam" class="block mt-1 w-full" type="number" step="0.01" name="investasi[laba_ditanam]" :value="old('investasi.laba_ditanam', optional($inv)->laba_ditanam)" />
+                                </div>
+                                <div class="md:col-span-2">
+                                    <x-input-label for="investasi_sewa" :value="__('Sewa (Rp)')" />
+                                    <x-text-input id="investasi_sewa" class="block mt-1 w-full" type="number" step="0.01" name="investasi[sewa]" :value="old('investasi.sewa', optional($inv)->sewa)" />
+                                </div>
+                                <div class="md:col-span-2">
+                                    <x-input-label :value="__('Pinjaman')" />
+                                    <div class="flex items-center gap-6 mt-2">
+                                        @php $pin = old('investasi.pinjaman', is_null(optional($inv)->pinjaman) ? '' : (optional($inv)->pinjaman ? '1' : '0')); @endphp
+                                        <label class="inline-flex items-center gap-2">
+                                            <input type="radio" name="investasi[pinjaman]" value="1" {{ $pin==='1' ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            <span>Ada</span>
+                                        </label>
+                                        <label class="inline-flex items-center gap-2">
+                                            <input type="radio" name="investasi[pinjaman]" value="0" {{ $pin==='0' ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            <span>Tidak</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <x-input-label for="investasi_modal_sendiri" :value="__('Modal Sendiri (Rp)')" />
+                                    <x-text-input id="investasi_modal_sendiri" class="block mt-1 w-full" type="number" step="0.01" name="investasi[modal_sendiri]" :value="old('investasi.modal_sendiri', optional($inv)->modal_sendiri)" />
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <x-input-label :value="__('Lahan (Status Kepemilikan)')" />
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+                                        @php $ops = ['LHSM','SHRS','SHGB','Girik/Petok']; @endphp
+                                        @foreach($ops as $opsi)
+                                            @php $checked = in_array($opsi, old('investasi.lahan_status', $lahanChecked)); @endphp
+                                            <label class="inline-flex items-center gap-2">
+                                                <input type="checkbox" name="investasi[lahan_status][]" value="{{ $opsi }}" {{ $checked ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span>{{ $opsi }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="investasi_luas_m2" :value="__('Luas (m2)')" />
+                                    <x-text-input id="investasi_luas_m2" class="block mt-1 w-full" type="number" step="0.01" name="investasi[luas_m2]" :value="old('investasi.luas_m2', optional($inv)->luas_m2)" />
+                                </div>
+                                <div>
+                                    <x-input-label for="investasi_nilai_bangunan" :value="__('Nilai Bangunan (Rp)')" />
+                                    <x-text-input id="investasi_nilai_bangunan" class="block mt-1 w-full" type="number" step="0.01" name="investasi[nilai_bangunan]" :value="old('investasi.nilai_bangunan', optional($inv)->nilai_bangunan)" />
+                                </div>
+                                <div class="md:col-span-2">
+                                    <x-input-label for="investasi_bangunan" :value="__('Bangunan (Keterangan)')" />
+                                    <x-text-input id="investasi_bangunan" class="block mt-1 w-full" type="text" name="investasi[bangunan]" :value="old('investasi.bangunan', optional($inv)->bangunan)" />
+                                </div>
+                                <div class="md:col-span-2">
+                                    <x-input-label :value="__('Sertifikat')" />
+                                    @php $sert = old('investasi.sertifikat', optional($inv)->sertifikat); @endphp
+                                    <div class="flex items-center gap-6 mt-2">
+                                        <label class="inline-flex items-center gap-2">
+                                            <input type="radio" name="investasi[sertifikat]" value="IMB" {{ $sert==='IMB' ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            <span>IMB</span>
+                                        </label>
+                                        <label class="inline-flex items-center gap-2">
+                                            <input type="radio" name="investasi[sertifikat]" value="NON_IMB" {{ $sert==='NON_IMB' ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            <span>Non IMB</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Step 5-7 placeholders -->
                         <div x-show="step===5" x-transition class="p-4 bg-gray-50 rounded border">
                             <h3 class="text-lg font-semibold mb-4">Produksi</h3>
                             <p class="text-slate-600">Form Produksi akan ditambahkan.</p>

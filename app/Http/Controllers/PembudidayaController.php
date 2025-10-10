@@ -5,6 +5,8 @@ use App\Models\Pembudidaya;
 use Illuminate\Http\Request;
 use App\Models\MasterKecamatan;
 use App\Models\MasterDesa;
+use App\Models\PembudidayaInvestasi;
+use App\Models\PembudidayaIzin;
 
 class PembudidayaController extends Controller
 {
@@ -67,17 +69,82 @@ class PembudidayaController extends Controller
     public function store(Request $request)
     {
         // Validasi data (sederhana untuk saat ini)
-        $request->validate([
+        $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'nik_pembudidaya' => 'required|string|size:16|unique:pembudidayas,nik_pembudidaya',
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
             'jenis_kegiatan_usaha' => 'required|string',
             'jenis_budidaya' => 'required|string',
+            // Izin Usaha (opsional strings)
+            'izin.nib' => 'nullable|string|max:255',
+            'izin.npwp' => 'nullable|string|max:255',
+            'izin.kusuka' => 'nullable|string|max:255',
+            'izin.pengesahan_menkumham' => 'nullable|string|max:255',
+            'izin.cbib' => 'nullable|string|max:255',
+            'izin.skai' => 'nullable|string|max:255',
+            'izin.surat_ijin_pembudidayaan_ikan' => 'nullable|string|max:255',
+            'izin.akta_pendirian_usaha' => 'nullable|string|max:255',
+            'izin.imb' => 'nullable|string|max:255',
+            'izin.sup_perikanan' => 'nullable|string|max:255',
+            'izin.sup_perdagangan' => 'nullable|string|max:255',
+            // Investasi (opsional)
+            'investasi.nilai_asset' => 'nullable|numeric',
+            'investasi.laba_ditanam' => 'nullable|numeric',
+            'investasi.sewa' => 'nullable|numeric',
+            'investasi.pinjaman' => 'nullable|in:0,1',
+            'investasi.modal_sendiri' => 'nullable|numeric',
+            'investasi.lahan_status' => 'nullable|array',
+            'investasi.lahan_status.*' => 'string',
+            'investasi.luas_m2' => 'nullable|numeric',
+            'investasi.nilai_bangunan' => 'nullable|numeric',
+            'investasi.bangunan' => 'nullable|string',
+            'investasi.sertifikat' => 'nullable|in:IMB,NON_IMB',
         ]);
 
         // Simpan data ke tabel pembudidayas
-        Pembudidaya::create($request->all());
+    $p = Pembudidaya::create($request->except(['investasi','izin']));
+
+        // Simpan investasi jika ada input
+        $inv = $request->input('investasi', []);
+        if (!empty($inv)) {
+            $payload = [
+                'id_pembudidaya' => $p->id_pembudidaya,
+                'nilai_asset' => $inv['nilai_asset'] ?? null,
+                'laba_ditanam' => $inv['laba_ditanam'] ?? null,
+                'sewa' => $inv['sewa'] ?? null,
+                'pinjaman' => isset($inv['pinjaman']) ? (bool)$inv['pinjaman'] : null,
+                'modal_sendiri' => $inv['modal_sendiri'] ?? null,
+                'lahan_status' => $inv['lahan_status'] ?? null,
+                'luas_m2' => $inv['luas_m2'] ?? null,
+                'nilai_bangunan' => $inv['nilai_bangunan'] ?? null,
+                'bangunan' => $inv['bangunan'] ?? null,
+                'sertifikat' => $inv['sertifikat'] ?? null,
+            ];
+            PembudidayaInvestasi::create($payload);
+        }
+
+        // Simpan izin jika ada input
+        $iz = $request->input('izin', []);
+        if (!empty($iz)) {
+            $payloadIzin = array_merge(
+                [ 'id_pembudidaya' => $p->id_pembudidaya ],
+                [
+                    'nib' => $iz['nib'] ?? null,
+                    'npwp' => $iz['npwp'] ?? null,
+                    'kusuka' => $iz['kusuka'] ?? null,
+                    'pengesahan_menkumham' => $iz['pengesahan_menkumham'] ?? null,
+                    'cbib' => $iz['cbib'] ?? null,
+                    'skai' => $iz['skai'] ?? null,
+                    'surat_ijin_pembudidayaan_ikan' => $iz['surat_ijin_pembudidayaan_ikan'] ?? null,
+                    'akta_pendirian_usaha' => $iz['akta_pendirian_usaha'] ?? null,
+                    'imb' => $iz['imb'] ?? null,
+                    'sup_perikanan' => $iz['sup_perikanan'] ?? null,
+                    'sup_perdagangan' => $iz['sup_perdagangan'] ?? null,
+                ]
+            );
+            PembudidayaIzin::create($payloadIzin);
+        }
 
         return redirect()->route('pembudidaya.index')->with('success', 'Data pembudidaya berhasil ditambahkan.');
     }
@@ -87,7 +154,7 @@ class PembudidayaController extends Controller
      */
     public function show(Pembudidaya $pembudidaya)
     {
-        // Kita bisa langsung mengirimkan objek $pembudidaya ke view
+    $pembudidaya->load(['kecamatan','desa','investasi','izin']);
         return view('pages.pembudidaya.show', compact('pembudidaya'));
     }
 
@@ -96,8 +163,9 @@ class PembudidayaController extends Controller
      */
     public function edit(Pembudidaya $pembudidaya)
     {
-        $kecamatans = MasterKecamatan::all();
-        $desas = MasterDesa::all();
+    $kecamatans = MasterKecamatan::all();
+    $desas = MasterDesa::all();
+    $pembudidaya->load(['investasi','izin']);
         return view('pages.pembudidaya.edit', compact('pembudidaya', 'kecamatans', 'desas'));
     }
 
@@ -107,17 +175,90 @@ class PembudidayaController extends Controller
     public function update(Request $request, Pembudidaya $pembudidaya)
     {
         // Validasi data
-        $request->validate([
+        $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'nik_pembudidaya' => 'required|string|size:16|unique:pembudidayas,nik_pembudidaya,' . $pembudidaya->id_pembudidaya . ',id_pembudidaya',
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
             'jenis_kegiatan_usaha' => 'required|string',
             'jenis_budidaya' => 'required|string',
+            // Izin Usaha (opsional strings)
+            'izin.nib' => 'nullable|string|max:255',
+            'izin.npwp' => 'nullable|string|max:255',
+            'izin.kusuka' => 'nullable|string|max:255',
+            'izin.pengesahan_menkumham' => 'nullable|string|max:255',
+            'izin.cbib' => 'nullable|string|max:255',
+            'izin.skai' => 'nullable|string|max:255',
+            'izin.surat_ijin_pembudidayaan_ikan' => 'nullable|string|max:255',
+            'izin.akta_pendirian_usaha' => 'nullable|string|max:255',
+            'izin.imb' => 'nullable|string|max:255',
+            'izin.sup_perikanan' => 'nullable|string|max:255',
+            'izin.sup_perdagangan' => 'nullable|string|max:255',
+            // Investasi (opsional)
+            'investasi.nilai_asset' => 'nullable|numeric',
+            'investasi.laba_ditanam' => 'nullable|numeric',
+            'investasi.sewa' => 'nullable|numeric',
+            'investasi.pinjaman' => 'nullable|in:0,1',
+            'investasi.modal_sendiri' => 'nullable|numeric',
+            'investasi.lahan_status' => 'nullable|array',
+            'investasi.lahan_status.*' => 'string',
+            'investasi.luas_m2' => 'nullable|numeric',
+            'investasi.nilai_bangunan' => 'nullable|numeric',
+            'investasi.bangunan' => 'nullable|string',
+            'investasi.sertifikat' => 'nullable|in:IMB,NON_IMB',
         ]);
 
         // Update data di tabel
-        $pembudidaya->update($request->all());
+    $pembudidaya->update($request->except(['investasi','izin']));
+
+        $inv = $request->input('investasi', []);
+        if (!empty($inv)) {
+            $payload = [
+                'nilai_asset' => $inv['nilai_asset'] ?? null,
+                'laba_ditanam' => $inv['laba_ditanam'] ?? null,
+                'sewa' => $inv['sewa'] ?? null,
+                'pinjaman' => isset($inv['pinjaman']) ? (bool)$inv['pinjaman'] : null,
+                'modal_sendiri' => $inv['modal_sendiri'] ?? null,
+                'lahan_status' => $inv['lahan_status'] ?? null,
+                'luas_m2' => $inv['luas_m2'] ?? null,
+                'nilai_bangunan' => $inv['nilai_bangunan'] ?? null,
+                'bangunan' => $inv['bangunan'] ?? null,
+                'sertifikat' => $inv['sertifikat'] ?? null,
+            ];
+
+            $existing = $pembudidaya->investasi;
+            if ($existing) {
+                $existing->update($payload);
+            } else {
+                $payload['id_pembudidaya'] = $pembudidaya->id_pembudidaya;
+                PembudidayaInvestasi::create($payload);
+            }
+        }
+
+        // Update/simpan izin
+        $iz = $request->input('izin', []);
+        if (!empty($iz)) {
+            $payloadIzin = [
+                'nib' => $iz['nib'] ?? null,
+                'npwp' => $iz['npwp'] ?? null,
+                'kusuka' => $iz['kusuka'] ?? null,
+                'pengesahan_menkumham' => $iz['pengesahan_menkumham'] ?? null,
+                'cbib' => $iz['cbib'] ?? null,
+                'skai' => $iz['skai'] ?? null,
+                'surat_ijin_pembudidayaan_ikan' => $iz['surat_ijin_pembudidayaan_ikan'] ?? null,
+                'akta_pendirian_usaha' => $iz['akta_pendirian_usaha'] ?? null,
+                'imb' => $iz['imb'] ?? null,
+                'sup_perikanan' => $iz['sup_perikanan'] ?? null,
+                'sup_perdagangan' => $iz['sup_perdagangan'] ?? null,
+            ];
+            $existingIzin = $pembudidaya->izin;
+            if ($existingIzin) {
+                $existingIzin->update($payloadIzin);
+            } else {
+                $payloadIzin['id_pembudidaya'] = $pembudidaya->id_pembudidaya;
+                PembudidayaIzin::create($payloadIzin);
+            }
+        }
 
         return redirect()->route('pembudidaya.index')->with('success', 'Data pembudidaya berhasil diperbarui.');
     }

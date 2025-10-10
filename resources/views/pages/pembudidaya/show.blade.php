@@ -58,6 +58,56 @@
                         </div>
                     </div>
 
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
+                        <h3 class="text-lg font-semibold border-b pb-2 mb-4">Izin Usaha</h3>
+                        @php $iz = $pembudidaya->izin; @endphp
+                        @if($iz)
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                            <div><strong class="font-medium text-gray-500 block">NIB:</strong><p>{{ $iz->nib ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">NPWP:</strong><p>{{ $iz->npwp ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">KUSUKA:</strong><p>{{ $iz->kusuka ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">Pengesahan MENKUMHAM:</strong><p>{{ $iz->pengesahan_menkumham ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">CBIB:</strong><p>{{ $iz->cbib ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">SKAI:</strong><p>{{ $iz->skai ?? '-' }}</p></div>
+                            <div class="lg:col-span-3"><strong class="font-medium text-gray-500 block">Surat Ijin Pembudidayaan Ikan:</strong><p>{{ $iz->surat_ijin_pembudidayaan_ikan ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">AKTA PENDIRIAN USAHA:</strong><p>{{ $iz->akta_pendirian_usaha ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">IMB:</strong><p>{{ $iz->imb ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">SUP Perikanan:</strong><p>{{ $iz->sup_perikanan ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">SUP Perdagangan:</strong><p>{{ $iz->sup_perdagangan ?? '-' }}</p></div>
+                        </div>
+                        @else
+                            <p class="text-slate-600">Belum ada data izin usaha.</p>
+                        @endif
+                    </div>
+
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
+                        <h3 class="text-lg font-semibold border-b pb-2 mb-4">Investasi</h3>
+                        @php $inv = $pembudidaya->investasi; @endphp
+                        @if($inv)
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                            <div><strong class="font-medium text-gray-500 block">Nilai Asset:</strong><p>Rp. {{ number_format($inv->nilai_asset ?? 0, 0, ',', '.') }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">Laba Ditanam:</strong><p>Rp. {{ number_format($inv->laba_ditanam ?? 0, 0, ',', '.') }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">Sewa:</strong><p>Rp. {{ number_format($inv->sewa ?? 0, 0, ',', '.') }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">Pinjaman:</strong><p>{{ is_null($inv->pinjaman) ? '-' : ($inv->pinjaman ? 'Ada' : 'Tidak') }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">Modal Sendiri:</strong><p>Rp. {{ number_format($inv->modal_sendiri ?? 0, 0, ',', '.') }}</p></div>
+                            <div class="lg:col-span-3"><strong class="font-medium text-gray-500 block">Lahan (Status Kepemilikan):</strong><p>
+                                @php 
+                                    $ls = $inv->lahan_status ?? []; 
+                                    if (is_string($ls)) { $ls = json_decode($ls, true) ?? []; }
+                                    if (!is_array($ls)) { $ls = []; }
+                                @endphp
+                                {{ $ls ? implode(', ', $ls) : '-' }}
+                            </p></div>
+                            <div><strong class="font-medium text-gray-500 block">Luas:</strong><p>{{ $inv->luas_m2 ? $inv->luas_m2 . ' m2' : '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">Nilai Bangunan:</strong><p>Rp. {{ number_format($inv->nilai_bangunan ?? 0, 0, ',', '.') }}</p></div>
+                            <div class="lg:col-span-3"><strong class="font-medium text-gray-500 block">Bangunan:</strong><p>{{ $inv->bangunan ?? '-' }}</p></div>
+                            <div><strong class="font-medium text-gray-500 block">Sertifikat:</strong><p>{{ $inv->sertifikat === 'IMB' ? 'IMB' : ($inv->sertifikat === 'NON_IMB' ? 'Non IMB' : '-') }}</p></div>
+                        </div>
+                        @else
+                            <p class="text-slate-600">Belum ada data investasi.</p>
+                        @endif
+                    </div>
+
                 </div>
             </div>
         </div>

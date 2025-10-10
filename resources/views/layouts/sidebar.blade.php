@@ -110,14 +110,33 @@
         </ul>
     </nav>
 
-    <!-- User footer -->
-    <div class="px-4 py-3 border-t border-slate-200 flex items-center gap-3">
-        <div class="h-8 w-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs">
-            {{ strtoupper(substr(Auth::user()->nama_lengkap ?? Auth::user()->name ?? 'U',0,1)) }}
-        </div>
-        <div class="min-w-0">
-            <div class="text-sm font-semibold text-slate-800 truncate">{{ Auth::user()->nama_lengkap ?? Auth::user()->name }}</div>
-            <div class="text-xs text-slate-500 truncate">{{ optional(Auth::user()->role)->nama_role ?? 'User' }}</div>
+    <!-- User footer with dropdown -->
+    <div x-data="{ open:false }" class="px-4 py-3 border-t border-slate-200 relative">
+        <button type="button" @click="open = !open" @keydown.escape.window="open=false" class="w-full flex items-center gap-3">
+            <div class="h-8 w-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs">
+                {{ strtoupper(substr(Auth::user()->nama_lengkap ?? Auth::user()->name ?? 'U',0,1)) }}
+            </div>
+            <div class="min-w-0 text-left flex-1">
+                <div class="text-sm font-semibold text-slate-800 truncate">{{ Auth::user()->nama_lengkap ?? Auth::user()->name }}</div>
+                <div class="text-xs text-slate-500 truncate">{{ optional(Auth::user()->role)->nama_role ?? 'User' }}</div>
+            </div>
+            <svg class="w-5 h-5 text-slate-500 transition-transform" :class="{'rotate-180': open}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </button>
+        <!-- Dropdown menu -->
+        <div x-show="open" x-transition @click.outside="open=false" class="absolute bottom-14 left-4 right-4 bg-white border border-slate-200 rounded-md shadow-lg z-50">
+            <div class="py-2">
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-blue-50">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232a3 3 0 114.243 4.243L7.5 21H3v-4.5L15.232 5.232z"/></svg>
+                    Edit Profil
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H3"/></svg>
+                        Logout
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </aside>
