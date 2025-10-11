@@ -51,11 +51,13 @@ class PetaLokasiController extends Controller
      */
     public function pengolah()
     {
-        // TODO: Implementasi ketika model Pengolah sudah ada
+        // Jika model Pengolah belum ada, kembalikan koleksi kosong
+        // Tetap kirimkan variabel $pengolahs agar view bisa mengaksesnya
+        $pengolahs = collect([]);
         $pembudidayas = collect([]);
         $kecamatans = MasterKecamatan::orderBy('nama_kecamatan')->get();
-        
-        return view('pages.peta-lokasi.pengolah', compact('pembudidayas', 'kecamatans'));
+
+        return view('pages.peta-lokasi.pengolah', compact('pengolahs', 'pembudidayas', 'kecamatans'));
     }
 
     /**
@@ -63,10 +65,12 @@ class PetaLokasiController extends Controller
      */
     public function pemasar()
     {
-        // TODO: Implementasi ketika model Pemasar sudah ada
+        // Jika model Pemasar belum ada, kembalikan koleksi kosong
+        // Tetap kirimkan variabel $pemasars agar view bisa mengaksesnya
+        $pemasars = collect([]);
         $pembudidayas = collect([]);
         $kecamatans = MasterKecamatan::orderBy('nama_kecamatan')->get();
-        
-        return view('pages.peta-lokasi.pemasar', compact('pembudidayas', 'kecamatans'));
+
+        return view('pages.peta-lokasi.pemasar', compact('pemasars', 'pembudidayas', 'kecamatans'));
     }
 }

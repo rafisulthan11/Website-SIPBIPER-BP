@@ -13,6 +13,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Additional Styles from Child Views -->
+        @stack('styles')
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100" x-data="{ sidebarShown: true, mobileDrawer: false }" @keydown.window.escape="mobileDrawer=false">
@@ -71,5 +74,8 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Additional Scripts from Child Views -->
+        @stack('scripts')
     </body>
 </html>
