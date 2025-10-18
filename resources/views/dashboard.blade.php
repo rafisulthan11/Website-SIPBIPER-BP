@@ -16,14 +16,14 @@
             <!-- Grafik Statistik (placeholder cards) -->
             <h4 class="text-lg sm:text-xl font-extrabold text-slate-800 mb-3">Grafik Statistik</h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-                <div class="bg-indigo-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
+                    <div class="bg-indigo-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
                     <div class="p-4">
                         <p class="font-semibold text-slate-800">Harga Komoditas</p>
                         <div class="mt-4 h-16 flex items-center justify-end text-slate-700">
                             <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7.5 13.5L10.5 9l3 6 2.25-3.75L21 18"/></svg>
                         </div>
                     </div>
-                    <div class="bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold">Lihat Detail</div>
+                    <a href="{{ route('grafik.tren.harga.komoditas') }}" class="block bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</a>
                 </div>
 
                 <div class="bg-indigo-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
@@ -33,17 +33,17 @@
                             <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9s3-4.5 9-4.5S21 9 21 9s-3 4.5-9 4.5S3 9 3 9zm0 0l6 6m12-6l-6 6"/></svg>
                         </div>
                     </div>
-                    <div class="bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold">Lihat Detail</div>
+                    <a href="{{ route('grafik.harga.ikan.segar') }}" class="block bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</a>
                 </div>
 
-                <div class="bg-indigo-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
+                    <div class="bg-indigo-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
                     <div class="p-4">
                         <p class="font-semibold text-slate-800">Pendataan Wilayah</p>
                         <div class="mt-4 h-16 flex items-center justify-end text-slate-700">
                             <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5l6-3 6 3 6-3v12l-6 3-6-3-6 3v-12z"/></svg>
                         </div>
                     </div>
-                    <div class="bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold">Lihat Detail</div>
+                    <a href="{{ route('grafik.pendataan.wilayah') }}" class="block bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</a>
                 </div>
             </div>
 

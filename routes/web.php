@@ -37,6 +37,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/peta-lokasi/pengolah', [PetaLokasiController::class, 'pengolah'])->name('peta-lokasi.pengolah');
     Route::get('/peta-lokasi/pemasar', [PetaLokasiController::class, 'pemasar'])->name('peta-lokasi.pemasar');
 
+    // Grafik
+    Route::get('/grafik/tren-harga-komoditas', [\App\Http\Controllers\GrafikController::class, 'trenHargaKomoditas'])->name('grafik.tren.harga.komoditas');
+    Route::get('/grafik/harga-ikan-segar', [\App\Http\Controllers\GrafikController::class, 'hargaIkanSegar'])->name('grafik.harga.ikan.segar');
+    Route::get('/grafik/pendataan-wilayah', [\App\Http\Controllers\GrafikController::class, 'pendataanWilayah'])->name('grafik.pendataan.wilayah');
+
     // Laporan - rekapitulasi pembudidaya
     Route::get('/laporan/rekapitulasi/pembudidaya', [\App\Http\Controllers\LaporanController::class, 'rekapitulasiPembudidaya'])
         ->name('laporan.rekapitulasi.pembudidaya');

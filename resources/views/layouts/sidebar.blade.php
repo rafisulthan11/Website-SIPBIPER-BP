@@ -129,6 +129,7 @@
                     <li>
                         <a href="{{ route('laporan.harga.ikan.segar') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('laporan.harga.ikan.segar') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Laporan Harga Ikan Segar</a>
                     </li>
+                    <!-- Grafik link removed per user request -->
                 </ul>
             </li>
         </ul>
