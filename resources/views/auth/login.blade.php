@@ -1,6 +1,6 @@
 <x-guest-layout>
     <!-- Judul Form -->
-    <h1 class="text-2xl sm:text-3xl font-extrabold text-center text-gray-900 mb-8">
+    <h1 class="text-lg sm:text-xl font-extrabold text-center text-gray-900 mb-8 whitespace-nowrap">
         {{ __('Masuk untuk memulai sesi Anda') }}
     </h1>
 

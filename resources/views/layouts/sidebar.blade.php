@@ -35,9 +35,11 @@
                     <li>
                         <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('profile.edit') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Manajemen profil pengguna</a>
                     </li>
+                    @if(auth()->user()->role->nama_role !== 'staff')
                     <li>
                         <a href="{{ route('users.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('users.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Manajemen akun</a>
                     </li>
+                    @endif
                 </ul>
             </li>
 
@@ -52,10 +54,10 @@
                 </button>
                 <ul x-show="open" x-transition.opacity class="ms-8 mt-1 space-y-1">
                     <li>
-                        <a href="#" class="block px-4 py-2 text-base rounded text-slate-700 hover:bg-blue-50">Kelola Komoditas</a>
+                        <a href="{{ route('komoditas.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('komoditas.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Kelola Komoditas</a>
                     </li>
                     <li>
-                        <a href="#" class="block px-4 py-2 text-base rounded text-slate-700 hover:bg-blue-50">Kelola Data Pasar</a>
+                        <a href="{{ route('pasar.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('pasar.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Kelola Data Pasar</a>
                     </li>
                 </ul>
             </li>
@@ -74,13 +76,13 @@
                         <a href="{{ route('pembudidaya.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('pembudidaya.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Data Pembudidaya</a>
                     </li>
                     <li>
-                        <a href="#" class="block px-4 py-2 text-base rounded text-slate-700 hover:bg-blue-50">Data Pengolah</a>
+                        <a href="{{ route('pengolah.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('pengolah.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Data Pengolah</a>
                     </li>
                     <li>
-                        <a href="#" class="block px-4 py-2 text-base rounded text-slate-700 hover:bg-blue-50">Data Pemasar</a>
+                        <a href="{{ route('pemasar.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('pemasar.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Data Pemasar</a>
                     </li>
                     <li>
-                        <a href="#" class="block px-4 py-2 text-base rounded text-slate-700 hover:bg-blue-50">Data Harga Ikan Segar</a>
+                        <a href="{{ route('harga-ikan-segar.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('harga-ikan-segar.*') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Data Harga Ikan Segar</a>
                     </li>
                 </ul>
             </li>
@@ -96,13 +98,7 @@
                 </button>
                 <ul x-show="open" x-transition.opacity class="ms-8 mt-1 space-y-1">
                     <li>
-                        <a href="{{ route('peta-lokasi.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('peta-lokasi.index') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Peta Interaktif Pembudidaya</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('peta-lokasi.pengolah') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('peta-lokasi.pengolah') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Peta Interaktif Pengolah</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('peta-lokasi.pemasar') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('peta-lokasi.pemasar') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Peta Interaktif Pemasar</a>
+                        <a href="{{ route('peta-lokasi.index') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('peta-lokasi.index') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Peta Interaktif Pelaku Usaha</a>
                     </li>
                 </ul>
             </li>

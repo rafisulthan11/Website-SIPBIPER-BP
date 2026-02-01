@@ -7,34 +7,46 @@
 
     <div class="py-6">
         <div class="px-4 sm:px-6 lg:px-8">
-            <!-- Card container -->
-            <div class="bg-white border border-slate-200 rounded-md shadow-md">
+            <div class="rounded-lg overflow-hidden shadow-md">
+                <!-- Blue Header Container -->
+                <div class="bg-blue-600 text-white px-6 py-4">
+                    <h3 class="text-2xl font-bold">Data Pembudidaya</h3>
+                </div>
+                
+                <!-- Card container -->
+                <div class="bg-white border-x border-b border-slate-200">
                 <!-- Top controls row -->
-                <div class="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <h4 class="text-slate-800 font-semibold text-lg">Daftar Budidaya</h4>
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <a href="{{ route('pembudidaya.create') }}" class="inline-flex items-center bg-blue-700 hover:bg-blue-800 text-white font-semibold text-base rounded px-3.5 py-2 shadow">
-                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                            Tambah Budidaya
-                        </a>
-                        <form method="GET" action="{{ route('pembudidaya.index') }}" class="flex items-center gap-3 ml-auto">
-                            <label class="flex items-center text-base text-slate-700">Show
-                                <select name="per_page" class="ml-2 border rounded px-2 py-1.5 text-base" onchange="this.form.submit()">
-                                    @foreach($allowedPerPage as $n)
-                                        <option value="{{ $n }}" {{ ($perPage ?? 10) == $n ? 'selected' : '' }}>{{ $n }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="ml-2">entries</span>
-                            </label>
-                            <div class="flex items-center text-base text-slate-700">
-                                <label class="mr-2">Search:</label>
+                <div class="p-5">
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <h4 class="text-slate-800 font-semibold text-lg">Daftar Budidaya</h4>
+                    </div>
+                    
+                    <!-- Show entries, Search and Add Button -->
+                    <form method="GET" action="{{ route('pembudidaya.index') }}" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="flex items-center gap-2 text-sm text-slate-700">
+                            <span>Show</span>
+                            <select name="per_page" class="border border-gray-300 rounded px-4 py-1.5 pr-8 text-sm focus:ring-blue-500 focus:border-blue-500 bg-white" onchange="this.form.submit()">
+                                @foreach($allowedPerPage as $n)
+                                    <option value="{{ $n }}" {{ ($perPage ?? 10) == $n ? 'selected' : '' }}>{{ $n }}</option>
+                                @endforeach
+                            </select>
+                            <span>entries</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2 text-sm text-slate-700">
+                                <label>Search:</label>
                                 <div class="relative">
-                                    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari" class="border rounded-full ps-9 pe-3 py-2 text-base placeholder:text-gray-400 focus:ring-indigo-500 focus:border-indigo-500" />
-                                    <svg class="absolute left-3 top-2 w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17.25 10.5a6.75 6.75 0 11-13.5 0 6.75 6.75 0 0113.5 0z"/></svg>
+                                    <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari" class="border border-gray-300 rounded-lg pl-10 pr-4 py-1.5 text-sm placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64" />
+                                    <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17.25 10.5a6.75 6.75 0 11-13.5 0 6.75 6.75 0 0113.5 0z"/></svg>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                            <a href="{{ route('pembudidaya.create') }}" class="inline-flex items-center justify-center bg-blue-700 hover:bg-blue-800 text-white font-medium text-sm rounded-lg px-4 py-1.5 shadow whitespace-nowrap">
+                                <svg class="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                                Tambah Budidaya
+                            </a>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Table -->
@@ -55,10 +67,16 @@
                                 @forelse ($pembudidayas as $p)
                                 <tr class="border-t border-slate-200">
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $p->nama_lengkap ?? '-' }}</td>
-                                    <td class="px-4 py-3 align-top text-slate-700">{{ $p->nama_usaha ?? '-' }}</td>
+                                    <td class="px-4 py-3 align-top text-slate-700">{{ $p->nama_kelompok ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $p->desa->nama_desa ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $p->kecamatan->nama_kecamatan ?? '-' }}</td>
-                                    <td class="px-4 py-3 align-top text-slate-700">{{ $p->jenis_budidaya ?? '-' }}</td>
+                                    <td class="px-4 py-3 align-top text-slate-700">
+                                        @if($p->kolam->count() > 0)
+                                            {{ $p->kolam->pluck('komoditas')->filter()->unique()->implode(', ') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3 align-top">
                                         <div class="flex flex-wrap gap-2">
                                             <a href="{{ route('pembudidaya.show', $p->id_pembudidaya) }}" class="inline-flex items-center rounded bg-green-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-green-700">
@@ -91,6 +109,7 @@
                         {{ $pembudidayas->onEachSide(1)->links('components.pagination.custom') }}
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>

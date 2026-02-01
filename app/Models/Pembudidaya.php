@@ -33,8 +33,12 @@ class Pembudidaya extends Model
         'jenis_kegiatan_usaha',
         'jenis_budidaya',
         'nama_usaha',
+        'nama_kelompok',
         'npwp_usaha',
         'alamat_usaha',
+        'kecamatan_usaha',
+        'desa_usaha',
+        'alamat_lengkap_usaha',
         'telp_usaha',
         'email_usaha',
         'skala_usaha',
@@ -43,6 +47,14 @@ class Pembudidaya extends Model
         'kontak',
         'latitude',
         'longitude',
+        'latitude_usaha',
+        'longitude_usaha',
+        'foto_ktp',
+        'foto_sertifikat',
+        'foto_cpib_cbib',
+        'foto_unit_usaha',
+        'foto_kusuka',
+        'foto_nib',
     ];
 
     // Definisikan relasi ke Kecamatan dan Desa
@@ -56,6 +68,16 @@ class Pembudidaya extends Model
         return $this->belongsTo(MasterDesa::class, 'id_desa', 'id_desa');
     }
 
+    public function kecamatanUsaha()
+    {
+        return $this->belongsTo(MasterKecamatan::class, 'kecamatan_usaha', 'id_kecamatan');
+    }
+
+    public function desaUsaha()
+    {
+        return $this->belongsTo(MasterDesa::class, 'desa_usaha', 'id_desa');
+    }
+
     public function investasi()
     {
         return $this->hasOne(PembudidayaInvestasi::class, 'id_pembudidaya', 'id_pembudidaya');
@@ -64,5 +86,25 @@ class Pembudidaya extends Model
     public function izin()
     {
         return $this->hasOne(PembudidayaIzin::class, 'id_pembudidaya', 'id_pembudidaya');
+    }
+
+    public function produksi()
+    {
+        return $this->hasOne(PembudidayaProduksi::class, 'id_pembudidaya', 'id_pembudidaya');
+    }
+
+    public function kolam()
+    {
+        return $this->hasMany(PembudidayaKolam::class, 'id_pembudidaya', 'id_pembudidaya');
+    }
+
+    public function ikan()
+    {
+        return $this->hasMany(PembudidayaIkan::class, 'id_pembudidaya', 'id_pembudidaya');
+    }
+
+    public function tenagaKerja()
+    {
+        return $this->hasOne(PembudidayaTenagaKerja::class, 'id_pembudidaya', 'id_pembudidaya');
     }
 }

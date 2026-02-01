@@ -9,17 +9,8 @@
             <div class="rounded-xl shadow-lg overflow-hidden">
             <!-- Tab Navigation (peta lokasi style) -->
             <div class="bg-blue-600 text-white">
-                <div class="px-4 sm:px-6 lg:px-8">
-                    <div class="flex flex-wrap justify-center items-center gap-1 p-2">
-                    <a href="{{ route('grafik.tren.harga.komoditas') }}" class="px-3 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-bold {{ request()->routeIs('grafik.tren.harga.komoditas') ? 'bg-white text-blue-700 rounded-lg shadow-md' : 'text-white hover:bg-blue-700 rounded-lg transition-all' }}">
-                        Harga Komoditas
-                    </a>
-                    <a href="{{ route('grafik.harga.ikan.segar') }}" class="px-3 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-semibold {{ request()->routeIs('grafik.harga.ikan.segar') ? 'bg-white text-blue-700 rounded-lg shadow-md' : 'text-white hover:bg-blue-700 rounded-lg transition-all' }}">
-                        Harga Ikan Segar
-                    </a>
-                    <a href="{{ route('grafik.pendataan.wilayah') }}" class="px-3 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-semibold {{ request()->routeIs('grafik.pendataan.wilayah') ? 'bg-white text-blue-700 rounded-lg shadow-md' : 'text-white hover:bg-blue-700 rounded-lg transition-all' }}">
-                        Jumlah Pendataan Wilayah
-                    </a>
+                <div class="px-6 py-4 lg:px-8">
+                    <h1 class="font-extrabold text-xl sm:text-2xl">Statistik Pendataan Wilayah</h1>
                 </div>
             </div>
 
@@ -67,16 +58,63 @@
                 data: {
                     labels: ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'],
                     datasets: [
-                        { label: '2020', data: [56, 88, 90, 78, 36, 25, 30, 68, 22, 40, 14, 66], backgroundColor: 'rgba(99,102,241,0.9)' },
-                        { label: '2021', data: [88, 70, 95, 60, 35, 30, 32, 82, 46, 48, 16, 72], backgroundColor: 'rgba(107,114,128,0.9)' },
-                        { label: '2022', data: [74, 54, 99, 70, 18, 15, 60, 98, 80, 36, 18, 78], backgroundColor: 'rgba(156,163,175,0.9)' },
+                        { 
+                            label: 'Pembudidaya', 
+                            data: {!! json_encode(array_values($pembudidayaPerBulan)) !!},
+                            backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1
+                        },
+                        { 
+                            label: 'Pengolah', 
+                            data: {!! json_encode(array_values($pengolahPerBulan)) !!},
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        },
+                        { 
+                            label: 'Pemasar', 
+                            data: {!! json_encode(array_values($pemasarPerBulan)) !!},
+                            backgroundColor: 'rgba(249, 115, 22, 0.8)',
+                            borderColor: 'rgba(249, 115, 22, 1)',
+                            borderWidth: 1
+                        }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { x: { stacked: false }, y: { beginAtZero: true } },
-                    plugins: { legend: { position: 'bottom' } }
+                    scales: { 
+                        x: { 
+                            stacked: false,
+                            grid: { display: false }
+                        }, 
+                        y: { 
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: { 
+                        legend: { 
+                            position: 'top',
+                            labels: {
+                                font: { size: 12 },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' pendataan';
+                                }
+                            }
+                        }
+                    }
                 }
             });
 

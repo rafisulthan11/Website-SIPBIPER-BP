@@ -16,16 +16,18 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @if(auth()->user()->role->nama_role !== 'staff')
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index*')">
                         {{ __('Manajemen Akun') }}
                     </x-nav-link>
+                    @endif
 
                     <x-nav-link :href="route('pembudidaya.index')" :active="request()->routeIs('pembudidaya.index*')">
                         {{ __('Data Pembudidaya') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('peta-lokasi.index')" :active="request()->routeIs('peta-lokasi.index*')">
-                        {{ __('Peta Interaktif Pembudidaya') }}
+                        {{ __('Peta Interaktif Pelaku Usaha') }}
                     </x-nav-link>
                 </div>
             </div>

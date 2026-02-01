@@ -5,8 +5,14 @@ use App\Models\Pembudidaya;
 use Illuminate\Http\Request;
 use App\Models\MasterKecamatan;
 use App\Models\MasterDesa;
+use App\Models\Komoditas;
 use App\Models\PembudidayaInvestasi;
 use App\Models\PembudidayaIzin;
+use App\Models\PembudidayaProduksi;
+use App\Models\PembudidayaKolam;
+use App\Models\PembudidayaIkan;
+use App\Models\PembudidayaTenagaKerja;
+use Illuminate\Support\Facades\Storage;
 
 class PembudidayaController extends Controller
 {
@@ -59,7 +65,8 @@ class PembudidayaController extends Controller
     {
         $kecamatans = MasterKecamatan::all();
         $desas = MasterDesa::all(); // Nanti kita buat ini dinamis
-        return view('pages.pembudidaya.create', compact('kecamatans', 'desas'));
+        $komoditas = Komoditas::orderBy('nama_komoditas')->get();
+        return view('pages.pembudidaya.create', compact('kecamatans', 'desas', 'komoditas'));
     }
 
 
@@ -100,10 +107,34 @@ class PembudidayaController extends Controller
             'investasi.nilai_bangunan' => 'nullable|numeric',
             'investasi.bangunan' => 'nullable|string',
             'investasi.sertifikat' => 'nullable|in:IMB,NON_IMB',
+            // Lampiran
+            'foto_ktp' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'foto_sertifikat' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'foto_cpib_cbib' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'foto_unit_usaha' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'foto_kusuka' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'foto_nib' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
+        // Handle file uploads
+        $fileFields = ['foto_ktp', 'foto_sertifikat', 'foto_cpib_cbib', 'foto_unit_usaha', 'foto_kusuka', 'foto_nib'];
+        $uploadedFiles = [];
+        
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $filename = time() . '_' . $field . '.' . $file->getClientOriginalExtension();
+                // Store file and get the path
+                $path = $file->storeAs('lampiran/pembudidaya', $filename, 'public');
+                $uploadedFiles[$field] = $path;
+            }
+        }
+
         // Simpan data ke tabel pembudidayas
-    $p = Pembudidaya::create($request->except(['investasi','izin']));
+        $p = Pembudidaya::create(array_merge(
+            $request->except(['investasi','izin', ...$fileFields]),
+            $uploadedFiles
+        ));
 
         // Simpan investasi jika ada input
         $inv = $request->input('investasi', []);
@@ -146,6 +177,70 @@ class PembudidayaController extends Controller
             PembudidayaIzin::create($payloadIzin);
         }
 
+        // Simpan data produksi jika ada
+        $prod = $request->input('produksi', []);
+        if (!empty($prod)) {
+            PembudidayaProduksi::create([
+                'id_pembudidaya' => $p->id_pembudidaya,
+                'total_luas_kolam' => $prod['total_luas_kolam'] ?? null,
+                'total_produksi' => $prod['total_produksi'] ?? null,
+                'satuan_produksi' => $prod['satuan_produksi'] ?? null,
+                'harga_per_satuan' => $prod['harga_per_satuan'] ?? null,
+            ]);
+        }
+
+        // Simpan data kolam jika ada
+        $kolams = $request->input('kolam', []);
+        if (!empty($kolams)) {
+            foreach ($kolams as $kolam) {
+                if (!empty($kolam['jenis_kolam'])) {
+                    PembudidayaKolam::create([
+                        'id_pembudidaya' => $p->id_pembudidaya,
+                        'jenis_kolam' => $kolam['jenis_kolam'],
+                        'ukuran' => $kolam['ukuran_m2'] ?? null,
+                        'jumlah' => $kolam['jumlah'] ?? 0,
+                        'komoditas' => $kolam['komoditas'] ?? null,
+                    ]);
+                }
+            }
+        }
+
+        // Simpan data ikan jika ada
+        $ikans = $request->input('ikan', []);
+        if (!empty($ikans)) {
+            foreach ($ikans as $ikan) {
+                if (!empty($ikan['jenis_ikan'])) {
+                    PembudidayaIkan::create([
+                        'id_pembudidaya' => $p->id_pembudidaya,
+                        'jenis_ikan' => $ikan['jenis_ikan'],
+                        'jenis_indukan' => $ikan['jenis_indukan'] ?? null,
+                        'jumlah' => $ikan['jumlah'] ?? 0,
+                        'asal' => $ikan['asal'] ?? null,
+                    ]);
+                }
+            }
+        }
+
+        // Simpan data tenaga kerja jika ada
+        $tk = $request->input('tenaga_kerja', []);
+        if (!empty($tk)) {
+            PembudidayaTenagaKerja::create([
+                'id_pembudidaya' => $p->id_pembudidaya,
+                'wni_laki_tetap' => $tk['wni_laki_tetap'] ?? 0,
+                'wni_laki_tidak_tetap' => $tk['wni_laki_tidak_tetap'] ?? 0,
+                'wni_laki_keluarga' => $tk['wni_laki_keluarga'] ?? 0,
+                'wni_perempuan_tetap' => $tk['wni_perempuan_tetap'] ?? 0,
+                'wni_perempuan_tidak_tetap' => $tk['wni_perempuan_tidak_tetap'] ?? 0,
+                'wni_perempuan_keluarga' => $tk['wni_perempuan_keluarga'] ?? 0,
+                'wna_laki_tetap' => $tk['wna_laki_tetap'] ?? 0,
+                'wna_laki_tidak_tetap' => $tk['wna_laki_tidak_tetap'] ?? 0,
+                'wna_laki_keluarga' => $tk['wna_laki_keluarga'] ?? 0,
+                'wna_perempuan_tetap' => $tk['wna_perempuan_tetap'] ?? 0,
+                'wna_perempuan_tidak_tetap' => $tk['wna_perempuan_tidak_tetap'] ?? 0,
+                'wna_perempuan_keluarga' => $tk['wna_perempuan_keluarga'] ?? 0,
+            ]);
+        }
+
         return redirect()->route('pembudidaya.index')->with('success', 'Data pembudidaya berhasil ditambahkan.');
     }
 
@@ -154,7 +249,7 @@ class PembudidayaController extends Controller
      */
     public function show(Pembudidaya $pembudidaya)
     {
-    $pembudidaya->load(['kecamatan','desa','investasi','izin']);
+    $pembudidaya->load(['kecamatan','desa','kecamatanUsaha','desaUsaha','investasi','izin','produksi','kolam','ikan','tenagaKerja']);
         return view('pages.pembudidaya.show', compact('pembudidaya'));
     }
 
@@ -165,8 +260,9 @@ class PembudidayaController extends Controller
     {
     $kecamatans = MasterKecamatan::all();
     $desas = MasterDesa::all();
-    $pembudidaya->load(['investasi','izin']);
-        return view('pages.pembudidaya.edit', compact('pembudidaya', 'kecamatans', 'desas'));
+    $komoditas = Komoditas::orderBy('nama_komoditas')->get();
+    $pembudidaya->load(['investasi','izin','produksi','kolam','ikan','tenagaKerja','kecamatanUsaha','desaUsaha']);
+        return view('pages.pembudidaya.edit', compact('pembudidaya', 'kecamatans', 'desas', 'komoditas'));
     }
 
     /**
@@ -260,6 +356,108 @@ class PembudidayaController extends Controller
             }
         }
 
+        // Handle file uploads
+        $fileFields = ['foto_ktp', 'foto_sertifikat', 'foto_cpib_cbib', 'foto_unit_usaha', 'foto_kusuka', 'foto_nib'];
+        $uploadedFiles = [];
+        
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                // Delete old file if exists
+                if ($pembudidaya->$field) {
+                    Storage::disk('public')->delete($pembudidaya->$field);
+                }
+                
+                $file = $request->file($field);
+                $filename = time() . '_' . $field . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('lampiran/pembudidaya', $filename, 'public');
+                $uploadedFiles[$field] = $path;
+            }
+        }
+        
+        if (!empty($uploadedFiles)) {
+            $pembudidaya->update($uploadedFiles);
+        }
+
+        // Update/Create Produksi
+        $prod = $request->input('produksi', []);
+        if (!empty($prod)) {
+            $produksiData = [
+                'total_luas_kolam' => $prod['total_luas_kolam'] ?? null,
+                'total_produksi' => $prod['total_produksi'] ?? null,
+                'satuan_produksi' => $prod['satuan_produksi'] ?? null,
+                'harga_per_satuan' => $prod['harga_per_satuan'] ?? null,
+            ];
+            
+            $existingProduksi = $pembudidaya->produksi;
+            if ($existingProduksi) {
+                $existingProduksi->update($produksiData);
+            } else {
+                $produksiData['id_pembudidaya'] = $pembudidaya->id_pembudidaya;
+                PembudidayaProduksi::create($produksiData);
+            }
+        }
+
+        // Update Kolam - delete all and recreate
+        $pembudidaya->kolam()->delete();
+        $kolams = $request->input('kolam', []);
+        if (!empty($kolams)) {
+            foreach ($kolams as $kolam) {
+                if (!empty($kolam['jenis_kolam'])) {
+                    PembudidayaKolam::create([
+                        'id_pembudidaya' => $pembudidaya->id_pembudidaya,
+                        'jenis_kolam' => $kolam['jenis_kolam'],
+                        'ukuran' => $kolam['ukuran_m2'] ?? null,
+                        'jumlah' => $kolam['jumlah'] ?? 0,
+                        'komoditas' => $kolam['komoditas'] ?? null,
+                    ]);
+                }
+            }
+        }
+
+        // Update Ikan - delete all and recreate
+        $pembudidaya->ikan()->delete();
+        $ikans = $request->input('ikan', []);
+        if (!empty($ikans)) {
+            foreach ($ikans as $ikan) {
+                if (!empty($ikan['jenis_ikan'])) {
+                    PembudidayaIkan::create([
+                        'id_pembudidaya' => $pembudidaya->id_pembudidaya,
+                        'jenis_ikan' => $ikan['jenis_ikan'],
+                        'jenis_indukan' => $ikan['jenis_indukan'] ?? null,
+                        'jumlah' => $ikan['jumlah'] ?? 0,
+                        'asal' => $ikan['asal'] ?? null,
+                    ]);
+                }
+            }
+        }
+
+        // Update/Create Tenaga Kerja
+        $tk = $request->input('tenaga_kerja', []);
+        if (!empty($tk)) {
+            $tkData = [
+                'wni_laki_tetap' => $tk['wni_laki_tetap'] ?? 0,
+                'wni_laki_tidak_tetap' => $tk['wni_laki_tidak_tetap'] ?? 0,
+                'wni_laki_keluarga' => $tk['wni_laki_keluarga'] ?? 0,
+                'wni_perempuan_tetap' => $tk['wni_perempuan_tetap'] ?? 0,
+                'wni_perempuan_tidak_tetap' => $tk['wni_perempuan_tidak_tetap'] ?? 0,
+                'wni_perempuan_keluarga' => $tk['wni_perempuan_keluarga'] ?? 0,
+                'wna_laki_tetap' => $tk['wna_laki_tetap'] ?? 0,
+                'wna_laki_tidak_tetap' => $tk['wna_laki_tidak_tetap'] ?? 0,
+                'wna_laki_keluarga' => $tk['wna_laki_keluarga'] ?? 0,
+                'wna_perempuan_tetap' => $tk['wna_perempuan_tetap'] ?? 0,
+                'wna_perempuan_tidak_tetap' => $tk['wna_perempuan_tidak_tetap'] ?? 0,
+                'wna_perempuan_keluarga' => $tk['wna_perempuan_keluarga'] ?? 0,
+            ];
+            
+            $existingTk = $pembudidaya->tenagaKerja;
+            if ($existingTk) {
+                $existingTk->update($tkData);
+            } else {
+                $tkData['id_pembudidaya'] = $pembudidaya->id_pembudidaya;
+                PembudidayaTenagaKerja::create($tkData);
+            }
+        }
+
         return redirect()->route('pembudidaya.index')->with('success', 'Data pembudidaya berhasil diperbarui.');
     }
 
@@ -271,5 +469,17 @@ class PembudidayaController extends Controller
         $pembudidaya->delete();
 
         return redirect()->route('pembudidaya.index')->with('success', 'Data pembudidaya berhasil dihapus.');
+    }
+
+    /**
+     * Get desa by kecamatan (for AJAX dependent dropdown)
+     */
+    public function getDesaByKecamatan($id_kecamatan)
+    {
+        $desas = MasterDesa::where('id_kecamatan', $id_kecamatan)
+            ->orderBy('nama_desa')
+            ->get(['id_desa', 'nama_desa']);
+        
+        return response()->json($desas);
     }
 }

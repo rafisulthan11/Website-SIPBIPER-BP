@@ -18,12 +18,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
                     <div class="bg-indigo-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
                     <div class="p-4">
-                        <p class="font-semibold text-slate-800">Harga Komoditas</p>
+                        <p class="font-semibold text-slate-800">Pelaku Usaha</p>
                         <div class="mt-4 h-16 flex items-center justify-end text-slate-700">
-                            <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7.5 13.5L10.5 9l3 6 2.25-3.75L21 18"/></svg>
+                            <svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
                         </div>
                     </div>
-                    <a href="{{ route('grafik.tren.harga.komoditas') }}" class="block bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</a>
+                    <a href="{{ route('grafik.pelaku.usaha') }}" class="block bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</a>
                 </div>
 
                 <div class="bg-indigo-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
@@ -69,7 +69,7 @@
                             <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835L5.964 9.75m0 0l.808 3.232A2.25 2.25 0 008.957 15h7.293a2.25 2.25 0 002.121-1.5l1.5-4A2.25 2.25 0 0017.743 6H5.964m0 0H3.375M6 20.25a.75.75 0 100-1.5.75.75 0 000 1.5zm10.5 0a.75.75 0 100-1.5.75.75 0 000 1.5z"/></svg>
                         </div>
                     </div>
-                    <div class="bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</div>
+                    <a href="{{ route('pemasar.index') }}" class="block bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</a>
                 </div>
 
                 <div class="bg-cyan-200/60 rounded-md shadow-[0_6px_0_rgba(15,23,42,0.3)]">
@@ -80,7 +80,7 @@
                             <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3v3.75M14.25 3v3.75m-9 9h13.5M4.5 21h15a1.5 1.5 0 001.5-1.5v-6.75a1.5 1.5 0 00-1.5-1.5h-15a1.5 1.5 0 00-1.5 1.5V19.5A1.5 1.5 0 004.5 21z"/></svg>
                         </div>
                     </div>
-                    <div class="bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</div>
+                    <a href="{{ route('pengolah.index') }}" class="block bg-slate-800 text-white rounded-b-md px-4 py-2 text-sm font-semibold text-center">Lihat Detail</a>
                 </div>
             </div>
         </div>

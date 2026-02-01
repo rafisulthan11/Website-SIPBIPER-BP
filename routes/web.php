@@ -4,13 +4,16 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\PembudidayaController;
+use App\Http\Controllers\PengolahController;
+use App\Http\Controllers\PemasarController;
+use App\Http\Controllers\HargaIkanSegarController;
+use App\Http\Controllers\KomoditasController;
+use App\Http\Controllers\PasarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PetaLokasiController;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\LandingController::class, 'index'])->name('landing');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -30,27 +33,53 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
     });
 
+    // API Routes for dependent dropdowns
+    Route::get('/api/desa-by-kecamatan/{id_kecamatan}', [PembudidayaController::class, 'getDesaByKecamatan'])->name('api.desa.by.kecamatan');
+    Route::get('/api/pasar-by-desa/{id_desa}', [HargaIkanSegarController::class, 'getPasarByDesa'])->name('api.pasar.by.desa');
+    
     Route::resource('pembudidaya', PembudidayaController::class);
+    Route::resource('pengolah', PengolahController::class);
+    Route::resource('pemasar', PemasarController::class);
+    Route::resource('harga-ikan-segar', HargaIkanSegarController::class);
+    Route::resource('komoditas', KomoditasController::class);
+    Route::resource('pasar', PasarController::class);
     
     // Peta Lokasi Routes
     Route::get('/peta-lokasi', [PetaLokasiController::class, 'index'])->name('peta-lokasi.index');
-    Route::get('/peta-lokasi/pengolah', [PetaLokasiController::class, 'pengolah'])->name('peta-lokasi.pengolah');
-    Route::get('/peta-lokasi/pemasar', [PetaLokasiController::class, 'pemasar'])->name('peta-lokasi.pemasar');
 
     // Grafik
-    Route::get('/grafik/tren-harga-komoditas', [\App\Http\Controllers\GrafikController::class, 'trenHargaKomoditas'])->name('grafik.tren.harga.komoditas');
+    Route::get('/grafik/pelaku-usaha', [\App\Http\Controllers\GrafikController::class, 'pelakuUsaha'])->name('grafik.pelaku.usaha');
     Route::get('/grafik/harga-ikan-segar', [\App\Http\Controllers\GrafikController::class, 'hargaIkanSegar'])->name('grafik.harga.ikan.segar');
     Route::get('/grafik/pendataan-wilayah', [\App\Http\Controllers\GrafikController::class, 'pendataanWilayah'])->name('grafik.pendataan.wilayah');
 
     // Laporan - rekapitulasi pembudidaya
     Route::get('/laporan/rekapitulasi/pembudidaya', [\App\Http\Controllers\LaporanController::class, 'rekapitulasiPembudidaya'])
         ->name('laporan.rekapitulasi.pembudidaya');
+    Route::get('/laporan/rekapitulasi/pembudidaya/export', [\App\Http\Controllers\LaporanController::class, 'exportPembudidaya'])
+        ->name('laporan.rekapitulasi.pembudidaya.export');
+    Route::get('/laporan/rekapitulasi/pembudidaya/pdf/{id}', [\App\Http\Controllers\LaporanController::class, 'pdfPembudidaya'])
+        ->name('laporan.rekapitulasi.pembudidaya.pdf');
+    
     Route::get('/laporan/rekapitulasi/pengolah', [\App\Http\Controllers\LaporanController::class, 'rekapitulasiPengolah'])
         ->name('laporan.rekapitulasi.pengolah');
+    Route::get('/laporan/rekapitulasi/pengolah/export', [\App\Http\Controllers\LaporanController::class, 'exportPengolah'])
+        ->name('laporan.rekapitulasi.pengolah.export');
+    Route::get('/laporan/rekapitulasi/pengolah/pdf/{id}', [\App\Http\Controllers\LaporanController::class, 'pdfPengolah'])
+        ->name('laporan.rekapitulasi.pengolah.pdf');
+    
     Route::get('/laporan/rekapitulasi/pemasar', [\App\Http\Controllers\LaporanController::class, 'rekapitulasiPemasar'])
         ->name('laporan.rekapitulasi.pemasar');
+    Route::get('/laporan/rekapitulasi/pemasar/export', [\App\Http\Controllers\LaporanController::class, 'exportPemasar'])
+        ->name('laporan.rekapitulasi.pemasar.export');
+    Route::get('/laporan/rekapitulasi/pemasar/pdf/{id}', [\App\Http\Controllers\LaporanController::class, 'pdfPemasar'])
+        ->name('laporan.rekapitulasi.pemasar.pdf');
+    
     Route::get('/laporan/harga-ikan-segar', [\App\Http\Controllers\LaporanController::class, 'rekapHargaIkanSegar'])
         ->name('laporan.harga.ikan.segar');
+    Route::get('/laporan/harga-ikan-segar/export', [\App\Http\Controllers\LaporanController::class, 'exportHargaIkanSegar'])
+        ->name('laporan.harga.ikan.segar.export');
+    Route::get('/laporan/harga-ikan-segar/pdf/{id}', [\App\Http\Controllers\LaporanController::class, 'pdfHargaIkanSegar'])
+        ->name('laporan.harga.ikan.segar.pdf');
 });
 
 require __DIR__.'/auth.php';
