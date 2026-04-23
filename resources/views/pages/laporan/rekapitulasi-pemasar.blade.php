@@ -17,7 +17,7 @@
                     <!-- Summary Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                         <!-- Total Pelaku Usaha Card -->
-                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 border-l-4 border-purple-600 rounded-lg p-4 shadow-md">
+                        <div class="border-l-4 border-purple-600 rounded-lg p-4 shadow-md" style="background: linear-gradient(to right, #faf5ff, #f3e8ff);">
                             <div class="flex items-center gap-3">
                                 <div class="bg-purple-600 rounded-full p-3">
                                     <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -33,7 +33,7 @@
                         </div>
 
                         <!-- Total Pemasaran (Kg) Card -->
-                        <div class="bg-gradient-to-r from-emerald-50 to-emerald-100 border-l-4 border-emerald-600 rounded-lg p-4 shadow-md">
+                        <div class="border-l-4 rounded-lg p-4 shadow-md" style="background: linear-gradient(to right, #ecfdf5, #d1fae5); border-left-color: #059669;">
                             <div class="flex items-center gap-3">
                                 <div class="bg-emerald-600 rounded-full p-3">
                                     <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -49,7 +49,7 @@
                         </div>
 
                         <!-- Total Pemasaran (Rp) Card -->
-                        <div class="bg-gradient-to-r from-amber-50 to-amber-100 border-l-4 border-amber-600 rounded-lg p-4 shadow-md">
+                        <div class="border-l-4 rounded-lg p-4 shadow-md" style="background: linear-gradient(to right, #fffbeb, #fef3c7); border-left-color: #d97706;">
                             <div class="flex items-center gap-3">
                                 <div class="bg-amber-600 rounded-full p-3">
                                     <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
