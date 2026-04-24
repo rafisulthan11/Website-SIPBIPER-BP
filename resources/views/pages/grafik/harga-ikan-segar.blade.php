@@ -19,7 +19,7 @@
             <div class="bg-white p-4 sm:p-6">
                 
                 <!-- Filter Section -->
-                <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-lg border border-blue-200">
+                <div class="mb-6 p-5 rounded-lg border" style="background: linear-gradient(to right, #eff6ff, #eef2ff); border-color: #bfdbfe;">
                     <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -180,14 +180,14 @@
 
                 <!-- Info Kebijakan -->
                 @if($statistics['total_data'] > 0)
-                <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <div class="mb-6 border-l-4 p-4 rounded" style="background-color: #eff6ff; border-left-color: #3b82f6;">
                     <div class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 mt-0.5 mr-3 flex-shrink-0" style="color: #2563eb;" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                         </svg>
                         <div>
-                            <h4 class="text-sm font-bold text-blue-900 mb-1">Analisis untuk Kebijakan</h4>
-                            <p class="text-sm text-blue-800">
+                            <h4 class="text-sm font-bold mb-1" style="color: #1e3a8a;">Analisis untuk Kebijakan</h4>
+                            <p class="text-sm" style="color: #1e40af;">
                                 <strong>Margin harga {{ $statistics['margin_persen'] }}%</strong> menunjukkan 
                                 @if($statistics['margin_persen'] > 50)
                                     selisih yang cukup besar antara harga produsen dan konsumen. Pertimbangkan untuk mengkaji rantai distribusi guna memberikan nilai tambah optimal bagi pembudidaya.
