@@ -173,7 +173,7 @@
                                     @if(auth()->check())
                                     <div x-data="{ open: false }" @click.away="open = false" class="relative">
                                         <button @click="open = !open" class="inline-flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" title="Profil Pengguna" aria-label="Profil Pengguna">
-                                            <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm leading-none">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm leading-none" style="background: linear-gradient(135deg, #60a5fa, #2563eb);">
                                                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                                             </div>
                                         </button>
@@ -190,10 +190,10 @@
                                              style="display: none;">
                                             
                                             <!-- Profile Header with Avatar -->
-                                            <div class="px-6 py-8 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                                            <div class="px-6 py-8 border-b border-gray-100" style="background: linear-gradient(135deg, #f8fafc, #ffffff);">
                                                 <!-- Avatar -->
                                                 <div class="flex justify-center mb-4">
-                                                    <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg ring-4 ring-white">
+                                                    <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg ring-4 ring-white" style="background: linear-gradient(135deg, #60a5fa, #2563eb);">
                                                         {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                                                     </div>
                                                 </div>
@@ -216,15 +216,15 @@
                                                 @if(auth()->user()->role)
                                                     <div class="flex justify-center">
                                                         @if(auth()->user()->role->nama_role == 'super admin')
-                                                            <span class="inline-flex items-center rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 border border-red-200">
+                                                            <span class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold border" style="background-color: #fef2f2; color: #b91c1c; border-color: #fecaca;">
                                                                 {{ auth()->user()->role->nama_role }}
                                                             </span>
                                                         @elseif(auth()->user()->role->nama_role == 'admin')
-                                                            <span class="inline-flex items-center rounded-full bg-yellow-50 px-4 py-2 text-sm font-semibold text-yellow-700 border border-yellow-200">
+                                                            <span class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold border" style="background-color: #fefce8; color: #a16207; border-color: #fde68a;">
                                                                 {{ auth()->user()->role->nama_role }}
                                                             </span>
                                                         @elseif(auth()->user()->role->nama_role == 'staff')
-                                                            <span class="inline-flex items-center rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 border border-blue-200">
+                                                            <span class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold border" style="background-color: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
                                                                 {{ auth()->user()->role->nama_role }}
                                                             </span>
                                                         @else
