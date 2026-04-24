@@ -19,7 +19,7 @@
             <div class="bg-white p-4 sm:p-6">
                 
                 <!-- Filter Section -->
-                <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-lg border border-blue-200">
+                <div class="mb-6 p-5 rounded-lg border" style="background: linear-gradient(to right, #eff6ff, #eef2ff); border-color: #bfdbfe;">
                     <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -108,14 +108,14 @@
                 <!-- Statistik Ringkasan -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                     <!-- Total Produksi Keseluruhan -->
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-4 text-white shadow-lg">
+                    <div class="rounded-lg p-4 text-white shadow-lg" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-blue-100 text-xs font-semibold uppercase">Total Produksi</p>
                                 <p class="text-2xl font-bold mt-1">{{ number_format($statistics['total_produksi_keseluruhan'], 2) }}</p>
                                 <p class="text-blue-100 text-xs mt-1">Kg/Tahun</p>
                             </div>
-                            <div class="bg-blue-400 bg-opacity-50 rounded-full p-3">
+                            <div class="rounded-full p-3" style="background-color: rgba(96, 165, 250, 0.5);">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
                                 </svg>
@@ -124,14 +124,14 @@
                     </div>
 
                     <!-- Produksi Pembudidaya -->
-                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-4 text-white shadow-lg">
+                    <div class="rounded-lg p-4 text-white shadow-lg" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-green-100 text-xs font-semibold uppercase">Pembudidaya</p>
                                 <p class="text-2xl font-bold mt-1">{{ number_format($statistics['total_produksi_pembudidaya'], 2) }}</p>
                                 <p class="text-green-100 text-xs mt-1">Kg ({{ $statistics['jumlah_pembudidaya'] }} pelaku)</p>
                             </div>
-                            <div class="bg-green-400 bg-opacity-50 rounded-full p-3">
+                            <div class="rounded-full p-3" style="background-color: rgba(74, 222, 128, 0.5);">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                                     <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -141,14 +141,14 @@
                     </div>
 
                     <!-- Produksi Pengolah -->
-                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-4 text-white shadow-lg">
+                    <div class="rounded-lg p-4 text-white shadow-lg" style="background: linear-gradient(135deg, #a855f7, #9333ea);">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-purple-100 text-xs font-semibold uppercase">Pengolah</p>
                                 <p class="text-2xl font-bold mt-1">{{ number_format($statistics['total_produksi_pengolah'], 2) }}</p>
                                 <p class="text-purple-100 text-xs mt-1">Kg ({{ $statistics['jumlah_pengolah'] }} pelaku)</p>
                             </div>
-                            <div class="bg-purple-400 bg-opacity-50 rounded-full p-3">
+                            <div class="rounded-full p-3" style="background-color: rgba(196, 181, 253, 0.5);">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm1 8a1 1 0 100 2h6a1 1 0 100-2H7zm1 4a1 1 0 011-1h4a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
                                 </svg>
@@ -157,14 +157,14 @@
                     </div>
 
                     <!-- Rata-rata per Bulan -->
-                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg p-4 text-white shadow-lg">
+                    <div class="rounded-lg p-4 text-white shadow-lg" style="background: linear-gradient(135deg, #f97316, #ea580c);">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-orange-100 text-xs font-semibold uppercase">Rata-rata/Bulan</p>
                                 <p class="text-2xl font-bold mt-1">{{ number_format($statistics['rata_rata_per_bulan'], 2) }}</p>
                                 <p class="text-orange-100 text-xs mt-1">Kg</p>
                             </div>
-                            <div class="bg-orange-400 bg-opacity-50 rounded-full p-3">
+                            <div class="rounded-full p-3" style="background-color: rgba(251, 146, 60, 0.5);">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
                                 </svg>
@@ -173,14 +173,14 @@
                     </div>
 
                     <!-- Puncak Produksi -->
-                    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-4 text-white shadow-lg">
+                    <div class="rounded-lg p-4 text-white shadow-lg" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-red-100 text-xs font-semibold uppercase">Puncak Produksi</p>
                                 <p class="text-lg font-bold mt-1">{{ $bulanNames[$statistics['bulan_tertinggi']] ?? '-' }}</p>
                                 <p class="text-red-100 text-xs mt-1">{{ number_format($statistics['produksi_tertinggi'], 2) }} Kg</p>
                             </div>
-                            <div class="bg-red-400 bg-opacity-50 rounded-full p-3">
+                            <div class="rounded-full p-3" style="background-color: rgba(248, 113, 113, 0.5);">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
                                 </svg>
@@ -191,14 +191,14 @@
 
                 <!-- Info Kebijakan -->
                 @if($statistics['total_produksi_keseluruhan'] > 0)
-                <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <div class="mb-6 border-l-4 p-4 rounded" style="background-color: #eff6ff; border-left-color: #3b82f6;">
                     <div class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 mt-0.5 mr-3 flex-shrink-0" style="color: #2563eb;" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                         </svg>
                         <div>
-                            <h4 class="text-sm font-bold text-blue-900 mb-1">Analisis untuk Kebijakan</h4>
-                            <p class="text-sm text-blue-800">
+                            <h4 class="text-sm font-bold mb-1" style="color: #1e3a8a;">Analisis untuk Kebijakan</h4>
+                            <p class="text-sm" style="color: #1e40af;">
                                 <strong>Total produksi {{ number_format($statistics['total_produksi_keseluruhan'], 2) }} Kg</strong> dari 
                                 {{ $statistics['jumlah_pembudidaya'] }} pembudidaya dan {{ $statistics['jumlah_pengolah'] }} pengolah.
                                 @php
