@@ -17,15 +17,19 @@
                 <div class="bg-white border-x border-b border-slate-200">
                     <div class="p-5">
                         @if($notifications->count() > 0)
-                            <div class="space-y-2">
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                                 @foreach($notifications as $notif)
-                                    <a href="{{ $notif->url }}" class="block p-4 rounded-lg border {{ $notif->is_read ? 'bg-white border-gray-200' : 'bg-blue-50 border-blue-200' }} hover:shadow-md transition">
+                                    <a href="{{ $notif->url }}"
+                                       class="block"
+                                       style="display: block; padding: 1rem; border-radius: 0.5rem; border: 1px solid {{ $notif->is_read ? '#e5e7eb' : '#bfdbfe' }}; background-color: {{ $notif->is_read ? '#ffffff' : '#eff6ff' }}; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06); transition: box-shadow 0.2s ease, transform 0.2s ease;"
+                                       onmouseover="this.style.boxShadow='0 8px 18px rgba(15, 23, 42, 0.12)'; this.style.transform='translateY(-1px)'"
+                                       onmouseout="this.style.boxShadow='0 1px 2px rgba(15, 23, 42, 0.06)'; this.style.transform='translateY(0)'">
                                         <div class="flex items-start gap-3">
-                                            <div class="flex-shrink-0 mt-1">
+                                            <div class="flex-shrink-0 mt-1" style="flex: 0 0 auto; margin-top: 0.25rem; width: 0.75rem; display: flex; justify-content: center;">
                                                 @if(!$notif->is_read)
-                                                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                                    <div style="width: 0.75rem; height: 0.75rem; background-color: #3b82f6; border-radius: 9999px;"></div>
                                                 @else
-                                                    <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                                                    <div style="width: 0.75rem; height: 0.75rem; background-color: #c0c0c0; border-radius: 9999px;"></div>
                                                 @endif
                                             </div>
                                             <div class="flex-1">
