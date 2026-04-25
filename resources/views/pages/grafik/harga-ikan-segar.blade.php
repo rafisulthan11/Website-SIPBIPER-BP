@@ -224,11 +224,11 @@
                     <!-- Legend Kustom -->
                     <div class="flex flex-wrap justify-center gap-6 mt-6 text-sm">
                         <div class="flex items-center">
-                            <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                            <div class="w-4 h-4 rounded mr-2" style="width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #3b82f6;"></div>
                             <span class="font-semibold">Harga Konsumen (Rp)</span>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                            <div class="w-4 h-4 rounded mr-2" style="width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #22c55e;"></div>
                             <span class="font-semibold">Harga Produsen (Rp)</span>
                         </div>
                     </div>
