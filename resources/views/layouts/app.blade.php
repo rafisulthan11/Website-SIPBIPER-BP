@@ -171,9 +171,9 @@
 
                                     <!-- Profile Dropdown -->
                                     @if(auth()->check())
-                                    <div x-data="{ open: false }" @click.away="open = false" class="relative">
-                                        <button @click="open = !open" class="inline-flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" title="Profil Pengguna" aria-label="Profil Pengguna">
-                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm leading-none" style="width: 2rem; height: 2rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #60a5fa, #2563eb);">
+                                    <div x-data="{ open: false, focused: false }" @click.away="open = false" class="relative">
+                                        <button @click="open = !open" @focus="focused = true" @blur="focused = false" class="inline-flex items-center justify-center rounded-full transition" title="Profil Pengguna" aria-label="Profil Pengguna" style="padding: 0; border: 0; background: transparent; outline: none; border-radius: 9999px;" :style="(open || focused) ? 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #3b82f6;' : ''">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm leading-none" style="width: 2.25rem; height: 2.25rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15); background: linear-gradient(135deg, #60a5fa, #2563eb);">
                                                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                                             </div>
                                         </button>
