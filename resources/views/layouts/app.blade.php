@@ -101,7 +101,7 @@
                                     class="relative">
                                         <button @click="open = !open; if(open) fetchNotifications()" class="relative p-2 rounded-full hover:bg-gray-100" title="Notifikasi" aria-label="Notifikasi">
                                             <svg class="w-5 h-5 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V8.25a6 6 0 10-12 0v1.5a8.967 8.967 0 01-2.312 6.022c1.766.68 3.56 1.13 5.454 1.31m5.715 0a24.255 24.255 0 01-5.715 0m5.715 0a3 3 0 11-5.715 0"/></svg>
-                                            <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1"></span>
+                                            <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full flex items-center justify-center" style="min-width: 20px; height: 20px; padding: 0 4px; background-color: #ef4444; color: #ffffff; border-radius: 9999px; line-height: 1;"></span>
                                         </button>
 
                                         <!-- Dropdown -->
@@ -146,8 +146,8 @@
                                                             <a :href="notif.url" @click="markAsRead(notif.id)" class="block px-3 sm:px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition">
                                                                 <div class="flex items-start gap-3">
                                                                     <div class="flex-shrink-0 mt-1">
-                                                                        <div class="w-2 h-2 bg-blue-500 rounded-full" x-show="!notif.is_read"></div>
-                                                                        <div class="w-2 h-2" x-show="notif.is_read"></div>
+                                                                        <div class="rounded-full" x-show="!notif.is_read" style="width: 8px; height: 8px; background-color: #3b82f6;"></div>
+                                                                        <div x-show="notif.is_read" style="width: 8px; height: 8px;"></div>
                                                                     </div>
                                                                     <div class="flex-1 min-w-0">
                                                                         <p class="text-sm font-medium text-gray-900 break-words" x-text="notif.title"></p>
