@@ -112,16 +112,16 @@
                                              x-transition:leave="transition ease-in duration-150"
                                              x-transition:leave-start="opacity-100 scale-100"
                                              x-transition:leave-end="opacity-0 scale-95"
-                                             class="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-[22rem] bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-                                             style="display: none;">
-                                            <div class="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between gap-2">
+                                             class="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                                             style="display: none; width: min(92vw, 22rem); max-width: 22rem; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden;">
+                                            <div class="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between gap-2" style="padding: 0.875rem 1rem; border-bottom: 1px solid #e5e7eb;">
                                                 <h3 class="text-sm font-semibold text-gray-900 truncate">Notifikasi</h3>
                                                 <button @click="markAllAsRead()" x-show="unreadCount > 0" class="text-xs text-blue-600 hover:text-blue-800 whitespace-nowrap">
                                                     Tandai semua dibaca
                                                 </button>
                                             </div>
                                             
-                                            <div class="max-h-[60vh] sm:max-h-96 overflow-y-auto overscroll-contain">
+                                            <div class="max-h-[60vh] sm:max-h-96 overflow-y-auto overscroll-contain" style="max-height: min(60vh, 24rem); overflow-y: auto; overscroll-behavior: contain;">
                                                 <template x-if="loading">
                                                     <div class="p-4 text-center text-gray-500">
                                                         <svg class="animate-spin h-6 w-6 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -161,7 +161,7 @@
                                                 </template>
                                             </div>
 
-                                            <div class="p-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+                                            <div class="p-3 bg-gray-50 border-t border-gray-200 rounded-b-lg" style="padding: 0.75rem 1rem; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
                                                 <a href="{{ route('notifications.index') }}" class="block text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
                                                     Lihat Semua Notifikasi
                                                 </a>
