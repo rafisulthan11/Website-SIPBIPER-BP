@@ -132,11 +132,11 @@
                                                 </template>
 
                                                 <template x-if="!loading && notifications.length === 0">
-                                                    <div class="p-8 text-center text-gray-500">
-                                                        <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <div class="p-8 text-center text-gray-500" style="padding: 2rem 1.5rem 2.25rem; text-align: center; color: #6b7280;">
+                                                        <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.25" stroke="currentColor" style="width: 3rem; height: 3rem; margin: 0 auto 0.75rem; color: #c4cad4; display: block;">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V8.25a6 6 0 10-12 0v1.5a8.967 8.967 0 01-2.312 6.022c1.766.68 3.56 1.13 5.454 1.31m5.715 0a24.255 24.255 0 01-5.715 0m5.715 0a3 3 0 11-5.715 0"/>
                                                         </svg>
-                                                        <p class="text-sm">Tidak ada notifikasi</p>
+                                                        <p class="text-sm" style="font-size: 0.875rem; line-height: 1.4; color: #6b7280; margin: 0;">Tidak ada notifikasi</p>
                                                     </div>
                                                 </template>
 
