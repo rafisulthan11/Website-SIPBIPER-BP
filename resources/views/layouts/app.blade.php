@@ -173,7 +173,7 @@
                                     @if(auth()->check())
                                     <div x-data="{ open: false }" @click.away="open = false" class="relative">
                                         <button @click="open = !open" class="inline-flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" title="Profil Pengguna" aria-label="Profil Pengguna">
-                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm leading-none" style="background: linear-gradient(135deg, #60a5fa, #2563eb);">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm leading-none" style="width: 2rem; height: 2rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #60a5fa, #2563eb);">
                                                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                                             </div>
                                         </button>
@@ -193,7 +193,7 @@
                                             <div class="px-6 py-8 border-b border-gray-100" style="background: linear-gradient(135deg, #f8fafc, #ffffff);">
                                                 <!-- Avatar -->
                                                 <div class="flex justify-center mb-4">
-                                                    <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg ring-4 ring-white" style="background: linear-gradient(135deg, #60a5fa, #2563eb);">
+                                                    <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg ring-4 ring-white" style="width: 5rem; height: 5rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); border: 4px solid #ffffff; background: linear-gradient(135deg, #60a5fa, #2563eb);">
                                                         {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                                                     </div>
                                                 </div>
