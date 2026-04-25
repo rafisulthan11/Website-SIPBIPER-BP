@@ -187,10 +187,10 @@
                                              x-transition:leave-start="opacity-100 scale-100"
                                              x-transition:leave-end="opacity-0 scale-95"
                                              class="absolute right-0 mt-3 w-[92vw] max-w-[20rem] sm:w-72 bg-white rounded-xl shadow-2xl border border-gray-100 z-50"
-                                             style="display: none;">
+                                            style="display: none; width: min(92vw, 20rem); max-width: 20rem; background-color: #ffffff; border: 1px solid #f3f4f6; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;">
                                             
                                             <!-- Profile Header with Avatar -->
-                                            <div class="px-6 py-8 border-b border-gray-100" style="background: linear-gradient(135deg, #f8fafc, #ffffff);">
+                                            <div class="px-6 py-8 border-b border-gray-100" style="padding: 2rem 1.5rem; border-bottom: 1px solid #f3f4f6; background: linear-gradient(135deg, #f8fafc, #ffffff);">
                                                 <!-- Avatar -->
                                                 <div class="flex justify-center mb-4">
                                                     <div class="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg ring-4 ring-white" style="width: 5rem; height: 5rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); border: 4px solid #ffffff; background: linear-gradient(135deg, #60a5fa, #2563eb);">
@@ -237,7 +237,7 @@
                                             </div>
 
                                             <!-- Menu Items -->
-                                            <div class="py-2">
+                                            <div class="py-2" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
                                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-100 flex items-center gap-3">
                                                     <svg class="w-5 h-5 text-gray-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
                                                     <span>Edit Profil</span>
@@ -245,7 +245,7 @@
                                             </div>
 
                                             <!-- Logout Section -->
-                                            <div class="border-t border-gray-100 px-2 py-2">
+                                            <div class="border-t border-gray-100 px-2 py-2" style="border-top: 1px solid #f3f4f6; padding: 0.5rem;">
                                                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                                                     @csrf
                                                     <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors duration-100 rounded-lg flex items-center gap-3 font-medium">
