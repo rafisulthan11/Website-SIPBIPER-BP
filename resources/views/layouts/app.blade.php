@@ -99,9 +99,9 @@
                                     x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)"
                                     @click.away="open = false" 
                                     class="relative">
-                                        <button @click="open = !open; if(open) fetchNotifications()" class="relative p-2 rounded-full hover:bg-gray-100" title="Notifikasi" aria-label="Notifikasi">
-                                            <svg class="w-5 h-5 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V8.25a6 6 0 10-12 0v1.5a8.967 8.967 0 01-2.312 6.022c1.766.68 3.56 1.13 5.454 1.31m5.715 0a24.255 24.255 0 01-5.715 0m5.715 0a3 3 0 11-5.715 0"/></svg>
-                                            <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full flex items-center justify-center" style="min-width: 20px; height: 20px; padding: 0 4px; background-color: #ef4444; color: #ffffff; border-radius: 9999px; line-height: 1;"></span>
+                                        <button @click="open = !open; if(open) fetchNotifications()" class="relative p-2 rounded-full hover:bg-gray-100" title="Notifikasi" aria-label="Notifikasi" style="position: relative; width: 2.25rem; height: 2.25rem; padding: 0; border: 0; border-radius: 9999px; background: transparent; display: inline-flex; align-items: center; justify-content: center;">
+                                            <svg class="w-5 h-5 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V8.25a6 6 0 10-12 0v1.5a8.967 8.967 0 01-2.312 6.022c1.766.68 3.56 1.13 5.454 1.31m5.715 0a24.255 24.255 0 01-5.715 0m5.715 0a3 3 0 11-5.715 0"/></svg>
+                                            <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute text-white text-xs font-bold rounded-full flex items-center justify-center" style="top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 4px; background-color: #ef4444; color: #ffffff; border: 2px solid #ffffff; border-radius: 9999px; line-height: 1; font-size: 11px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);"></span>
                                         </button>
 
                                         <!-- Dropdown -->
@@ -143,9 +143,9 @@
                                                 <template x-if="!loading && notifications.length > 0">
                                                     <div>
                                                         <template x-for="notif in notifications" :key="notif.id">
-                                                            <a :href="notif.url" @click="markAsRead(notif.id)" class="block px-3 sm:px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition">
-                                                                <div class="flex items-start gap-3">
-                                                                    <div class="flex-shrink-0 mt-1">
+                                                            <a :href="notif.url" @click="markAsRead(notif.id)" class="block px-3 sm:px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition" style="display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f3f4f6;">
+                                                                <div class="flex items-start gap-3" style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                                                                    <div class="flex-shrink-0 mt-1" style="flex: 0 0 auto; width: 8px; margin-top: 0.45rem; display: flex; align-items: center; justify-content: center;">
                                                                         <div class="rounded-full" x-show="!notif.is_read" style="width: 8px; height: 8px; background-color: #3b82f6;"></div>
                                                                         <div x-show="notif.is_read" style="width: 8px; height: 8px;"></div>
                                                                     </div>
