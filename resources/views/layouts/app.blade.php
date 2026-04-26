@@ -347,29 +347,29 @@
             </div>
         </div>
 
-        <div id="reject-note-modal" class="fixed inset-0 z-[9999] hidden" aria-hidden="true">
-            <div class="absolute inset-0 bg-slate-900/50" data-role="overlay"></div>
-            <div class="relative z-10 min-h-full flex items-center justify-center p-4">
-                <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl border border-slate-200">
-                    <div class="px-6 py-5 border-b border-slate-200">
+        <div id="reject-note-modal" class="fixed inset-0 z-[9999] hidden" aria-hidden="true" style="position: fixed; inset: 0; z-index: 9999;">
+            <div class="absolute inset-0 bg-slate-900/50" data-role="overlay" style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.5);"></div>
+            <div class="relative z-10 min-h-full flex items-center justify-center p-4" style="position: relative; z-index: 1; min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+                <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl border border-slate-200" style="width: min(100%, 36rem); background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35); overflow: hidden;">
+                    <div class="px-6 py-5 border-b border-slate-200" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0;">
                         <h3 class="text-xl font-bold text-slate-800">Tolak Data</h3>
                         <p class="mt-1 text-sm text-slate-600" id="reject-note-description">
                             Tambahkan catatan perbaikan agar staff memahami revisi yang dibutuhkan.
                         </p>
                     </div>
 
-                    <div class="px-6 py-5">
+                    <div class="px-6 py-5" style="padding: 1.25rem 1.5rem;">
                         <label for="reject-note-input" class="block text-sm font-semibold text-slate-700 mb-2">Catatan Perbaikan</label>
-                        <textarea id="reject-note-input" rows="5" maxlength="2000" class="w-full rounded-lg border border-slate-300 focus:border-orange-500 focus:ring-orange-500 text-sm" placeholder="Contoh: Mohon lengkapi data komoditas dan perbaiki format NIK."></textarea>
-                        <div class="mt-2 flex items-center justify-between">
+                        <textarea id="reject-note-input" rows="5" maxlength="2000" class="w-full rounded-lg border border-slate-300 focus:border-orange-500 focus:ring-orange-500 text-sm" style="width: 100%; min-height: 7.5rem; border: 1px solid #cbd5e1; border-radius: 0.625rem; padding: 0.75rem 0.875rem; font-size: 0.875rem; line-height: 1.4; outline: none; resize: vertical;" placeholder="Contoh: Mohon lengkapi data komoditas dan perbaiki format NIK."></textarea>
+                        <div class="mt-2 flex items-center justify-between" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
                             <p id="reject-note-error" class="text-sm text-red-600 hidden">Catatan perbaikan wajib diisi.</p>
                             <p class="text-xs text-slate-500 ml-auto"><span id="reject-note-count">0</span>/2000</p>
                         </div>
                     </div>
 
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 rounded-b-2xl flex items-center justify-end gap-2">
-                        <button type="button" id="reject-note-cancel" class="inline-flex items-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-300">Batal</button>
-                        <button type="button" id="reject-note-confirm" class="inline-flex items-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700">Tolak & Kirim Catatan</button>
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 rounded-b-2xl flex items-center justify-end gap-2" style="padding: 1rem 1.5rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                        <button type="button" id="reject-note-cancel" class="inline-flex items-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-300" style="border: 0; border-radius: 0.625rem; background: #cbd5e1; color: #334155; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;">Batal</button>
+                        <button type="button" id="reject-note-confirm" class="inline-flex items-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700" style="border: 0; border-radius: 0.625rem; background: #ea580c; color: #ffffff; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;">Tolak & Kirim Catatan</button>
                     </div>
                 </div>
             </div>
