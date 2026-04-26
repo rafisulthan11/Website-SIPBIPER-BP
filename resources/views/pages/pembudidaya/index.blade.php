@@ -98,11 +98,11 @@
                                     </div>
                                     <div>
                                         @if($p->status === 'pending')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Pending</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style="display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #fef3c7; color: #92400e;">Pending</span>
                                         @elseif($p->status === 'verified')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">Verified</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style="display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #dcfce7; color: #166534;">Verified</span>
                                         @elseif($p->status === 'rejected')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">Rejected</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style="display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #fee2e2; color: #b91c1c;">Rejected</span>
                                         @endif
                                     </div>
                                 </div>
@@ -118,7 +118,7 @@
                                         @endif
                                     </p>
                                     @if($p->status === 'rejected' && $p->catatan_perbaikan)
-                                        <p class="text-xs text-red-700"><span class="font-semibold">Catatan:</span> {{ $p->catatan_perbaikan }}</p>
+                                        <p class="text-xs text-red-700" style="margin-top: 0.25rem; font-size: 0.75rem; line-height: 1.35; color: #b91c1c;"><span class="font-semibold">Catatan:</span> {{ $p->catatan_perbaikan }}</p>
                                     @endif
                                 </div>
 
@@ -178,13 +178,13 @@
                                     <td class="px-4 py-3 align-top text-slate-700 font-semibold text-blue-600">{{ $p->tahun_pendataan }}</td>
                                     <td class="px-4 py-3 align-top">
                                         @if($p->status === 'pending')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Pending</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style="display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #fef3c7; color: #92400e;">Pending</span>
                                         @elseif($p->status === 'verified')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">Verified</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style="display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #dcfce7; color: #166534;">Verified</span>
                                         @elseif($p->status === 'rejected')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">Rejected</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style="display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #fee2e2; color: #b91c1c;">Rejected</span>
                                             @if($p->catatan_perbaikan)
-                                                <div class="mt-1 text-xs text-red-700 max-w-xs break-words">
+                                                <div class="mt-1 text-xs text-red-700 max-w-xs break-words" style="margin-top: 0.3rem; font-size: 0.75rem; line-height: 1.35; color: #b91c1c; max-width: 20rem; word-break: break-word;">
                                                     <span class="font-semibold">Catatan:</span> {{ $p->catatan_perbaikan }}
                                                 </div>
                                             @endif
