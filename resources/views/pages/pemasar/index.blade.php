@@ -24,9 +24,9 @@
                     
                     <!-- Show entries, Search and Add Button -->
                     <form method="GET" action="{{ route('pemasar.index') }}" class="space-y-3">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; row-gap: 0.75rem; column-gap: 1rem;">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3" style="row-gap: 0.75rem; column-gap: 1rem;">
                             <!-- Left side: Show entries -->
-                            <div class="flex items-center gap-2 text-sm text-slate-700" style="display: flex; align-items: center; gap: 0.5rem; flex: 0 0 auto; white-space: nowrap;">
+                            <div class="flex items-center gap-2 text-sm text-slate-700" style="gap: 0.5rem; white-space: nowrap;">
                                 <span class="font-medium">Show</span>
                                 <select name="per_page" class="h-9 border border-gray-300 rounded-md px-3 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm" onchange="this.form.submit()">
                                     @foreach($allowedPerPage as $n)
@@ -37,7 +37,7 @@
                             </div>
 
                             <!-- Right side: Filters and Add button -->
-                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-left: auto;">
+                            <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:ml-auto" style="gap: 0.75rem;">
                                 <!-- Tahun Filter -->
                                 <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 0.5rem;">
                                     <label class="text-sm font-medium text-slate-700 whitespace-nowrap">Tahun:</label>
