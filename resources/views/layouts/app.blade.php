@@ -114,8 +114,8 @@
                                              x-transition:leave-end="opacity-0 scale-95"
                                                             class="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
                                              :style="(window.innerWidth < 640)
-                                                                ? 'position: fixed; left: 0.75rem; right: 0.75rem; top: 4.25rem; width: auto; max-width: none; max-height: calc(100vh - 5rem); margin-top: 0; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden; z-index: 1400;'
-                                                                : 'position: absolute; right: 0; top: 100%; width: 22rem; max-width: 22rem; margin-top: 0.5rem; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden; z-index: 1400;'">
+                                                                ? 'display:flex; flex-direction:column; position: fixed; left: 0.75rem; right: 0.75rem; top: 4.25rem; width: auto; max-width: none; height:' + Math.max(320, window.innerHeight - 84) + 'px; max-height:' + Math.max(320, window.innerHeight - 84) + 'px; margin-top: 0; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden; z-index: 1400;'
+                                                                : 'display:flex; flex-direction:column; position: absolute; right: 0; top: 100%; width: 22rem; max-width: 22rem; height:min(60vh, 28rem); max-height:min(60vh, 28rem); margin-top: 0.5rem; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden; z-index: 1400;'">
                                             <div class="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between gap-2" style="padding: 0.875rem 1rem; border-bottom: 1px solid #e5e7eb; background-color: #ffffff; position: sticky; top: 0; z-index: 1;">
                                                 <h3 class="text-sm font-semibold text-gray-900 truncate">Notifikasi</h3>
                                                 <button @click="markAllAsRead()" x-show="unreadCount > 0" class="text-xs text-blue-600 hover:text-blue-800 whitespace-nowrap">
@@ -123,7 +123,7 @@
                                                 </button>
                                             </div>
                                             
-                                            <div class="max-h-[60vh] sm:max-h-96 overflow-y-auto overscroll-contain" :style="(window.innerWidth < 640) ? 'max-height: calc(100vh - 10rem); overflow-y: auto; overscroll-behavior: contain;' : 'max-height: min(60vh, 24rem); overflow-y: auto; overscroll-behavior: contain;'">
+                                            <div class="max-h-[60vh] sm:max-h-96 overflow-y-auto overscroll-contain" :style="(window.innerWidth < 640) ? 'flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain;' : 'flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain;'">
                                                 <template x-if="loading">
                                                     <div class="p-4 text-center text-gray-500">
                                                         <svg class="animate-spin h-6 w-6 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
