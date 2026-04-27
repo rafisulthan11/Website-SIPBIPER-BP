@@ -85,8 +85,16 @@
                         <input type="hidden" name="kategori" value="{{ request('kategori') }}">
                         <input type="hidden" name="jenis_kegiatan_usaha" value="{{ request('jenis_kegiatan_usaha') }}">
                         
-                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-3">
-                            <div class="flex items-center gap-3">
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-3"
+                             x-data="{ isMobile: window.innerWidth < 768 }"
+                             x-init="window.addEventListener('resize', () => { isMobile = window.innerWidth < 768 })"
+                             :style="isMobile
+                                ? 'display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; row-gap:0.75rem; column-gap:1rem;'
+                                : 'display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:flex-start; row-gap:0.75rem; column-gap:1rem;'">
+                            <div class="flex items-center gap-3"
+                                 :style="isMobile
+                                    ? 'display:flex; align-items:center; gap:0.75rem; width:100%;'
+                                    : 'display:flex; align-items:center; gap:0.75rem;'">
                                 <label class="text-sm">Show</label>
                                 <select class="px-3 h-9 w-20 border rounded bg-white text-sm">
                                     <option>10</option>
@@ -95,13 +103,20 @@
                                 </select>
                                 <span class="text-sm">entries</span>
                             </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2"
+                                 :style="isMobile
+                                    ? 'display:flex; flex-direction:column; align-items:stretch; gap:0.75rem; margin-left:0; width:100%;'
+                                    : 'display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; column-gap:0.5rem; row-gap:0.5rem; margin-left:auto; width:auto;'">
                                 <label class="sr-only">Search</label>
-                                <div class="flex items-center gap-2 border rounded px-2 py-1 w-full sm:w-auto">
+                                <div class="flex items-center gap-2 border rounded px-2 py-1 w-full sm:w-auto"
+                                     :style="isMobile
+                                        ? 'display:flex; align-items:center; gap:0.5rem; width:100%;'
+                                        : 'display:flex; align-items:center; gap:0.5rem; width:30rem; max-width:30rem;'">
                                     <label class="text-sm">Search:</label>
                                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, usaha, jenis kegiatan..." class="border-0 focus:ring-0 px-2 h-8 text-sm w-full sm:w-80" />
                                 </div>
-                                <a href="{{ route('laporan.rekapitulasi.pemasar.export', request()->query()) }}" title="Unduh Excel — semua hasil filter" aria-label="Unduh Excel untuk semua hasil filter" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm w-full sm:w-auto">
+                                <a href="{{ route('laporan.rekapitulasi.pemasar.export', request()->query()) }}" title="Unduh Excel — semua hasil filter" aria-label="Unduh Excel untuk semua hasil filter" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm w-full sm:w-auto"
+                                   :style="isMobile ? 'width:100%;' : 'width:auto;'">
                                     <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                                     Unduh Excel (Semua)
                                 </a>
