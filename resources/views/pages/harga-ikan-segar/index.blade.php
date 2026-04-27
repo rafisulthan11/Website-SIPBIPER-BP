@@ -24,7 +24,12 @@
                     
                     <!-- Show entries, Search and Add Button -->
                     <form method="GET" action="{{ route('harga-ikan-segar.index') }}" class="space-y-3">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3" style="row-gap: 0.75rem; column-gap: 1rem;">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+                             x-data="{ isMobile: window.innerWidth < 768 }"
+                             x-init="window.addEventListener('resize', () => { isMobile = window.innerWidth < 768 })"
+                             :style="isMobile
+                            ? 'display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; row-gap:0.75rem; column-gap:1rem;'
+                            : 'display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:flex-start; row-gap:0.75rem; column-gap:1rem;'">
                             <!-- Left side: Show entries -->
                             <div class="flex items-center gap-2 text-sm text-slate-700" style="gap: 0.5rem; white-space: nowrap;">
                                 <span class="font-medium">Show</span>
@@ -37,7 +42,10 @@
                             </div>
 
                             <!-- Right side: Filters and Add button -->
-                            <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:ml-auto" style="gap: 0.75rem;">
+                                <div class="flex items-center gap-3"
+                                 :style="isMobile
+                                    ? 'display:flex; flex-direction:column; align-items:stretch; gap:0.75rem; margin-left:0; width:100%;'
+                                    : 'display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; gap:0.75rem; margin-left:auto; width:auto;'">
                                 <!-- Tahun Filter -->
                                 <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 0.5rem;">
                                     <label class="text-sm font-medium text-slate-700 whitespace-nowrap">Tahun:</label>
@@ -64,8 +72,11 @@
                                 <!-- Search -->
                                 <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 0.5rem;">
                                     <label class="text-sm font-medium text-slate-700 whitespace-nowrap">Search:</label>
-                                    <div class="relative">
-                                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari data..." class="border border-gray-300 rounded-md pl-10 pr-4 py-1.5 text-sm placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm hover:border-gray-400 transition w-full sm:w-64" />
+                                        <div class="relative"
+                                         :style="isMobile
+                                            ? 'position:relative; width:100%; max-width:100%;'
+                                            : 'position:relative; width:16rem; max-width:16rem;'">
+                                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari data..." class="border border-gray-300 rounded-md pl-10 pr-4 py-1.5 text-sm placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm hover:border-gray-400 transition w-full sm:w-64" style="width: 100%;" />
                                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                                     </div>
                                 </div>
