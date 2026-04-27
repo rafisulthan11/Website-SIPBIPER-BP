@@ -351,7 +351,7 @@
                 <div class="col-lg-7 mb-5 mb-lg-0" data-aos="fade-right">
                     <h1 class="hero-title">Sistem Informasi Pendataan Bidang Budidaya dan Pasca Panen Dinas Perikanan Jember</h1>
                     <p class="hero-subtitle">
-                        SIPBIPER-BP adalah platform digital terpadu untuk pengelolaan data dan informasi sektor perikanan. 
+                        SIPBIPER-BP adalah platform digital terpadu untuk pengelolaan data dan informasi pelaku usaha sektor perikanan. 
                         Memudahkan monitoring, pelaporan, dan analisis data pelaku usaha perikanan di Kabupaten Jember.
                     </p>
                     @if (Route::has('login'))
