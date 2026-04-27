@@ -40,7 +40,7 @@
                     <!-- Page Content -->
                     <main>
                         <!-- Header bar: only hamburger, search, notif -->
-                        <div class="bg-white shadow-sm z-30 sticky top-0 relative">
+                        <div class="bg-white shadow-sm z-30 sticky top-0 relative" style="z-index: 1200; isolation: isolate;">
                             <div class="h-14 sm:h-16 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
                                 <div class="flex items-center gap-3">
                                     <!-- Hamburger (mobile & desktop) -->
@@ -98,7 +98,7 @@
                                     }" 
                                     x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)"
                                     @click.away="open = false" 
-                                    class="relative">
+                                    class="relative" style="position: relative; z-index: 1300;">
                                         <button @click="open = !open; if(open) fetchNotifications()" class="relative p-2 rounded-full hover:bg-gray-100" title="Notifikasi" aria-label="Notifikasi" style="position: relative; width: 2.25rem; height: 2.25rem; padding: 0; border: 0; border-radius: 9999px; background: transparent; display: inline-flex; align-items: center; justify-content: center;">
                                             <svg class="w-5 h-5 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V8.25a6 6 0 10-12 0v1.5a8.967 8.967 0 01-2.312 6.022c1.766.68 3.56 1.13 5.454 1.31m5.715 0a24.255 24.255 0 01-5.715 0m5.715 0a3 3 0 11-5.715 0"/></svg>
                                             <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute text-white text-xs font-bold rounded-full flex items-center justify-center" style="top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 4px; background-color: #ef4444; color: #ffffff; border: 2px solid #ffffff; border-radius: 9999px; line-height: 1; font-size: 11px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);"></span>
@@ -112,10 +112,10 @@
                                              x-transition:leave="transition ease-in duration-150"
                                              x-transition:leave-start="opacity-100 scale-100"
                                              x-transition:leave-end="opacity-0 scale-95"
-                                             class="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                                                            class="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
                                              :style="(window.innerWidth < 640)
-                                                ? 'position: fixed; left: 0.75rem; right: 0.75rem; top: 4.25rem; width: auto; max-width: none; max-height: calc(100vh - 5rem); margin-top: 0; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden;'
-                                                : 'position: absolute; right: 0; top: 100%; width: 22rem; max-width: 22rem; margin-top: 0.5rem; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden;'">
+                                                                ? 'position: fixed; left: 0.75rem; right: 0.75rem; top: 4.25rem; width: auto; max-width: none; max-height: calc(100vh - 5rem); margin-top: 0; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden; z-index: 1400;'
+                                                                : 'position: absolute; right: 0; top: 100%; width: 22rem; max-width: 22rem; margin-top: 0.5rem; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); overflow: hidden; z-index: 1400;'">
                                             <div class="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between gap-2" style="padding: 0.875rem 1rem; border-bottom: 1px solid #e5e7eb; background-color: #ffffff; position: sticky; top: 0; z-index: 1;">
                                                 <h3 class="text-sm font-semibold text-gray-900 truncate">Notifikasi</h3>
                                                 <button @click="markAllAsRead()" x-show="unreadCount > 0" class="text-xs text-blue-600 hover:text-blue-800 whitespace-nowrap">
