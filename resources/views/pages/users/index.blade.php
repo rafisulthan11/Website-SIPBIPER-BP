@@ -23,8 +23,17 @@
                             </div>
                             
                             <!-- Show entries, Search and Add Button -->
-                                <form method="GET" action="{{ route('users.index') }}" class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
-                                <div class="flex items-center gap-2 text-sm text-slate-700">
+                                <form method="GET" action="{{ route('users.index') }}" class="mb-5"
+                                      x-data="{ isMobile: window.innerWidth < 768 }"
+                                      x-init="window.addEventListener('resize', () => { isMobile = window.innerWidth < 768 })">
+                                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3"
+                                     :style="isMobile
+                                        ? 'display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; row-gap:0.75rem; column-gap:1rem;'
+                                        : 'display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:flex-start; row-gap:0.75rem; column-gap:1rem;'">
+                                <div class="flex items-center gap-2 text-sm text-slate-700"
+                                     :style="isMobile
+                                        ? 'display:flex; align-items:center; gap:0.5rem; width:100%;'
+                                        : 'display:flex; align-items:center; gap:0.5rem;'">
                                     <span>Tampilkan</span>
                                     <select name="per_page" class="border border-gray-300 rounded px-4 py-1.5 pr-8 text-sm focus:ring-blue-500 focus:border-blue-500 bg-white" onchange="this.form.submit()">
                                             <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
@@ -34,22 +43,32 @@
                                     </select>
                                     <span>data</span>
                                 </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
-                                        <div class="flex items-center gap-2 text-sm text-slate-700 w-full sm:w-auto">
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto"
+                                         :style="isMobile
+                                            ? 'display:flex; flex-direction:column; align-items:stretch; gap:0.75rem; margin-left:0; width:100%;'
+                                            : 'display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; column-gap:0.5rem; row-gap:0.5rem; margin-left:auto; width:auto;'">
+                                        <div class="flex items-center gap-2 text-sm text-slate-700 w-full sm:w-auto"
+                                             :style="isMobile
+                                                ? 'display:flex; align-items:center; gap:0.5rem; width:100%;'
+                                                : 'display:flex; align-items:center; gap:0.5rem;'">
                                         <label>Cari:</label>
-                                            <div class="relative w-full sm:w-auto">
+                                            <div class="relative w-full sm:w-auto"
+                                                 :style="isMobile
+                                                    ? 'position:relative; width:100%; max-width:100%;'
+                                                    : 'position:relative; width:16rem; max-width:16rem;'">
                                                     <input type="text" name="q" value="{{ $q ?? request('q') }}" placeholder="Cari nama, email, NIP" class="border border-gray-300 rounded-lg pl-10 pr-4 py-1.5 text-sm placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64" />
                                             <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17.25 10.5a6.75 6.75 0 11-13.5 0 6.75 6.75 0 0113.5 0z"/></svg>
                                         </div>
                                     </div>
-                                        <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center bg-blue-700 hover:bg-blue-800 text-white font-medium text-sm rounded-lg px-4 py-1.5 shadow whitespace-nowrap w-full sm:w-auto">
+                                        <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center bg-blue-700 hover:bg-blue-800 text-white font-medium text-sm rounded-lg px-4 py-1.5 shadow whitespace-nowrap w-full sm:w-auto"
+                                           :style="isMobile ? 'width:100%;' : 'width:auto;'">
                                         <svg class="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                                         Tambah User Baru
                                     </a>
                                 </div>
                             </form>
 
-                            <div class="md:hidden space-y-3 mb-4">
+                            <div class="md:hidden space-y-3 mb-4" style="margin-top:0.5rem;">
                                 @forelse ($users as $user)
                                 <div class="rounded-lg border border-slate-200 p-4 bg-white shadow-sm">
                                     <div class="flex items-start justify-between gap-3">
@@ -77,9 +96,9 @@
                                 @endforelse
                             </div>
 
-                            <div class="hidden md:block overflow-x-auto">
-                            <div class="rounded-md border border-slate-300 overflow-hidden">
-                                <table class="min-w-full text-base">
+                            <div class="hidden md:block overflow-x-auto" style="width:100%; max-width:100%; margin-top:0.5rem;">
+                            <div class="rounded-md border border-slate-300 overflow-hidden" style="width:100%;">
+                                <table class="min-w-full text-base" style="width:100%; table-layout:auto;">
                                     <thead class="bg-slate-100 text-slate-800">
                                         <tr>
                                             <th class="px-4 py-3 text-left font-semibold text-[15px]">No</th>
@@ -106,7 +125,7 @@
                                                     {{ $user->role->nama_role }}
                                                 </span>
                                             @elseif($user->role->nama_role == 'admin')
-                                                <span class="inline-block whitespace-nowrap rounded-[0.27rem] bg-yellow-100 px-[0.65em] pb-[0.25em] pt-[0.35em] text-center align-baseline text-[0.75em] font-bold leading-none text-yellow-700">
+                                                <span style="display:inline-block; white-space:nowrap; border-radius:0.27rem; background-color:#fef9c3; padding:0.35em 0.65em 0.25em; text-align:center; vertical-align:baseline; font-size:0.75em; font-weight:700; line-height:1; color:#a16207;">
                                                     {{ $user->role->nama_role }}
                                                 </span>
                                             @elseif($user->role->nama_role == 'staff')
