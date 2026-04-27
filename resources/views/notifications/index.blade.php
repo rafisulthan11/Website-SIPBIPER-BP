@@ -47,7 +47,7 @@
                                                         @elseif($notif->type === 'verified')
                                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Verified</span>
                                                         @elseif($notif->type === 'rejected')
-                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Rejected</span>
+                                                            <span style="display:inline-flex; align-items:center; padding:0.125rem 0.625rem; border-radius:9999px; font-size:0.75rem; font-weight:500; line-height:1.25; background-color:#fee2e2; color:#b91c1c;">Rejected</span>
                                                         @endif
                                                     </div>
                                                 </div>
