@@ -125,7 +125,7 @@
         
         .hero-image {
             display: block;
-            width: min(78vw, 360px);
+            width: min(84vw, 420px);
             max-width: 100%;
             height: auto;
             margin: 0 auto;
@@ -303,7 +303,7 @@
             }
 
             .hero-image {
-                width: min(72vw, 260px);
+                width: min(78vw, 300px);
             }
             
             .hero-subtitle {
@@ -348,7 +348,10 @@
     <section class="hero-section">
         <div class="container">
             <div class="row align-items-center hero-content">
-                <div class="col-lg-7 mb-5 mb-lg-0" data-aos="fade-right">
+                <div class="col-lg-5 text-center order-1 order-lg-2 mb-4 mb-lg-0" data-aos="fade-left">
+                    <img src="{{ asset('images/ilustrasi-sipbiper.png') }}" alt="Ilustrasi SIPBIPER" class="hero-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%2360a5fa%22 opacity=%220.2%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22white%22%3EIlustrasi SIPBIPER%3C/text%3E%3C/svg%3E'">
+                </div>
+                <div class="col-lg-7 order-2 order-lg-1 mb-5 mb-lg-0" data-aos="fade-right">
                     <h1 class="hero-title">Sistem Informasi Pendataan Bidang Budidaya dan Pasca Panen Dinas Perikanan Jember</h1>
                     <p class="hero-subtitle">
                         SIPBIPER-BP adalah platform digital terpadu untuk pengelolaan data dan informasi pelaku usaha sektor perikanan. 
@@ -361,9 +364,6 @@
                             </a>
                         @endguest
                     @endif
-                </div>
-                <div class="col-lg-5 text-center" data-aos="fade-left">
-                    <img src="{{ asset('images/dinas-perikanan-logo.png') }}" alt="Dinas Perikanan" class="hero-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%2360a5fa%22 opacity=%220.2%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22white%22%3ELogo Dinas Perikanan%3C/text%3E%3C/svg%3E'">
                 </div>
             </div>
         </div>
