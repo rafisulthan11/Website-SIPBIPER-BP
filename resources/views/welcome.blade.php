@@ -299,7 +299,7 @@
         /* Responsive */
         @media (max-width: 768px) {
             .hero-title {
-                font-size: 2.2rem;
+                font-size: 1.9rem;
             }
 
             .hero-image {
@@ -307,11 +307,19 @@
             }
             
             .hero-subtitle {
-                font-size: 1rem;
+                font-size: 0.95rem;
             }
             
             .section-title {
-                font-size: 2rem;
+                font-size: 1.7rem;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+            }
+
+            .feature-description {
+                font-size: 0.95rem;
             }
             
             .stat-card {
@@ -352,7 +360,7 @@
                     <img src="{{ asset('images/ilustrasi-sipbiper.png') }}" alt="Ilustrasi SIPBIPER" class="hero-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%2360a5fa%22 opacity=%220.2%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22white%22%3EIlustrasi SIPBIPER%3C/text%3E%3C/svg%3E'">
                 </div>
                 <div class="col-lg-7 order-2 order-lg-1 mb-5 mb-lg-0" data-aos="fade-right">
-                    <h1 class="hero-title">Sistem Informasi Pendataan Bidang Budidaya dan Pasca Panen Dinas Perikanan Jember</h1>
+                    <h1 class="hero-title">Sistem Informasi Pendataan Bidang Perikanan Budidaya dan Pasca Panen</h1>
                     <p class="hero-subtitle">
                         SIPBIPER-BP adalah platform digital terpadu untuk pengelolaan data dan informasi pelaku usaha sektor perikanan. 
                         Memudahkan monitoring, pelaporan, dan analisis data pelaku usaha perikanan di Kabupaten Jember.
