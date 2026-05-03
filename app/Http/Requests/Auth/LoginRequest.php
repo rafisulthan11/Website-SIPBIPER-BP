@@ -49,6 +49,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+        if (! $user || $user->status !== 'aktif') {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun anda tidak aktif, silahkan hubungi super admin.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
