@@ -109,32 +109,6 @@
                     </div>
 
                     <div class="p-4 bg-gray-50 rounded-lg border">
-                        <h3 class="text-lg font-semibold border-b pb-2 mb-4">Jenis Usaha</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div><strong class="font-medium text-gray-500 block">Jenis Kegiatan Usaha:</strong><p>{{ $displayData->jenis_kegiatan_usaha ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Jenis Budidaya:</strong><p>{{ $displayData->jenis_budidaya ?? '-' }}</p></div>
-                        </div>
-                    </div>
-
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
-                        <h3 class="text-lg font-semibold border-b pb-2 mb-4">Profil Pemilik</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                            <div><strong class="font-medium text-gray-500 block">Nama Lengkap:</strong><p>{{ $displayData->nama_lengkap ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">NIK:</strong><p>{{ $displayData->nik_pembudidaya ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Jenis Kelamin:</strong><p>{{ $displayData->jenis_kelamin ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Tempat Lahir:</strong><p>{{ $displayData->tempat_lahir ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Tanggal Lahir:</strong><p>{{ $displayData->tanggal_lahir ? \Carbon\Carbon::parse($displayData->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Status Perkawinan:</strong><p>{{ $displayData->status_perkawinan ?? '-' }}</p></div>
-                            <div class="lg:col-span-3"><strong class="font-medium text-gray-500 block">Alamat Lengkap:</strong><p>{{ $displayData->alamat ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Kecamatan:</strong><p>{{ $displayData->kecamatan->nama_kecamatan ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Desa/Kelurahan:</strong><p>{{ $displayData->desa->nama_desa ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">No. Telepon/HP:</strong><p>{{ $displayData->kontak ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Email:</strong><p>{{ $displayData->email ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">No. NPWP:</strong><p>{{ $displayData->no_npwp ?? '-' }}</p></div>
-                        </div>
-                    </div>
-
-                    <div class="p-4 bg-gray-50 rounded-lg border">
                         <h3 class="text-lg font-semibold border-b pb-2 mb-4">Profil Usaha</h3>
                         
                         <!-- Informasi Umum -->
