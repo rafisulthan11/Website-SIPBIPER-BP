@@ -130,15 +130,14 @@ class PengolahController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'nik_pengolah' => [
                 'required',
-                'string',
-                'size:16',
+                'digits:16',
                 Rule::unique('pengolahs', 'nik_pengolah')->where(function ($query) use ($request) {
                     return $query->where('tahun_pendataan', $request->tahun_pendataan);
                 })
             ],
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
-            'jenis_kegiatan_usaha' => 'nullable|string',
+            'jenis_kegiatan_usaha' => 'required|string',
             'jenis_pengolahan' => 'nullable|string',
             'jenis_kelamin' => 'nullable|string',
             'tempat_lahir' => 'nullable|string|max:255',
@@ -148,7 +147,7 @@ class PengolahController extends Controller
             'jumlah_tanggungan' => 'nullable|integer',
             'aset_pribadi' => 'nullable|numeric',
             'alamat' => 'nullable|string',
-            'kontak' => 'nullable|string|max:20',
+            'kontak' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
             'no_npwp' => 'nullable|string|max:255',
             // Profil Usaha
@@ -204,7 +203,15 @@ class PengolahController extends Controller
             'foto_sertifikat_pirt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'foto_sertifikat_halal' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'nik_pengolah.required' => 'NIK wajib diisi.',
+            'nik_pengolah.digits' => 'Penulisan NIK salah atau tidak sesuai format.',
             'nik_pengolah.unique' => 'NIK ini sudah terdaftar untuk tahun pendataan yang sama. Satu NIK hanya boleh didaftarkan satu kali per tahun.',
+            'id_kecamatan.required' => 'Kecamatan dan desa wajib diisi.',
+            'id_desa.required' => 'Desa wajib diisi.',
+            'kontak.required' => 'Nomor telepon wajib diisi.',
+            'email.email' => 'Penulisan email salah atau tidak sesuai format.',
+            'jenis_kegiatan_usaha.required' => 'Jenis kegiatan usaha wajib diisi.',
         ]);
 
         // Handle file uploads
@@ -379,8 +386,7 @@ class PengolahController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'nik_pengolah' => [
                 'required',
-                'string',
-                'size:16',
+                'digits:16',
                 Rule::unique('pengolahs', 'nik_pengolah')
                     ->where(function ($query) use ($request) {
                         return $query->where('tahun_pendataan', $request->tahun_pendataan);
@@ -389,7 +395,7 @@ class PengolahController extends Controller
             ],
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
-            'jenis_kegiatan_usaha' => 'nullable|string',
+            'jenis_kegiatan_usaha' => 'required|string',
             'jenis_pengolahan' => 'nullable|string',
             'jenis_kelamin' => 'nullable|string',
             'tempat_lahir' => 'nullable|string|max:255',
@@ -399,7 +405,7 @@ class PengolahController extends Controller
             'jumlah_tanggungan' => 'nullable|integer',
             'aset_pribadi' => 'nullable|numeric',
             'alamat' => 'nullable|string',
-            'kontak' => 'nullable|string|max:20',
+            'kontak' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
             'no_npwp' => 'nullable|string|max:255',
             // Profil Usaha
@@ -455,7 +461,15 @@ class PengolahController extends Controller
             'foto_sertifikat_pirt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'foto_sertifikat_halal' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'nik_pengolah.required' => 'NIK wajib diisi.',
+            'nik_pengolah.digits' => 'Penulisan NIK salah atau tidak sesuai format.',
             'nik_pengolah.unique' => 'NIK ini sudah terdaftar untuk tahun pendataan yang sama. Satu NIK hanya boleh didaftarkan satu kali per tahun.',
+            'id_kecamatan.required' => 'Kecamatan dan desa wajib diisi.',
+            'id_desa.required' => 'Desa wajib diisi.',
+            'kontak.required' => 'Nomor telepon wajib diisi.',
+            'email.email' => 'Penulisan email salah atau tidak sesuai format.',
+            'jenis_kegiatan_usaha.required' => 'Jenis kegiatan usaha wajib diisi.',
         ]);
 
         // Handle file uploads

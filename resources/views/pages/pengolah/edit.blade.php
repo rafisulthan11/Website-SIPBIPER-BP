@@ -12,6 +12,8 @@
             'nik_pengolah' => 1,
             'id_kecamatan' => 1,
             'id_desa' => 1,
+            'kontak' => 1,
+            'email' => 1,
         ];
         $initialStep = 0;
         if ($errors->any()) {
@@ -51,7 +53,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('pengolah.update', $pengolah->id_pengolah) }}" enctype="multipart/form-data" novalidate>
+                <form method="POST" action="{{ route('pengolah.update', $pengolah->id_pengolah) }}" enctype="multipart/form-data" novalidate data-skip-multistep-validation="1">
                     @csrf
                     @method('PUT')
                     <!-- Step panels -->
@@ -78,7 +80,7 @@
 
                                 <!-- Jenis Kegiatan Usaha -->
                                 <div>
-                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha')" />
+                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha*')" />
                                     <select name="jenis_kegiatan_usaha" id="jenis_kegiatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Pilih Jenis Kegiatan Usaha</option>
                                         <option value="Pengalengan" {{ old('jenis_kegiatan_usaha', $pengolah->jenis_kegiatan_usaha)=='Pengalengan' ? 'selected' : '' }}>Pengalengan</option>
@@ -109,7 +111,7 @@
                                 </div>
                                 <div>
                                     <x-input-label for="nik_pengolah" :value="__('NIK (Sesuai KTP)*')" />
-                                    <x-text-input id="nik_pengolah" class="block mt-1 w-full" type="text" name="nik_pengolah" :value="old('nik_pengolah', $pengolah->nik_pengolah)" required />
+                                    <x-text-input id="nik_pengolah" class="block mt-1 w-full" type="text" name="nik_pengolah" :value="old('nik_pengolah', $pengolah->nik_pengolah)" required maxlength="16" inputmode="numeric" pattern="[0-9]*" />
                                     <x-input-error :messages="$errors->get('nik_pengolah')" class="mt-2" />
                                 </div>
                                 <div>
@@ -154,8 +156,9 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <x-input-label for="kontak" :value="__('No. Telepon / HP')" />
-                                    <x-text-input id="kontak" class="block mt-1 w-full" type="text" name="kontak" :value="old('kontak', $pengolah->kontak)" />
+                                    <x-input-label for="kontak" :value="__('No. Telepon / HP*')" />
+                                    <x-text-input id="kontak" class="block mt-1 w-full" type="text" name="kontak" :value="old('kontak', $pengolah->kontak)" required />
+                                    <x-input-error :messages="$errors->get('kontak')" class="mt-2" />
                                 </div>
                                 <div class="relative">
                                     <x-input-label for="jumlah_tanggungan" :value="__('Jumlah Tanggungan')" />
@@ -190,6 +193,7 @@
                                 <div>
                                     <x-input-label for="email" :value="__('Email')" />
                                     <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $pengolah->email)" />
+                                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
                                 <div>
                                     <x-input-label for="no_npwp" :value="__('No. NPWP')" />
@@ -270,16 +274,6 @@
                                         <x-text-input id="nama_kelompok" class="block mt-1 w-full" type="text" name="nama_kelompok" :value="old('nama_kelompok', $pengolah->nama_kelompok)" />
                                     </div>
                                     <div>
-                                        <x-input-label for="komoditas" :value="__('Komoditas')" />
-                                        <select id="komoditas" name="komoditas" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                                            <option value="">Pilih Komoditas</option>
-                                            @foreach($komoditas as $item)
-                                                <option value="{{ $item->nama_komoditas }}" {{ old('komoditas', $pengolah->komoditas) == $item->nama_komoditas ? 'selected' : '' }}>{{ $item->nama_komoditas }}</option>
-                                            @endforeach
-                                        </select>
-                                        <x-input-error :messages="$errors->get('komoditas')" class="mt-2" />
-                                    </div>
-                                    <div>
                                         <x-input-label for="skala_usaha" :value="__('Skala Usaha')" />
                                         <select id="skala_usaha" name="skala_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                             <option value="">Pilih Skala Usaha</option>
@@ -311,7 +305,7 @@
                                 <h4 class="text-base font-semibold text-slate-700 mb-4">Lokasi Usaha</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
-                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha*')" />
+                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha')" />
                                         <select name="kecamatan_usaha" id="kecamatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                             <option value="">Pilih Kecamatan</option>
                                             @foreach ($kecamatans as $kecamatan)
@@ -320,7 +314,7 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha*')" />
+                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha')" />
                                         <select name="desa_usaha" id="desa_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                             <option value="">Loading...</option>
                                         </select>
@@ -388,12 +382,12 @@
                                                 </div>
 
                                                 <div>
-                                                    <x-input-label :value="__('Periode')" class="font-semibold" />
-                                                    <select class="block mt-2 w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm" x-bind:name="'produksi['+index+'][periode]'" x-model="product.periode">
-                                                        <option value="">Pilih Periode</option>
-                                                        <option value="Tahunan">Tahunan</option>
-                                                        <option value="Bulanan">Bulanan</option>
-                                                        <option value="Harian">Harian</option>
+                                                    <x-input-label :value="__('Komoditas')" class="font-semibold" />
+                                                    <select class="block mt-2 w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm" x-bind:name="'produksi['+index+'][komoditas]'" x-model="product.komoditas">
+                                                        <option value="">Pilih Komoditas</option>
+                                                        @foreach($komoditas as $item)
+                                                            <option value="{{ $item->nama_komoditas }}">{{ $item->nama_komoditas }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
 
