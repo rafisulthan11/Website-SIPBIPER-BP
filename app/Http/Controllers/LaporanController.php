@@ -7,6 +7,7 @@ use App\Models\Pembudidaya;
 use App\Models\Pengolah;
 use App\Models\Pemasar;
 use App\Models\HargaIkanSegar;
+use App\Models\Pasar;
 use App\Models\MasterKecamatan;
 use App\Models\Komoditas;
 use Illuminate\Support\Facades\View;
@@ -1520,11 +1521,8 @@ class LaporanController extends Controller
             ->orderBy('jenis_ikan')
             ->pluck('jenis_ikan');
 
-        // collect nama_pasar distinct values for filter
-        $namaPasars = HargaIkanSegar::select('nama_pasar')
-            ->whereNotNull('nama_pasar')
-            ->groupBy('nama_pasar')
-            ->orderBy('nama_pasar')
+        // collect nama_pasar values for filter from master data pasar
+        $namaPasars = Pasar::orderBy('nama_pasar')
             ->pluck('nama_pasar');
 
         // Ringkasan penting untuk dashboard rekap harga ikan

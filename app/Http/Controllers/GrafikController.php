@@ -9,6 +9,7 @@ use App\Models\Pengolah;
 use App\Models\Pemasar;
 use App\Models\HargaIkanSegar;
 use App\Models\MasterKecamatan;
+use App\Models\Pasar;
 
 class GrafikController extends Controller
 {
@@ -190,12 +191,8 @@ class GrafikController extends Controller
         // Get kecamatan list
         $kecamatanList = \App\Models\MasterKecamatan::orderBy('nama_kecamatan')->get();
         
-        // Get distinct pasar
-        $pasarList = HargaIkanSegar::select('nama_pasar')
-            ->distinct()
-            ->whereNotNull('nama_pasar')
-            ->where('nama_pasar', '!=', '')
-            ->orderBy('nama_pasar')
+        // Get pasar list from master data
+        $pasarList = Pasar::orderBy('nama_pasar')
             ->pluck('nama_pasar')
             ->toArray();
         
