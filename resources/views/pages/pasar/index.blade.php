@@ -90,8 +90,7 @@
 
                                 <div class="mt-2 text-sm text-slate-700 space-y-1">
                                     <p><span class="font-medium">Alamat:</span> {{ $p->alamat ?? '-' }}</p>
-                                    <p><span class="font-medium">Latitude:</span> {{ $p->latitude ?? '-' }}</p>
-                                    <p><span class="font-medium">Longitude:</span> {{ $p->longitude ?? '-' }}</p>
+                                    <p><span class="font-medium">Kode Pasar:</span> {{ $p->kode_pasar ?? '-' }}</p>
                                 </div>
 
                                 <div class="mt-3 flex flex-wrap gap-2">
@@ -119,8 +118,7 @@
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Kecamatan</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Desa</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Alamat</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Latitude</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Longitude</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Kode Pasar</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Status</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Aksi</th>
                                 </tr>
@@ -132,8 +130,7 @@
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $p->kecamatan ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $p->desa ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $p->alamat ?? '-' }}</td>
-                                    <td class="px-4 py-3 align-top text-slate-700">{{ $p->latitude ?? '-' }}</td>
-                                    <td class="px-4 py-3 align-top text-slate-700">{{ $p->longitude ?? '-' }}</td>
+                                    <td class="px-4 py-3 align-top text-slate-700">{{ $p->kode_pasar ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">
                                         @if($p->status == 'aktif')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Aktif</span>
@@ -161,7 +158,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="8" class="px-4 py-6 text-center text-slate-500">Belum ada data pasar.</td>
+                                    <td colspan="7" class="px-4 py-6 text-center text-slate-500">Belum ada data pasar.</td>
                                 </tr>
                                 @endforelse
                             </tbody>

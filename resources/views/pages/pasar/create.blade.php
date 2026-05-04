@@ -63,24 +63,13 @@
                             @enderror
                         </div>
 
-                        <!-- Latitude -->
+                        <!-- Kode Pasar -->
                         <div class="mb-5">
-                            <label for="latitude" class="block mb-2 text-base font-medium text-gray-900">
-                                Latitude
+                            <label for="kode_pasar" class="block mb-2 text-base font-medium text-gray-900">
+                                Kode Pasar <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="latitude" name="latitude" value="{{ old('latitude') }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: -8.123456">
-                            @error('latitude')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Longitude -->
-                        <div class="mb-5">
-                            <label for="longitude" class="block mb-2 text-base font-medium text-gray-900">
-                                Longitude
-                            </label>
-                            <input type="text" id="longitude" name="longitude" value="{{ old('longitude') }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: 113.123456">
-                            @error('longitude')
+                            <input type="text" id="kode_pasar" name="kode_pasar" value="{{ old('kode_pasar') }}" required class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Masukkan kode pasar">
+                            @error('kode_pasar')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

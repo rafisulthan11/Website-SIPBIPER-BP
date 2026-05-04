@@ -31,16 +31,10 @@
                                 <p class="text-base text-slate-900">{{ $pasar->desa ?? '-' }}</p>
                             </div>
 
-                            <!-- Latitude -->
+                            <!-- Kode Pasar -->
                             <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Latitude</label>
-                                <p class="text-base text-slate-900">{{ $pasar->latitude ?? '-' }}</p>
-                            </div>
-
-                            <!-- Longitude -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Longitude</label>
-                                <p class="text-base text-slate-900">{{ $pasar->longitude ?? '-' }}</p>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Kode Pasar</label>
+                                <p class="text-base text-slate-900">{{ $pasar->kode_pasar ?? '-' }}</p>
                             </div>
 
                             <!-- Alamat -->

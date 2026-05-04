@@ -11,13 +11,12 @@ class Pasar extends Model
     
     protected $fillable = [
         'nama_pasar',
+        'kode_pasar',
         'id_kecamatan',
         'id_desa',
         'kecamatan',
         'desa',
         'alamat',
-        'latitude',
-        'longitude',
         'status',
         'created_by',
         'updated_by'

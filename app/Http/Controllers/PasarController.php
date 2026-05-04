@@ -8,6 +8,7 @@ use App\Models\MasterDesa;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PasarController extends Controller
 {
@@ -59,11 +60,10 @@ class PasarController extends Controller
         $pasar = Pasar::query()
             ->when($q, function ($query, $q) {
                 return $query->where('nama_pasar', 'like', '%' . $q . '%')
+                    ->orWhere('kode_pasar', 'like', '%' . $q . '%')
                     ->orWhere('kecamatan', 'like', '%' . $q . '%')
                     ->orWhere('desa', 'like', '%' . $q . '%')
                     ->orWhere('alamat', 'like', '%' . $q . '%')
-                    ->orWhere('latitude', 'like', '%' . $q . '%')
-                    ->orWhere('longitude', 'like', '%' . $q . '%')
                     ->orWhere('status', 'like', '%' . $q . '%');
             })
             ->orderBy('nama_pasar')
@@ -90,12 +90,13 @@ class PasarController extends Controller
     {
         $validated = $request->validate([
             'nama_pasar' => 'required|string|max:255',
+            'kode_pasar' => ['required', 'string', 'max:50', Rule::unique('pasar', 'kode_pasar')],
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
             'alamat' => 'required|string',
-            'latitude' => 'nullable|string|max:255',
-            'longitude' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,tidak aktif'
+        ], [
+            'kode_pasar.unique' => 'kode yang anda masukkan sudah terdaftar',
         ]);
 
         $kecamatan = MasterKecamatan::findOrFail($validated['id_kecamatan']);
@@ -160,12 +161,18 @@ class PasarController extends Controller
     {
         $validated = $request->validate([
             'nama_pasar' => 'required|string|max:255',
+            'kode_pasar' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('pasar', 'kode_pasar')->ignore($id, 'id_pasar'),
+            ],
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
             'alamat' => 'required|string',
-            'latitude' => 'nullable|string|max:255',
-            'longitude' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,tidak aktif'
+        ], [
+            'kode_pasar.unique' => 'kode yang anda masukkan sudah terdaftar',
         ]);
 
         $kecamatan = MasterKecamatan::findOrFail($validated['id_kecamatan']);
