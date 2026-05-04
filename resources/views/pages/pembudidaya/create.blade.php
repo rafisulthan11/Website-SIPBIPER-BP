@@ -76,7 +76,7 @@
 
                                 <!-- Jenis Kegiatan Usaha -->
                                 <div>
-                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha')" />
+                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha*')" />
                                     <select name="jenis_kegiatan_usaha" id="jenis_kegiatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Pilih Jenis Kegiatan Usaha</option>
                                         <option value="Pembenihan/Pembibitan" {{ old('jenis_kegiatan_usaha')=='Pembenihan/Pembibitan' ? 'selected' : '' }}>Pembenihan/Pembibitan</option>
@@ -88,7 +88,7 @@
 
                                 <!-- Jenis Budidaya -->
                                 <div>
-                                    <x-input-label for="jenis_budidaya" :value="__('Jenis Budidaya')" />
+                                    <x-input-label for="jenis_budidaya" :value="__('Jenis Budidaya*')" />
                                     <select name="jenis_budidaya" id="jenis_budidaya" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Pilih Jenis Budidaya</option>
                                         <option value="Kolam" {{ old('jenis_budidaya')=='Kolam' ? 'selected' : '' }}>Kolam</option>
@@ -284,7 +284,7 @@
                                 <h4 class="text-base font-semibold text-slate-700 mb-4">Lokasi Usaha</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
-                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha*')" />
+                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha')" />
                                         <select name="kecamatan_usaha" id="kecamatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                             <option value="">Pilih Kecamatan</option>
                                             @foreach ($kecamatans as $kecamatan)
@@ -293,7 +293,7 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha*')" />
+                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha')" />
                                         <select name="desa_usaha" id="desa_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm bg-gray-100" disabled>
                                             <option value="">Pilih Kecamatan Terlebih Dahulu</option>
                                         </select>
