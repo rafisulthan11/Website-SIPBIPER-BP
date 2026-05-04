@@ -431,35 +431,13 @@ class GrafikController extends Controller
         // Get kecamatan list
         $kecamatanList = \App\Models\MasterKecamatan::orderBy('nama_kecamatan')->get();
         
-        // Get distinct komoditas from both pembudidaya (via ikan) and pengolah
-        $komoditasPembudidaya = \App\Models\PembudidayaIkan::select('jenis_ikan')
-            ->distinct()
-            ->whereNotNull('jenis_ikan')
-            ->where('jenis_ikan', '!=', '')
-            ->pluck('jenis_ikan');
-        
-        $komoditasPengolah = Pengolah::select('komoditas')
-            ->distinct()
-            ->whereNotNull('komoditas')
-            ->where('komoditas', '!=', '')
-            ->pluck('komoditas');
-        
-        // Merge and split komoditas (some pengolah might have comma-separated values)
-        $komoditasList = collect();
-        foreach ($komoditasPembudidaya as $k) {
-            $komoditasList->push($k);
-        }
-        foreach ($komoditasPengolah as $k) {
-            $items = explode(',', $k);
-            foreach ($items as $item) {
-                $komoditasList->push(trim($item));
-            }
-        }
-        
-        $komoditasList = $komoditasList
+        // Get komoditas list from master data (tipe pembudidaya + pengolah), unique by kode
+        $komoditasList = \App\Models\Komoditas::whereIn('tipe', ['pembudidaya', 'pengolah'])
+            ->orderBy('nama_komoditas')
+            ->get()
+            ->unique('kode')
+            ->pluck('nama_komoditas')
             ->filter()
-            ->unique()
-            ->sort()
             ->values()
             ->toArray();
         

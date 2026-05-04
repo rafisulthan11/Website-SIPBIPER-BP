@@ -86,7 +86,19 @@ class KomoditasController extends Controller
             'tipe' => 'required|string|max:255',
             'kode' => 'required|string|max:255',
             'status' => 'required|in:aktif,tidak aktif'
+        ], [
+            'kode_tipe_unique' => 'kode dan tipe komoditas sudah terdaftar',
         ]);
+
+        $exists = Komoditas::where('kode', $validated['kode'])
+            ->where('tipe', $validated['tipe'])
+            ->exists();
+
+        if ($exists) {
+            return back()
+                ->withErrors(['kode' => 'kode dan tipe komoditas sudah terdaftar'])
+                ->withInput();
+        }
 
         $komoditas = Komoditas::create(array_merge($validated, [
             'created_by' => auth()->id(),
@@ -132,7 +144,20 @@ class KomoditasController extends Controller
             'tipe' => 'required|string|max:255',
             'kode' => 'required|string|max:255',
             'status' => 'required|in:aktif,tidak aktif'
+        ], [
+            'kode_tipe_unique' => 'kode dan tipe komoditas sudah terdaftar',
         ]);
+
+        $exists = Komoditas::where('kode', $validated['kode'])
+            ->where('tipe', $validated['tipe'])
+            ->where('id_komoditas', '!=', $id)
+            ->exists();
+
+        if ($exists) {
+            return back()
+                ->withErrors(['kode' => 'kode dan tipe komoditas sudah terdaftar'])
+                ->withInput();
+        }
 
         $komoditas = Komoditas::findOrFail($id);
         $komoditas->update(array_merge($validated, [

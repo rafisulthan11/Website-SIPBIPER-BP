@@ -324,9 +324,9 @@ class LaporanController extends Controller
 
         $kecamatans = MasterKecamatan::orderBy('nama_kecamatan')->get();
 
-        // collect komoditas distinct values for filter (dari master komoditas yang aktif)
+        // collect komoditas distinct values for filter (tipe pembudidaya, aktif & tidak aktif)
         // Hanya tampilkan komoditas yang ada data pembudidaya-nya
-        $komoditasAktif = Komoditas::where('status', 'aktif')
+        $komoditasAktif = Komoditas::where('tipe', 'pembudidaya')
             ->pluck('nama_komoditas')
             ->unique()
             ->values();

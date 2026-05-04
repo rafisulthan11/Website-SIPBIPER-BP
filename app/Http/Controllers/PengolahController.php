@@ -112,7 +112,10 @@ class PengolahController extends Controller
     {
         $kecamatans = MasterKecamatan::all();
         $desas = MasterDesa::all();
-        $komoditas = \App\Models\Komoditas::orderBy('nama_komoditas')->get();
+        $komoditas = \App\Models\Komoditas::where('status', 'aktif')
+            ->where('tipe', 'pengolah')
+            ->orderBy('nama_komoditas')
+            ->get();
         return view('pages.pengolah.create', compact('kecamatans', 'desas', 'komoditas'));
     }
 
@@ -358,7 +361,10 @@ class PengolahController extends Controller
     {
         $kecamatans = MasterKecamatan::all();
         $desas = MasterDesa::all();
-        $komoditas = \App\Models\Komoditas::orderBy('nama_komoditas')->get();
+        $komoditas = \App\Models\Komoditas::where('status', 'aktif')
+            ->where('tipe', 'pengolah')
+            ->orderBy('nama_komoditas')
+            ->get();
         return view('pages.pengolah.edit', compact('pengolah', 'kecamatans', 'desas', 'komoditas'));
     }
 

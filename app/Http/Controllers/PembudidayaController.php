@@ -119,7 +119,10 @@ class PembudidayaController extends Controller
     {
         $kecamatans = MasterKecamatan::all();
         $desas = MasterDesa::all(); // Nanti kita buat ini dinamis
-        $komoditas = Komoditas::orderBy('nama_komoditas')->get();
+        $komoditas = Komoditas::where('status', 'aktif')
+            ->where('tipe', 'pembudidaya')
+            ->orderBy('nama_komoditas')
+            ->get();
         return view('pages.pembudidaya.create', compact('kecamatans', 'desas', 'komoditas'));
     }
 
@@ -431,7 +434,10 @@ class PembudidayaController extends Controller
     {
         $kecamatans = MasterKecamatan::all();
         $desas = MasterDesa::all();
-        $komoditas = Komoditas::orderBy('nama_komoditas')->get();
+        $komoditas = Komoditas::where('status', 'aktif')
+            ->where('tipe', 'pembudidaya')
+            ->orderBy('nama_komoditas')
+            ->get();
         $pembudidaya->load(['investasi','izin','produksi','kolam','ikan','tenagaKerja','kecamatanUsaha','desaUsaha']);
         return view('pages.pembudidaya.edit', compact('pembudidaya', 'kecamatans', 'desas', 'komoditas'));
     }

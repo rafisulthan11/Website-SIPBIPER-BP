@@ -166,9 +166,32 @@ class PetaLokasiController extends Controller
         // Ambil daftar kecamatan untuk filter
         $kecamatans = MasterKecamatan::orderBy('nama_kecamatan')->get();
         
-        // Ambil daftar komoditas untuk filter
-        $komoditas = Komoditas::orderBy('nama_komoditas')->get();
+        // Ambil daftar komoditas untuk filter (unik berdasarkan kode komoditas)
+        $komoditasPembudidaya = Komoditas::where('tipe', 'pembudidaya')
+            ->orderBy('nama_komoditas')
+            ->get()
+            ->unique('kode')
+            ->values();
 
-        return view('pages.peta-lokasi.index', compact('allData', 'kecamatans', 'komoditas', 'totalLokasi', 'luasLahanInvestasi', 'luasKolam', 'totalGabungan'));
+        $komoditasPengolah = Komoditas::where('tipe', 'pengolah')
+            ->orderBy('nama_komoditas')
+            ->get()
+            ->unique('kode')
+            ->values();
+
+        $komoditasPemasar = Komoditas::where('tipe', 'pemasar')
+            ->orderBy('nama_komoditas')
+            ->get()
+            ->unique('kode')
+            ->values();
+
+        $komoditasSemua = $komoditasPembudidaya
+            ->concat($komoditasPengolah)
+            ->concat($komoditasPemasar)
+            ->unique('kode')
+            ->sortBy('nama_komoditas')
+            ->values();
+
+        return view('pages.peta-lokasi.index', compact('allData', 'kecamatans', 'komoditasSemua', 'komoditasPembudidaya', 'komoditasPengolah', 'komoditasPemasar', 'totalLokasi', 'luasLahanInvestasi', 'luasKolam', 'totalGabungan'));
     }
 }

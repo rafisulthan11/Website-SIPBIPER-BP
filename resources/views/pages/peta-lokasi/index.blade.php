@@ -63,7 +63,7 @@
                             </label>
                             <select id="filter-komoditas" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Semua Komoditas</option>
-                                @foreach($komoditas ?? [] as $item)
+                                @foreach($komoditasSemua ?? [] as $item)
                                     <option value="{{ $item->nama_komoditas }}">{{ $item->nama_komoditas }}</option>
                                 @endforeach
                             </select>
@@ -287,6 +287,31 @@
             document.getElementById('stat-total-gabungan').textContent = totalGabungan.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' m²';
         }
         
+        // Komoditas options per tab
+        const komoditasOptions = {
+            semua: @json($komoditasSemua ?? []),
+            pembudidaya: @json($komoditasPembudidaya ?? []),
+            pengolah: @json($komoditasPengolah ?? []),
+            pemasar: @json($komoditasPemasar ?? [])
+        };
+
+        function renderKomoditasOptions(tabKey) {
+            const select = document.getElementById('filter-komoditas');
+            if (!select) return;
+
+            const items = komoditasOptions[tabKey] || [];
+            select.innerHTML = '<option value="">Semua Komoditas</option>';
+            items.forEach(item => {
+                if (!item || !item.nama_komoditas) return;
+                const option = document.createElement('option');
+                option.value = item.nama_komoditas;
+                option.textContent = item.nama_komoditas;
+                select.appendChild(option);
+            });
+
+            select.value = '';
+        }
+
         // Tab Navigation Functionality
         const tabButtons = document.querySelectorAll('.tab-button');
         
@@ -299,6 +324,7 @@
                 this.classList.add('active');
                 
                 // Filter berdasarkan tab yang dipilih
+                renderKomoditasOptions(tab);
                 applyFilters();
             });
         });
@@ -531,6 +557,7 @@
         };
 
         // Initial render
+        renderKomoditasOptions('semua');
         addMarkers(pembudidayaData);
 
         // Filter functionality

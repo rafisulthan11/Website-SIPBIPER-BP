@@ -113,7 +113,10 @@ class PemasarController extends Controller
     {
         $kecamatans = MasterKecamatan::all();
         $desas = MasterDesa::all();
-        $komoditas = \App\Models\Komoditas::where('status', 'aktif')->orderBy('nama_komoditas')->get();
+        $komoditas = \App\Models\Komoditas::where('status', 'aktif')
+            ->where('tipe', 'pemasar')
+            ->orderBy('nama_komoditas')
+            ->get();
         return view('pages.pemasar.create', compact('kecamatans', 'desas', 'komoditas'));
     }
 
@@ -426,7 +429,10 @@ class PemasarController extends Controller
     {
         $kecamatans = MasterKecamatan::all();
         $desas = MasterDesa::all();
-        $komoditas = \App\Models\Komoditas::where('status', 'aktif')->orderBy('nama_komoditas')->get();
+        $komoditas = \App\Models\Komoditas::where('status', 'aktif')
+            ->where('tipe', 'pemasar')
+            ->orderBy('nama_komoditas')
+            ->get();
         return view('pages.pemasar.edit', compact('pemasar', 'kecamatans', 'desas', 'komoditas'));
     }
 
