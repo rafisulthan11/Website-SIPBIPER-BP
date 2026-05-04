@@ -13,6 +13,8 @@
             'nik_pembudidaya' => 1,
             'id_kecamatan' => 1,
             'id_desa' => 1,
+            'kontak' => 1,
+            'email' => 1,
         ];
         $initialStep = 0;
         if ($errors->any()) {
@@ -47,7 +49,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('pembudidaya.update', $pembudidaya->id_pembudidaya) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('pembudidaya.update', $pembudidaya->id_pembudidaya) }}" enctype="multipart/form-data" novalidate data-skip-multistep-validation="1">
                     @csrf
                     @method('PUT')
                     <!-- Step panels -->
@@ -107,10 +109,12 @@
                                 <div>
                                     <x-input-label for="nama_lengkap" :value="__('Nama Lengkap (Sesuai KTP)*')" />
                                     <x-text-input id="nama_lengkap" class="block mt-1 w-full" type="text" name="nama_lengkap" :value="old('nama_lengkap', $pembudidaya->nama_lengkap)" required />
+                                    <x-input-error :messages="$errors->get('nama_lengkap')" class="mt-2" />
                                 </div>
                                 <div>
                                     <x-input-label for="nik_pembudidaya" :value="__('NIK (Sesuai KTP)*')" />
-                                    <x-text-input id="nik_pembudidaya" class="block mt-1 w-full" type="text" name="nik_pembudidaya" :value="old('nik_pembudidaya', $pembudidaya->nik_pembudidaya)" required />
+                                    <x-text-input id="nik_pembudidaya" class="block mt-1 w-full" type="text" name="nik_pembudidaya" :value="old('nik_pembudidaya', $pembudidaya->nik_pembudidaya)" required maxlength="16" inputmode="numeric" pattern="[0-9]*" />
+                                    <x-input-error :messages="$errors->get('nik_pembudidaya')" class="mt-2" />
                                 </div>
                                 <div>
                                     <x-input-label for="jenis_kelamin" :value="__('Jenis Kelamin')" />
@@ -147,20 +151,24 @@
                                             <option value="{{ $kecamatan->id_kecamatan }}" {{ old('id_kecamatan', $pembudidaya->id_kecamatan)==$kecamatan->id_kecamatan ? 'selected' : '' }}>{{ $kecamatan->nama_kecamatan }}</option>
                                         @endforeach
                                     </select>
+                                    <x-input-error :messages="$errors->get('id_kecamatan')" class="mt-2" />
                                 </div>
                                 <div>
                                     <x-input-label for="id_desa" :value="__('Desa/Kelurahan*')" />
                                     <select name="id_desa" id="id_desa" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
                                         <option value="">Loading...</option>
                                     </select>
+                                    <x-input-error :messages="$errors->get('id_desa')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <x-input-label for="kontak" :value="__('No. Telepon / HP')" />
-                                    <x-text-input id="kontak" class="block mt-1 w-full" type="text" name="kontak" :value="old('kontak', $pembudidaya->kontak)" />
+                                    <x-input-label for="kontak" :value="__('No. Telepon / HP*')" />
+                                    <x-text-input id="kontak" class="block mt-1 w-full" type="text" name="kontak" :value="old('kontak', $pembudidaya->kontak)" required />
+                                    <x-input-error :messages="$errors->get('kontak')" class="mt-2" />
                                 </div>
                                 <div>
                                     <x-input-label for="email" :value="__('Email')" />
                                     <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $pembudidaya->email)" />
+                                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
                                 <div>
                                     <x-input-label for="no_npwp" :value="__('No. NPWP')" />
@@ -785,7 +793,7 @@
                         <div class="flex items-center gap-3">
                             <button type="button" class="px-5 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-slate-700 text-sm font-medium transition" @click="if(step>0) step--" x-show="step>0">Sebelumnya</button>
                             <button type="button" class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition" @click="if(step<maxStep) step++" x-show="step<maxStep">Berikutnya</button>
-                            <button type="submit" x-show="step===maxStep" class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                            <button type="submit" x-show="step===maxStep" formnovalidate class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
                                 {{ __('Perbarui Data') }}
                             </button>
                         </div>

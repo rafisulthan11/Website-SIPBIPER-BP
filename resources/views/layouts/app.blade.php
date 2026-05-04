@@ -497,6 +497,7 @@
                 function bindMultiStepValidation() {
                     document.querySelectorAll('form').forEach(function (form) {
                         if (form.dataset.multistepValidationBound === '1') return;
+                        if (form.dataset.skipMultistepValidation === '1') return;
 
                         const hasStepPanels = form.querySelector('[x-show*="step==="]');
                         if (!hasStepPanels) return;

@@ -138,14 +138,15 @@ class PembudidayaController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'nik_pembudidaya' => [
                 'required',
-                'string',
-                'size:16',
+                'digits:16',
                 Rule::unique('pembudidayas', 'nik_pembudidaya')->where(function ($query) use ($request) {
                     return $query->where('tahun_pendataan', $request->tahun_pendataan);
                 })
             ],
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
+            'kontak' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
             'jenis_kegiatan_usaha' => 'required|string',
             'jenis_budidaya' => 'required|string',
             // Izin Usaha (opsional strings)
@@ -180,7 +181,14 @@ class PembudidayaController extends Controller
             'foto_kusuka' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'foto_nib' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'nik_pembudidaya.required' => 'NIK wajib diisi.',
+            'nik_pembudidaya.digits' => 'Penulisan NIK salah atau tidak sesuai format.',
             'nik_pembudidaya.unique' => 'NIK ini sudah terdaftar untuk tahun pendataan yang sama. Satu NIK hanya boleh didaftarkan satu kali per tahun.',
+            'id_kecamatan.required' => 'Kecamatan dan desa wajib diisi.',
+            'id_desa.required' => 'Desa wajib diisi.',
+            'kontak.required' => 'Nomor telepon wajib diisi.',
+            'email.email' => 'Penulisan email salah atau tidak sesuai format.',
         ]);
 
         // Handle file uploads
@@ -453,8 +461,7 @@ class PembudidayaController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'nik_pembudidaya' => [
                 'required',
-                'string',
-                'size:16',
+                'digits:16',
                 Rule::unique('pembudidayas', 'nik_pembudidaya')
                     ->where(function ($query) use ($request) {
                         return $query->where('tahun_pendataan', $request->tahun_pendataan);
@@ -463,6 +470,8 @@ class PembudidayaController extends Controller
             ],
             'id_kecamatan' => 'required|exists:master_kecamatans,id_kecamatan',
             'id_desa' => 'required|exists:master_desas,id_desa',
+            'kontak' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
             'jenis_kegiatan_usaha' => 'required|string',
             'jenis_budidaya' => 'required|string',
             // Izin Usaha (opsional strings)
@@ -490,7 +499,14 @@ class PembudidayaController extends Controller
             'investasi.bangunan' => 'nullable|string',
             'investasi.sertifikat' => 'nullable|in:IMB,NON_IMB',
         ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'nik_pembudidaya.required' => 'NIK wajib diisi.',
+            'nik_pembudidaya.digits' => 'Penulisan NIK salah atau tidak sesuai format.',
             'nik_pembudidaya.unique' => 'NIK ini sudah terdaftar untuk tahun pendataan yang sama. Satu NIK hanya boleh didaftarkan satu kali per tahun.',
+            'id_kecamatan.required' => 'Kecamatan dan desa wajib diisi.',
+            'id_desa.required' => 'Desa wajib diisi.',
+            'kontak.required' => 'Nomor telepon wajib diisi.',
+            'email.email' => 'Penulisan email salah atau tidak sesuai format.',
         ]);
 
         // Handle file uploads
