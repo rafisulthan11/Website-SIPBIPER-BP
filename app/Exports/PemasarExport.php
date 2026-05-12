@@ -22,7 +22,7 @@ class PemasarExport implements FromCollection, WithHeadings, WithMapping, WithSt
 
     public function collection()
     {
-        $query = Pemasar::with(['kecamatan', 'desa', 'kecamatanUsaha', 'desaUsaha']);
+        $query = Pemasar::with(['kecamatan', 'desa', 'kecamatanUsaha', 'desaUsaha', 'pemasaran']);
 
         // Apply filters
         if (!empty($this->filters['kecamatan'])) {
@@ -31,10 +31,6 @@ class PemasarExport implements FromCollection, WithHeadings, WithMapping, WithSt
 
         if (!empty($this->filters['komoditas'])) {
             $query->where('jenis_kegiatan_usaha', 'like', '%' . $this->filters['komoditas'] . '%');
-        }
-
-        if (!empty($this->filters['kategori'])) {
-            $query->where('jenis_pemasaran', $this->filters['kategori']);
         }
 
         if (!empty($this->filters['bulan'])) {
@@ -88,7 +84,6 @@ class PemasarExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'SKALA USAHA',
             'STATUS USAHA',
             'TAHUN MULAI USAHA (US)',
-            'KOMODITAS (USAHAT)',
             // lokasi usaha
             'KECAMATAN USAHA',
             'DESA USAHA',
@@ -127,8 +122,6 @@ class PemasarExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'LUAS BANGUNAN',
             'NILAI BANGUNAN',
             // produksi
-            'KAPASITAS TERPASANG SETAHUN',
-            'JUMLAH HARI PRODUKSI/BULAN',
             'BULAN PRODUKSI',
             'DISTRIBUSI PEMASARAN',
             // tenaga kerja (compact)
@@ -157,10 +150,16 @@ class PemasarExport implements FromCollection, WithHeadings, WithMapping, WithSt
             }
         }
 
+        $pemasaranSection = null;
+        if ($pemasar->relationLoaded('pemasaran') && $pemasar->pemasaran->isNotEmpty()) {
+            $pemasaranSection = $pemasar->pemasaran->sortBy('section_index')->first();
+        }
+
         // bulan produksi
         $bulanProduksi = '-';
-        if ($pemasar->bulan_produksi) {
-            $bp = json_decode($pemasar->bulan_produksi, true);
+        $bulanProduksiRaw = $pemasaranSection->bulan_produksi ?? $pemasar->bulan_produksi ?? null;
+        if ($bulanProduksiRaw) {
+            $bp = is_string($bulanProduksiRaw) ? json_decode($bulanProduksiRaw, true) : $bulanProduksiRaw;
             if (is_array($bp)) {
                 $bulanProduksi = implode(', ', $bp);
             }
@@ -222,7 +221,6 @@ class PemasarExport implements FromCollection, WithHeadings, WithMapping, WithSt
             $pemasar->skala_usaha ?? '-',
             $pemasar->status_usaha ?? '-',
             $pemasar->tahun_mulai_usaha ?? '-',
-            $pemasar->komoditas ?? '-',
 
             // lokasi usaha
             optional($pemasar->kecamatanUsaha)->nama_kecamatan ?? '-',
@@ -269,10 +267,8 @@ class PemasarExport implements FromCollection, WithHeadings, WithMapping, WithSt
             $pemasar->nilai_bangunan ? 'Rp. ' . number_format($pemasar->nilai_bangunan, 2, ',', '.') : '-',
 
             // produksi
-            $pemasar->kapasitas_terpasang_setahun ? $pemasar->kapasitas_terpasang_setahun . ' Kg' : '-',
-            $pemasar->jumlah_hari_produksi ? $pemasar->jumlah_hari_produksi . ' hari' : '-',
             $bulanProduksi,
-            $pemasar->distribusi_pemasaran ?? '-',
+            $pemasaranSection->distribusi_pemasaran ?? $pemasar->distribusi_pemasaran ?? '-',
 
             // tenaga kerja
             $tkSummary,

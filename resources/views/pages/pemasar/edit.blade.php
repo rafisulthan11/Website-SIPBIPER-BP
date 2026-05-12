@@ -12,6 +12,8 @@
             'nik_pemasar' => 1,
             'id_kecamatan' => 1,
             'id_desa' => 1,
+            'kontak' => 1,
+            'email' => 1,
         ];
         $initialStep = 0;
         if ($errors->any()) {
@@ -46,7 +48,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('pemasar.update', $pemasar->id_pemasar) }}" enctype="multipart/form-data" novalidate>
+                <form method="POST" action="{{ route('pemasar.update', $pemasar->id_pemasar) }}" enctype="multipart/form-data" novalidate data-skip-multistep-validation="1">
                     @csrf
                     @method('PUT')
                     
@@ -74,7 +76,7 @@
 
                                 <!-- Jenis Kegiatan Usaha -->
                                 <div>
-                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha')" />
+                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha*')" />
                                     <select name="jenis_kegiatan_usaha" id="jenis_kegiatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Pilih Jenis Kegiatan Usaha</option>
                                         <option value="Pemasar Ikan Segar Pengecer" {{ old('jenis_kegiatan_usaha', $pemasar->jenis_kegiatan_usaha)=='Pemasar Ikan Segar Pengecer' ? 'selected' : '' }}>Pemasar Ikan Segar Pengecer</option>
@@ -100,7 +102,7 @@
                                 </div>
                                 <div>
                                     <x-input-label for="nik_pemasar" :value="__('NIK (Sesuai KTP)*')" />
-                                    <x-text-input id="nik_pemasar" class="block mt-1 w-full" type="text" name="nik_pemasar" :value="old('nik_pemasar', $pemasar->nik_pemasar)" required maxlength="16" />
+                                    <x-text-input id="nik_pemasar" class="block mt-1 w-full" type="text" name="nik_pemasar" :value="old('nik_pemasar', $pemasar->nik_pemasar)" required maxlength="16" inputmode="numeric" pattern="[0-9]*" />
                                     <x-input-error :messages="$errors->get('nik_pemasar')" class="mt-2" />
                                 </div>
                                 <div>
@@ -161,8 +163,8 @@
                                     <p class="text-xs text-gray-500">(Jumlah anggota keluarga yang ditanggung, tidak termasuk diri sendiri)</p>
                                 </div>
                                 <div class="md:col-span-2 lg:col-span-3">
-                                    <x-input-label for="alamat" :value="__('Alamat Lengkap (Sesuai KTP)*')" />
-                                    <textarea id="alamat" name="alamat" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" rows="3" required>{{ old('alamat', $pemasar->alamat) }}</textarea>
+                                    <x-input-label for="alamat" :value="__('Alamat Lengkap (Sesuai KTP)')" />
+                                    <textarea id="alamat" name="alamat" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" rows="3">{{ old('alamat', $pemasar->alamat) }}</textarea>
                                     <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
                                 </div>
                                 <div>
@@ -319,18 +321,6 @@
                                         </select>
                                         <x-input-error :messages="$errors->get('skala_usaha')" class="mt-2" />
                                     </div>
-                                    <div>
-                                        <x-input-label for="komoditas" :value="__('Komoditas')" />
-                                        <select name="komoditas" id="komoditas" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                                            <option value="">Pilih Komoditas</option>
-                                            @foreach($komoditas as $item)
-                                                <option value="{{ $item->nama_komoditas }}" {{ old('komoditas', $pemasar->komoditas)==$item->nama_komoditas ? 'selected' : '' }}>
-                                                    {{ $item->nama_komoditas }} ({{ $item->tipe }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <x-input-error :messages="$errors->get('komoditas')" class="mt-2" />
-                                    </div>
                                 </div>
                             </div>
 
@@ -339,7 +329,7 @@
                                 <h4 class="text-base font-semibold text-slate-700 mb-4">Lokasi Usaha</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
-                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha*')" />
+                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha')" />
                                         <select name="kecamatan_usaha" id="kecamatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                             <option value="">Pilih Kecamatan</option>
                                             @foreach ($kecamatans as $kecamatan)
@@ -348,7 +338,7 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha*')" />
+                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha')" />
                                         <select name="desa_usaha" id="desa_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                             <option value="">Loading...</option>
                                         </select>
@@ -601,22 +591,74 @@
 
                         <!-- Step 5: Pemasaran -->
                         @php
-                            $existingData = old('data_pemasaran', json_decode($pemasar->data_pemasaran ?? '[]', true));
-                            if (empty($existingData)) {
-                                $existingData = [['jenis_ikan' => '', 'jumlah_volume' => '', 'asal_ikan' => '', 'harga_beli' => '', 'harga_jual' => '']];
+                            $existingSections = $pemasar->pemasaran
+                                ->groupBy(function ($row) {
+                                    return $row->section_index ?? 0;
+                                })
+                                ->map(function ($rows, $sectionIndex) {
+                                    $firstRow = $rows->first();
+                                    $bulanProduksi = $firstRow->bulan_produksi;
+                                    if (is_string($bulanProduksi)) {
+                                        $bulanProduksi = json_decode($bulanProduksi, true);
+                                    }
+
+                                    return [
+                                        'id' => (int) $sectionIndex + 1,
+                                        'kapasitas_terpasang' => $firstRow->kapasitas_terpasang ?? '',
+                                        'hasil_produksi_kg' => $firstRow->hasil_produksi_kg ?? '',
+                                        'hasil_produksi_rp' => $firstRow->hasil_produksi_rp ?? '',
+                                        'bulan_produksi' => is_array($bulanProduksi) ? array_values($bulanProduksi) : [],
+                                        'distribusi_pemasaran' => $firstRow->distribusi_pemasaran ?? '',
+                                        'rows' => $rows->map(function ($row) {
+                                            return [
+                                                'id' => $row->id_pemasar_pemasaran,
+                                                'komoditas' => $row->komoditas ?? '',
+                                                'jumlah_volume' => $row->jumlah_volume ?? '',
+                                                'asal_ikan' => $row->asal_ikan ?? '',
+                                                'harga_beli' => $row->harga_beli ?? '',
+                                                'harga_jual' => $row->harga_jual ?? '',
+                                            ];
+                                        })->values()->toArray(),
+                                    ];
+                                })->values()->toArray();
+
+                            if (empty($existingSections)) {
+                                $existingSections = [[
+                                    'id' => 1,
+                                    'kapasitas_terpasang' => '',
+                                    'hasil_produksi_kg' => '',
+                                    'hasil_produksi_rp' => '',
+                                    'bulan_produksi' => [],
+                                    'distribusi_pemasaran' => '',
+                                    'rows' => [[
+                                        'id' => 1,
+                                        'komoditas' => '',
+                                        'jumlah_volume' => '',
+                                        'asal_ikan' => '',
+                                        'harga_beli' => '',
+                                        'harga_jual' => '',
+                                    ]],
+                                    'nextRowId' => 2,
+                                ]];
+                            } else {
+                                $existingSections = array_map(function ($section) {
+                                    $section['nextRowId'] = count($section['rows']) + 1;
+                                    return $section;
+                                }, $existingSections);
                             }
                         @endphp
                         <div x-show="step===5" x-transition class="bg-gray-50 rounded-lg border border-gray-200 p-6" x-data="{ 
-                            sections: [{
-                                id: 1,
-                                rows: {{ json_encode(array_values($existingData)) }},
-                                nextRowId: {{ count($existingData) + 1 }}
-                            }],
-                            nextSectionId: 2,
+                            sections: {{ json_encode($existingSections) }},
+                            nextSectionId: {{ count($existingSections) + 1 }},
                             addSection() {
                                 this.sections.push({
                                     id: this.nextSectionId++,
-                                    rows: [{ id: 1, jenis_ikan: '', jumlah_volume: '', asal_ikan: '', harga_beli: '', harga_jual: '' }],
+                                    kapasitas_terpasang: '',
+                                    hasil_produksi_kg: '',
+                                    hasil_produksi_rp: '',
+                                    bulan_produksi: [],
+                                    distribusi_pemasaran: '',
+                                    rows: [{ id: 1, komoditas: '', jumlah_volume: '', asal_ikan: '', harga_beli: '', harga_jual: '' }],
                                     nextRowId: 2
                                 });
                             },
@@ -628,7 +670,7 @@
                             addRow(sectionIndex) {
                                 this.sections[sectionIndex].rows.push({ 
                                     id: this.sections[sectionIndex].nextRowId++, 
-                                    jenis_ikan: '', 
+                                    komoditas: '', 
                                     jumlah_volume: '', 
                                     asal_ikan: '', 
                                     harga_beli: '', 
@@ -673,7 +715,7 @@
                             <template x-for="(section, sectionIndex) in sections" :key="section.id">
                                 <div class="mb-6 p-4 bg-white rounded-lg border-2 border-blue-200 relative">
                                     <!-- Remove Section Button -->
-                                    <div class="flex justify-between items-center mb-4" x-show="sections.length > 1">
+                                    <div class="flex justify-between items-center mb-4">
                                         <span class="text-sm font-semibold text-blue-600" x-text="'Data Pemasaran #' + (sectionIndex + 1)"></span>
                                         <button type="button" @click="removeSection(section.id)" class="text-red-600 hover:text-red-800 text-sm font-medium">
                                             Hapus Data Pemasaran
@@ -689,7 +731,7 @@
                                                     Kapasitas Terpasang
                                                 </label>
                                                 <div class="flex items-center gap-2">
-                                                    <input class="block w-full border-gray-300 rounded-md shadow-sm" type="number" :name="'pemasaran[' + sectionIndex + '][kapasitas_terpasang]'" :value="sectionIndex === 0 ? '{{ old('kapasitas_terpasang', $pemasar->kapasitas_terpasang ?? '') }}' : ''" step="0.01" />
+                                                    <input class="block w-full border-gray-300 rounded-md shadow-sm" type="number" :name="'pemasaran[' + sectionIndex + '][kapasitas_terpasang]'" x-model="section.kapasitas_terpasang" step="0.01" />
                                                     <span class="text-sm text-gray-600 whitespace-nowrap">Kg</span>
                                                 </div>
                                             </div>
@@ -717,13 +759,10 @@
                                             <label class="block text-sm font-medium text-slate-700 mb-3">
                                                 Bulan Pemasaran <span class="text-xs text-gray-500">(Pilih bulan pemasaran)</span>
                                             </label>
-                                            @php
-                                                $bulanProduksiData = old('bulan_produksi', json_decode($pemasar->bulan_produksi ?? '[]', true));
-                                            @endphp
                                             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                                 @foreach(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] as $index => $bulan)
                                                     <label class="flex items-center p-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer">
-                                                        <input type="checkbox" :name="'pemasaran[' + sectionIndex + '][bulan_produksi][]'" value="{{ $bulan }}" class="rounded border-gray-300 text-blue-600" x-bind:checked="sectionIndex === 0 && {{ is_array($bulanProduksiData) && in_array($bulan, $bulanProduksiData) ? 'true' : 'false' }}">
+                                                        <input type="checkbox" :name="'pemasaran[' + sectionIndex + '][bulan_produksi][]'" value="{{ $bulan }}" class="rounded border-gray-300 text-blue-600" x-model="section.bulan_produksi">
                                                         <span class="ml-2 text-sm">{{ $bulan }}</span>
                                                     </label>
                                                 @endforeach
@@ -744,7 +783,7 @@
                                             <table class="w-full border-collapse border border-gray-300">
                                                 <thead>
                                                     <tr class="bg-gray-100">
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Jenis Ikan</th>
+                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Komoditas Ikan</th>
                                                         <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Asal Ikan</th>
                                                         <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Jumlah / Volume Ikan</th>
                                                         <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Harga beli /kg</th>
@@ -756,7 +795,12 @@
                                                     <template x-for="(row, rowIndex) in section.rows" :key="rowIndex">
                                                         <tr>
                                                             <td class="border border-gray-300 px-2 py-2">
-                                                                <input type="text" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][jenis_ikan]'" x-model="row.jenis_ikan" class="w-full border-gray-300 rounded text-sm" />
+                                                                <select :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][komoditas]'" x-model="row.komoditas" class="w-full border-gray-300 rounded text-sm">
+                                                                    <option value="">Pilih Komoditas</option>
+                                                                    @foreach($komoditas as $item)
+                                                                        <option value="{{ $item->nama_komoditas }}">{{ $item->nama_komoditas }}</option>
+                                                                    @endforeach
+                                                                </select>
                                                             </td>
                                                             <td class="border border-gray-300 px-2 py-2">
                                                                 <input type="text" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][asal_ikan]'" x-model="row.asal_ikan" class="w-full border-gray-300 rounded text-sm" />
@@ -793,7 +837,7 @@
                                         <label class="block text-sm font-medium text-slate-700 mb-2">
                                             Distribusi / Pemasaran
                                         </label>
-                                        <textarea class="block w-full border-gray-300 rounded-md shadow-sm" :name="'pemasaran[' + sectionIndex + '][distribusi_pemasaran]'" rows="3" x-text="sectionIndex === 0 ? '{{ old('distribusi_pemasaran', $pemasar->distribusi_pemasaran ?? '') }}' : ''"></textarea>
+                                        <textarea class="block w-full border-gray-300 rounded-md shadow-sm" :name="'pemasaran[' + sectionIndex + '][distribusi_pemasaran]'" rows="3" x-model="section.distribusi_pemasaran"></textarea>
                                     </div>
                                 </div>
                             </template>
@@ -986,7 +1030,7 @@
                             <button type="button" @click="if(step < maxStep) step++" x-show="step < maxStep" class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
                                 Berikutnya
                             </button>
-                            <button type="submit" x-show="step === maxStep" class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                            <button type="submit" x-show="step === maxStep" formnovalidate class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
                                 {{ __('Perbarui Data') }}
                             </button>
                         </div>

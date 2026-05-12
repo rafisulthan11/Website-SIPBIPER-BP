@@ -129,8 +129,7 @@
 
                     <div class="p-4 bg-gray-50 rounded-lg border">
                         <h3 class="text-lg font-semibold border-b pb-2 mb-4">Profil Usaha</h3>
-                        
-                        <!-- Informasi Umum -->
+
                         <h4 class="text-base font-semibold text-slate-700 mb-3">Informasi Umum</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-6">
                             <div><strong class="font-medium text-gray-500 block">Nama Usaha:</strong><p>{{ $displayData->nama_usaha ?? '-' }}</p></div>
@@ -141,7 +140,6 @@
                             <div><strong class="font-medium text-gray-500 block">Tahun Mulai Usaha:</strong><p>{{ $displayData->tahun_mulai_usaha ?? '-' }}</p></div>
                         </div>
 
-                        <!-- Lokasi Usaha -->
                         <h4 class="text-base font-semibold text-slate-700 mb-3">Lokasi Usaha</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                             <div><strong class="font-medium text-gray-500 block">Kecamatan Usaha:</strong><p>{{ $displayData->kecamatanUsaha->nama_kecamatan ?? '-' }}</p></div>
@@ -154,90 +152,95 @@
 
                     <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
                         <h3 class="text-lg font-semibold border-b pb-2 mb-4">Produksi</h3>
-                        
+
                         @if($displayData->produksi_data && is_array($displayData->produksi_data) && count($displayData->produksi_data) > 0)
-                        @foreach($displayData->produksi_data as $index => $produksi)
-                            @if(isset($produksi['nama_merk']) || isset($produksi['periode']))
-                            <div class="@if(!$loop->first) mt-6 @endif">
-                                <h4 class="font-semibold text-slate-800 mb-3">Produk {{ $index + 1 }}</h4>
-                                
-                                <!-- Informasi Produk -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
-                                    <div><strong class="font-medium text-gray-500 block">Nama Merk:</strong><p>{{ $produksi['nama_merk'] ?? '-' }}</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Periode:</strong><p>{{ $produksi['periode'] ?? '-' }}</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Kapasitas Terpasang:</strong><p>{{ isset($produksi['kapasitas_terpasang']) ? number_format($produksi['kapasitas_terpasang'], 2) . ' Kg' : '-' }}</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Jumlah Hari Produksi/Bulan:</strong><p>{{ $produksi['jumlah_hari_produksi'] ?? '-' }} hari</p></div>
-                                </div>
-                                    
-                                @if(isset($produksi['bulan_produksi']) && is_array($produksi['bulan_produksi']) && count($produksi['bulan_produksi']) > 0)
-                                <div class="mb-4">
-                                    <strong class="font-medium text-gray-500 block mb-2">Bulan Produksi:</strong>
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach($produksi['bulan_produksi'] as $bulan)
-                                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">{{ $bulan }}</span>
-                                        @endforeach
+                            @foreach($displayData->produksi_data as $index => $produksi)
+                                @php
+                                    $hasProductionData = collect($produksi)->filter(function ($value) {
+                                        return !is_null($value) && $value !== '' && $value !== [];
+                                    })->isNotEmpty();
+                                @endphp
+
+                                @if($hasProductionData)
+                                    <div class="@if(!$loop->first) mt-6 @endif p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                                        <div class="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-200">
+                                            <h4 class="font-semibold text-slate-800">Produk {{ $index + 1 }}</h4>
+                                            @if(!empty($produksi['komoditas']))
+                                                <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">{{ $produksi['komoditas'] }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
+                                            <div><strong class="font-medium text-gray-500 block">Nama Merk:</strong><p>{{ $produksi['nama_merk'] ?? '-' }}</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Komoditas:</strong><p>{{ $produksi['komoditas'] ?? '-' }}</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Kapasitas Terpasang:</strong><p>{{ isset($produksi['kapasitas_terpasang']) ? number_format($produksi['kapasitas_terpasang'], 2) . ' Kg' : '-' }}</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Jumlah Hari Produksi/Bulan:</strong><p>{{ $produksi['jumlah_hari_produksi'] ?? '-' }} hari</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Harga Jual:</strong><p>Rp {{ isset($produksi['harga_jual']) ? number_format($produksi['harga_jual'], 0, ',', '.') : '-' }}</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Pemasaran:</strong><p>{{ $produksi['pemasaran'] ?? '-' }}</p></div>
+                                        </div>
+
+                                        @if(isset($produksi['bulan_produksi']) && is_array($produksi['bulan_produksi']) && count($produksi['bulan_produksi']) > 0)
+                                            <div class="mb-4">
+                                                <strong class="font-medium text-gray-500 block mb-2">Bulan Produksi:</strong>
+                                                <div class="flex flex-wrap gap-2">
+                                                    @foreach($produksi['bulan_produksi'] as $bulan)
+                                                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">{{ $bulan }}</span>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if(isset($produksi['sertifikat_lahan']) && is_array($produksi['sertifikat_lahan']) && count($produksi['sertifikat_lahan']) > 0)
+                                            <div class="mb-4">
+                                                <strong class="font-medium text-gray-500 block mb-2">Sertifikat Lahan:</strong>
+                                                <div class="flex flex-wrap gap-2">
+                                                    @foreach($produksi['sertifikat_lahan'] as $sertifikat)
+                                                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs">{{ $sertifikat }}</span>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
+                                            <div><strong class="font-medium text-gray-500 block">Biaya Produksi:</strong><p>Rp {{ isset($produksi['biaya_produksi']) ? number_format($produksi['biaya_produksi'], 0, ',', '.') : '-' }}</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Biaya Lain-lain:</strong><p>Rp {{ isset($produksi['biaya_lain']) ? number_format($produksi['biaya_lain'], 0, ',', '.') : '-' }}</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Harga Jual/pack:</strong><p>Rp {{ isset($produksi['harga_jual_pack']) ? number_format($produksi['harga_jual_pack'], 0, ',', '.') : '-' }}</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Jumlah Produk:</strong><p>{{ isset($produksi['jumlah_produk_qty']) ? number_format($produksi['jumlah_produk_qty'], 2) . ' Kg' : '-' }} - {{ $produksi['jumlah_produk_pack'] ?? '-' }} pack</p></div>
+                                            <div><strong class="font-medium text-gray-500 block">Hasil Produksi:</strong><p>{{ isset($produksi['harga_produksi_qty']) ? number_format($produksi['harga_produksi_qty'], 2) . ' Kg' : '-' }} - Rp {{ isset($produksi['harga_produksi_harga']) ? number_format($produksi['harga_produksi_harga'], 0, ',', '.') : '-' }}</p></div>
+                                        </div>
+
+                                        @if(isset($produksi['bahan_baku']) && is_array($produksi['bahan_baku']) && count($produksi['bahan_baku']) > 0)
+                                            <div class="mb-4">
+                                                <strong class="font-medium text-gray-500 block mb-2">Bahan Baku:</strong>
+                                                <div class="overflow-x-auto">
+                                                    <table class="min-w-full text-sm border border-gray-200">
+                                                        <thead class="bg-gray-100">
+                                                            <tr>
+                                                                <th class="px-4 py-2 text-left border-b">No</th>
+                                                                <th class="px-4 py-2 text-left border-b">Bahan</th>
+                                                                <th class="px-4 py-2 text-left border-b">Asal Bahan Baku</th>
+                                                                <th class="px-4 py-2 text-left border-b">Harga Bahan Baku</th>
+                                                                <th class="px-4 py-2 text-left border-b">Qty (kg)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($produksi['bahan_baku'] as $bahanIndex => $bahan)
+                                                                <tr class="hover:bg-gray-50">
+                                                                    <td class="px-4 py-2 border-b">{{ $bahanIndex + 1 }}</td>
+                                                                    <td class="px-4 py-2 border-b">{{ $bahan['bahan'] ?? '-' }}</td>
+                                                                    <td class="px-4 py-2 border-b">{{ $bahan['asal'] ?? '-' }}</td>
+                                                                    <td class="px-4 py-2 border-b">Rp {{ isset($bahan['harga']) ? number_format($bahan['harga'], 0, ',', '.') : '-' }}</td>
+                                                                    <td class="px-4 py-2 border-b">{{ isset($bahan['qty']) ? number_format($bahan['qty'], 2) : '-' }} kg</td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
-                                </div>
                                 @endif
-
-                                @if(isset($produksi['sertifikat_lahan']) && is_array($produksi['sertifikat_lahan']) && count($produksi['sertifikat_lahan']) > 0)
-                                <div class="mb-4">
-                                    <strong class="font-medium text-gray-500 block mb-2">Sertifikat Lahan:</strong>
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach($produksi['sertifikat_lahan'] as $sertifikat)
-                                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs">{{ $sertifikat }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                @endif
-
-                                <!-- Informasi Biaya dan Harga -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
-                                    <div><strong class="font-medium text-gray-500 block">Biaya Produksi:</strong><p>Rp {{ isset($produksi['biaya_produksi']) ? number_format($produksi['biaya_produksi'], 0, ',', '.') : '-' }}</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Biaya Lain-lain:</strong><p>Rp {{ isset($produksi['biaya_lain']) ? number_format($produksi['biaya_lain'], 0, ',', '.') : '-' }}</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Harga Jual:</strong><p>Rp {{ isset($produksi['harga_jual']) ? number_format($produksi['harga_jual'], 0, ',', '.') : '-' }}</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Hasil Produksi:</strong><p>{{ isset($produksi['harga_produksi_qty']) ? number_format($produksi['harga_produksi_qty'], 2) . ' Kg' : '-' }} - Rp {{ isset($produksi['harga_produksi_harga']) ? number_format($produksi['harga_produksi_harga'], 0, ',', '.') : '-' }}</p></div>
-                                </div>
-
-                                @if(isset($produksi['bahan_baku']) && is_array($produksi['bahan_baku']) && count($produksi['bahan_baku']) > 0)
-                                <div class="mb-4">
-                                    <strong class="font-medium text-gray-500 block mb-2">Bahan Baku:</strong>
-                                    <div class="overflow-x-auto">
-                                        <table class="min-w-full text-sm border border-gray-200">
-                                            <thead class="bg-gray-100">
-                                                <tr>
-                                                    <th class="px-4 py-2 text-left border-b">No</th>
-                                                    <th class="px-4 py-2 text-left border-b">Bahan</th>
-                                                    <th class="px-4 py-2 text-left border-b">Asal Bahan Baku</th>
-                                                    <th class="px-4 py-2 text-left border-b">Harga Bahan Baku</th>
-                                                    <th class="px-4 py-2 text-left border-b">Qty (kg)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($produksi['bahan_baku'] as $bahanIndex => $bahan)
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="px-4 py-2 border-b">{{ $bahanIndex + 1 }}</td>
-                                                    <td class="px-4 py-2 border-b">{{ $bahan['bahan'] ?? '-' }}</td>
-                                                    <td class="px-4 py-2 border-b">{{ $bahan['asal'] ?? '-' }}</td>
-                                                    <td class="px-4 py-2 border-b">Rp {{ isset($bahan['harga']) ? number_format($bahan['harga'], 0, ',', '.') : '-' }}</td>
-                                                    <td class="px-4 py-2 border-b">{{ isset($bahan['qty']) ? number_format($bahan['qty'], 2) : '-' }} kg</td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                @endif
-
-                                <!-- Pemasaran -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                                    <div class="lg:col-span-2"><strong class="font-medium text-gray-500 block">Pemasaran:</strong><p>{{ $produksi['pemasaran'] ?? '-' }}</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Jumlah Produk:</strong><p>{{ isset($produksi['jumlah_produk_qty']) ? number_format($produksi['jumlah_produk_qty'], 2) . ' Kg' : '-' }} - {{ $produksi['jumlah_produk_pack'] ?? '-' }} pack</p></div>
-                                    <div><strong class="font-medium text-gray-500 block">Harga Jual/pack:</strong><p>Rp {{ isset($produksi['harga_jual_pack']) ? number_format($produksi['harga_jual_pack'], 0, ',', '.') : '-' }}</p></div>
-                                </div>
-                            </div>
-                            @endif
-                        @endforeach
+                            @endforeach
                         @else
                             <p class="text-slate-600">Belum ada data produksi.</p>
                         @endif

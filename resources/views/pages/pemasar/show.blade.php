@@ -128,7 +128,6 @@
                             <div><strong class="font-medium text-gray-500 block">Skala Usaha:</strong><p>{{ $displayData->skala_usaha ?? '-' }}</p></div>
                             <div><strong class="font-medium text-gray-500 block">Status Usaha:</strong><p>{{ $displayData->status_usaha ?? '-' }}</p></div>
                             <div><strong class="font-medium text-gray-500 block">Tahun Mulai Usaha:</strong><p>{{ $displayData->tahun_mulai_usaha ?? '-' }}</p></div>
-                            <div><strong class="font-medium text-gray-500 block">Komoditas:</strong><p>{{ $displayData->komoditas ?? '-' }}</p></div>
                         </div>
 
                         <!-- Lokasi Usaha -->
@@ -260,72 +259,78 @@
                     <!-- Pemasaran -->
                     <div class="mb-6 p-4 bg-gray-50 rounded-lg border">
                         <h3 class="text-lg font-semibold border-b pb-2 mb-4">Pemasaran</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-6">
-                            <div><strong class="font-medium text-gray-500 block">Kapasitas Terpasang:</strong><p>{{ $displayData->kapasitas_terpasang ? $displayData->kapasitas_terpasang . ' Kg' : '-' }}</p></div>
-                            <div>
-                                <strong class="font-medium text-gray-500 block">Hasil Pemasaran <span class="text-xs text-gray-400">(Otomatis Terhitung)</span>:</strong>
-                                <p>{{ $displayData->hasil_produksi_kg ? $displayData->hasil_produksi_kg . ' Kg' : '-' }}{{ $displayData->hasil_produksi_rp ? ' | Rp. ' . number_format($displayData->hasil_produksi_rp, 2, ',', '.') : '' }}</p>
-                            </div>
-                            <div class="md:col-span-2">
-                                <strong class="font-medium text-gray-500 block">Bulan Pemasaran:</strong>
-                                @if($displayData->bulan_produksi)
-                                    @php
-                                        $bulanPemasaranList = json_decode($displayData->bulan_produksi, true);
-                                    @endphp
-                                    @if(is_array($bulanPemasaranList) && count($bulanPemasaranList) > 0)
-                                        <div class="flex flex-wrap gap-2 mt-2">
-                                            @foreach($bulanPemasaranList as $bulan)
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">{{ $bulan }}</span>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <p>-</p>
-                                    @endif
-                                @else
-                                    <p>-</p>
-                                @endif
-                            </div>
-                        </div>
-
                         <!-- PEMASARAN Table -->
-                        @if($displayData->data_pemasaran)
-                            @php
-                                $dataPemasaran = json_decode($displayData->data_pemasaran, true);
-                            @endphp
-                            @if(is_array($dataPemasaran) && count($dataPemasaran) > 0)
-                                <h4 class="text-base font-semibold text-slate-700 mb-3">Data Pemasaran</h4>
-                                <div class="overflow-x-auto mb-6">
-                                    <table class="w-full border-collapse border border-gray-300 text-sm">
-                                        <thead class="bg-gray-100">
-                                            <tr>
-                                                <th class="border border-gray-300 px-3 py-2 text-left">Jenis Ikan</th>
-                                                <th class="border border-gray-300 px-3 py-2 text-left">Asal Ikan</th>
-                                                <th class="border border-gray-300 px-3 py-2 text-left">Jumlah / Volume Ikan</th>
-                                                <th class="border border-gray-300 px-3 py-2 text-left">Harga Beli /kg</th>
-                                                <th class="border border-gray-300 px-3 py-2 text-left">Harga Jual/kg</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($dataPemasaran as $row)
-                                                <tr>
-                                                    <td class="border border-gray-300 px-3 py-2">{{ $row['jenis_ikan'] ?? '-' }}</td>
-                                                    <td class="border border-gray-300 px-3 py-2">{{ $row['asal_ikan'] ?? '-' }}</td>
-                                                    <td class="border border-gray-300 px-3 py-2 text-right">{{ isset($row['jumlah_volume']) && $row['jumlah_volume'] ? number_format($row['jumlah_volume'], 2, ',', '.') : '-' }}</td>
-                                                    <td class="border border-gray-300 px-3 py-2 text-right">{{ isset($row['harga_beli']) && $row['harga_beli'] ? 'Rp. ' . number_format($row['harga_beli'], 2, ',', '.') : '-' }}</td>
-                                                    <td class="border border-gray-300 px-3 py-2 text-right">{{ isset($row['harga_jual']) && $row['harga_jual'] ? 'Rp. ' . number_format($row['harga_jual'], 2, ',', '.') : '-' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
-                        @endif
+                        @php
+                            $sourceData = $backupData ?? $displayData ?? $pemasar;
+                            $dataPemasaran = collect();
+                            if (method_exists($sourceData, 'relationLoaded') && $sourceData->relationLoaded('pemasaran')) {
+                                $dataPemasaran = $sourceData->pemasaran;
+                            }
 
-                        <!-- Distribusi / Pemasaran -->
-                        <div class="text-sm">
-                            <strong class="font-medium text-gray-500 block mb-2">Distribusi / Pemasaran:</strong>
-                            <p class="whitespace-pre-wrap">{{ $displayData->distribusi_pemasaran ?? '-' }}</p>
-                        </div>
+                            $pemasaranSections = $dataPemasaran->groupBy(function ($row) {
+                                return $row->section_index ?? 0;
+                            });
+                        @endphp
+                        @if($pemasaranSections->count() > 0)
+                            @foreach($pemasaranSections as $sectionIndex => $rows)
+                                @php
+                                    $firstRow = $rows->first();
+                                    $bulanPemasaran = $firstRow->bulan_produksi ? json_decode($firstRow->bulan_produksi, true) : [];
+                                @endphp
+                                <div class="mb-6 rounded-lg border border-blue-200 bg-white p-4">
+                                    <div class="mb-4 flex items-center justify-between">
+                                        <h4 class="text-base font-semibold text-blue-700">Data Pemasaran #{{ (int) $sectionIndex + 1 }}</h4>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4 text-sm">
+                                        <div><strong class="text-gray-500 block">Kapasitas Terpasang:</strong><p>{{ $firstRow->kapasitas_terpasang ? number_format($firstRow->kapasitas_terpasang, 2, ',', '.') . ' Kg' : '-' }}</p></div>
+                                        <div><strong class="text-gray-500 block">Hasil Pemasaran:</strong><p>{{ $firstRow->hasil_produksi_kg ? number_format($firstRow->hasil_produksi_kg, 2, ',', '.') . ' Kg' : '-' }}{{ $firstRow->hasil_produksi_rp ? ' | Rp. ' . number_format($firstRow->hasil_produksi_rp, 2, ',', '.') : '' }}</p></div>
+                                        <div class="md:col-span-2">
+                                            <strong class="text-gray-500 block">Bulan Pemasaran:</strong>
+                                            @if(is_array($bulanPemasaran) && count($bulanPemasaran) > 0)
+                                                <div class="mt-2 flex flex-wrap gap-2">
+                                                    @foreach($bulanPemasaran as $bulan)
+                                                        <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">{{ $bulan }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <p>-</p>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="overflow-x-auto mb-4">
+                                        <table class="w-full border-collapse border border-gray-300 text-sm">
+                                            <thead class="bg-gray-100">
+                                                <tr>
+                                                    <th class="border border-gray-300 px-3 py-2 text-left">Komoditas Ikan</th>
+                                                    <th class="border border-gray-300 px-3 py-2 text-left">Asal Ikan</th>
+                                                    <th class="border border-gray-300 px-3 py-2 text-left">Jumlah / Volume Ikan</th>
+                                                    <th class="border border-gray-300 px-3 py-2 text-left">Harga Beli /kg</th>
+                                                    <th class="border border-gray-300 px-3 py-2 text-left">Harga Jual/kg</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($rows as $row)
+                                                    <tr>
+                                                        <td class="border border-gray-300 px-3 py-2">{{ $row->komoditas ?? '-' }}</td>
+                                                        <td class="border border-gray-300 px-3 py-2">{{ $row->asal_ikan ?? '-' }}</td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-right">{{ $row->jumlah_volume !== null ? number_format($row->jumlah_volume, 2, ',', '.') : '-' }}</td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-right">{{ $row->harga_beli !== null ? 'Rp. ' . number_format($row->harga_beli, 2, ',', '.') : '-' }}</td>
+                                                        <td class="border border-gray-300 px-3 py-2 text-right">{{ $row->harga_jual !== null ? 'Rp. ' . number_format($row->harga_jual, 2, ',', '.') : '-' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="text-sm">
+                                        <strong class="font-medium text-gray-500 block mb-2">Distribusi / Pemasaran:</strong>
+                                        <p class="whitespace-pre-wrap">{{ $firstRow->distribusi_pemasaran ?? '-' }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
 
                     <!-- Tenaga Kerja -->

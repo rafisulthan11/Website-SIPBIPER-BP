@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Pembudidaya;
 use App\Models\Pengolah;
 use App\Models\Pemasar;
+use App\Models\PemasarPemasaran;
 use App\Models\HargaIkanSegar;
 use App\Models\Pasar;
 use App\Models\MasterKecamatan;
@@ -369,7 +370,9 @@ class LaporanController extends Controller
         }
 
         if ($request->filled('komoditas')) {
-            $query->where('komoditas', 'like', '%'.$request->komoditas.'%');
+            $query->whereHas('pemasaran', function ($pemasaranQuery) use ($request) {
+                $pemasaranQuery->where('komoditas', 'like', '%'.$request->komoditas.'%');
+            });
         }
 
         if ($request->filled('kategori')) {
@@ -1180,7 +1183,7 @@ class LaporanController extends Controller
     public function rekapitulasiPemasar(Request $request)
     {
         // Query data verified
-        $query = Pemasar::with(['kecamatan','desa'])
+        $query = Pemasar::with(['kecamatan','desa','pemasaran'])
             ->where('status', 'verified');
 
         // filters
@@ -1189,7 +1192,9 @@ class LaporanController extends Controller
         }
 
         if ($request->filled('komoditas')) {
-            $query->where('komoditas', 'like', '%'.$request->komoditas.'%');
+            $query->whereHas('pemasaran', function ($pemasaranQuery) use ($request) {
+                $pemasaranQuery->where('komoditas', 'like', '%'.$request->komoditas.'%');
+            });
         }
 
         if ($request->filled('kategori')) {
@@ -1235,6 +1240,12 @@ class LaporanController extends Controller
                         $relationships['desa'] = $data['desa'];
                         unset($data['desa']);
                     }
+
+                    $pemasaranRows = [];
+                    if (isset($data['pemasaran']) && is_array($data['pemasaran'])) {
+                        $pemasaranRows = $data['pemasaran'];
+                        unset($data['pemasaran']);
+                    }
                     
                     $pemasar->forceFill($data);
                     $pemasar->exists = true;
@@ -1256,6 +1267,18 @@ class LaporanController extends Controller
                         $desa = new \App\Models\MasterDesa();
                         $desa->forceFill($relationships['desa']);
                         $pemasar->setRelation('desa', $desa);
+                    }
+
+                    if (count($pemasaranRows) > 0) {
+                        $pemasar->setRelation(
+                            'pemasaran',
+                            collect($pemasaranRows)->map(function ($row) {
+                                $pemasaran = new PemasarPemasaran();
+                                $pemasaran->forceFill((array) $row);
+                                $pemasaran->exists = true;
+                                return $pemasaran;
+                            })
+                        );
                     }
                     
                     return $pemasar;
@@ -1322,29 +1345,12 @@ class LaporanController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // Hitung total harga pemasaran dari semua pemasar yang difilter (sebelum pagination)
-        // Ambil dari data_pemasaran JSON field harga_jual
-        $totalHargaPemasaran = 0;
-        foreach ($allPemasars as $pemasar) {
-            if ($pemasar->data_pemasaran) {
-                $dataPemasaran = is_string($pemasar->data_pemasaran) 
-                    ? json_decode($pemasar->data_pemasaran, true) 
-                    : $pemasar->data_pemasaran;
-                
-                if (is_array($dataPemasaran)) {
-                    foreach ($dataPemasaran as $item) {
-                        $totalHargaPemasaran += floatval($item['harga_jual'] ?? 0);
-                    }
-                }
-            }
-        }
-
-        // Hitung total pemasaran keseluruhan (Kg dan Rp) dari hasil_produksi
+        // Hitung total pemasaran keseluruhan dari seluruh blok pemasaran
         $totalPemasaranKg = 0;
         $totalPemasaranRp = 0;
         foreach ($allPemasars as $pemasar) {
-            $totalPemasaranKg += floatval($pemasar->hasil_produksi_kg ?? 0);
-            $totalPemasaranRp += floatval($pemasar->hasil_produksi_rp ?? 0);
+            $totalPemasaranKg += (float) ($pemasar->total_volume_pemasaran ?? 0);
+            $totalPemasaranRp += (float) ($pemasar->total_nilai_pemasaran ?? 0);
         }
 
         $kecamatans = MasterKecamatan::orderBy('nama_kecamatan')->get();
@@ -1363,7 +1369,7 @@ class LaporanController extends Controller
         // Hitung unique RTP berdasarkan NIK (jika ada data dengan NIK sama dan tahun berbeda, hitung 1 saja)
         $uniqueRTP = $allPemasars->pluck('nik_pemasar')->filter()->unique()->count();
 
-        return view('pages.laporan.rekapitulasi-pemasar', compact('pemasars','kecamatans','komoditas','kategoris','jenis_kegiatan_usaha_list','totalHargaPemasaran','uniqueRTP','totalPemasaranKg','totalPemasaranRp'));
+        return view('pages.laporan.rekapitulasi-pemasar', compact('pemasars','kecamatans','komoditas','kategoris','jenis_kegiatan_usaha_list','uniqueRTP','totalPemasaranKg','totalPemasaranRp'));
     }
 
     /**
@@ -1724,7 +1730,7 @@ class LaporanController extends Controller
      */
     public function pdfPemasar($id)
     {
-        $pemasar = Pemasar::with(['kecamatan', 'desa', 'kecamatanUsaha', 'desaUsaha'])->findOrFail($id);
+        $pemasar = Pemasar::with(['kecamatan', 'desa', 'kecamatanUsaha', 'desaUsaha', 'pemasaran'])->findOrFail($id);
 
         $pemasar = $this->resolveVerifiedSnapshotIfPending(
             $pemasar,
@@ -1736,7 +1742,9 @@ class LaporanController extends Controller
                 'kecamatanUsaha' => \App\Models\MasterKecamatan::class,
                 'desaUsaha' => \App\Models\MasterDesa::class,
             ],
-            []
+            [
+                'pemasaran' => \App\Models\PemasarPemasaran::class,
+            ]
         );
         
         $pdf = Pdf::loadView('pages.laporan.pdf.pemasar', compact('pemasar'));

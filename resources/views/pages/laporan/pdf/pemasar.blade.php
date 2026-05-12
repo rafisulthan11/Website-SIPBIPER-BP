@@ -215,46 +215,57 @@
     <div class="section">
         <div class="section-title">PRODUKSI</div>
         
-        <div class="subsection-title">Informasi Produksi</div>
-        <table class="info-table">
-            <tr><td>Biaya Produksi</td><td>: {{ $pemasar->biaya_produksi ? 'Rp. ' . number_format($pemasar->biaya_produksi, 2, ',', '.') : '-' }}</td></tr>
-            <tr><td>Harga Jual Produksi</td><td>: {{ $pemasar->harga_jual_produksi ? 'Rp. ' . number_format($pemasar->harga_jual_produksi, 2, ',', '.') : '-' }}</td></tr>
-            <tr><td>Kapasitas Terpasang</td><td>: {{ $pemasar->kapasitas_terpasang ? $pemasar->kapasitas_terpasang . ' Kg' : '-' }}</td></tr>
-            <tr><td>Hasil Produksi (Kg)</td><td>: {{ $pemasar->hasil_produksi_kg ?? '-' }}</td></tr>
-            <tr><td>Hasil Produksi (Rp)</td><td>: {{ $pemasar->hasil_produksi_rp ? 'Rp. ' . number_format($pemasar->hasil_produksi_rp, 2, ',', '.') : '-' }}</td></tr>
-            <tr><td>Kapasitas Terpasang Setahun</td><td>: {{ $pemasar->kapasitas_terpasang_setahun ? $pemasar->kapasitas_terpasang_setahun . ' Kg' : '-' }}</td></tr>
-            <tr><td>Jumlah Hari Produksi/bulan</td><td>: {{ $pemasar->jumlah_hari_produksi ? $pemasar->jumlah_hari_produksi . ' hari' : '-' }}</td></tr>
-            <tr>
-                <td>Bulan Produksi</td>
-                <td>: 
-                    @if($pemasar->bulan_produksi)
-                        @php
-                            $bulanProduksi = json_decode($pemasar->bulan_produksi, true);
-                        @endphp
-                        @if(is_array($bulanProduksi))
-                            {{ implode(', ', $bulanProduksi) }}
-                        @else
-                            -
-                        @endif
-                    @else
-                        -
-                    @endif
-                </td>
-            </tr>
-            <tr><td>Distribusi Pemasaran</td><td>: {{ $pemasar->distribusi_pemasaran ?? '-' }}</td></tr>
-        </table>
+        @php
+            $pemasaranSections = collect();
+            if (method_exists($pemasar, 'relationLoaded') && $pemasar->relationLoaded('pemasaran')) {
+                $pemasaranSections = $pemasar->pemasaran->groupBy(function ($row) {
+                    return $row->section_index ?? 0;
+                });
+            }
+        @endphp
+
+        @if($pemasaranSections->count() > 0)
+            <div class="subsection-title">Informasi Produksi</div>
+            @foreach($pemasaranSections as $sectionIndex => $rows)
+                @php
+                    $firstRow = $rows->first();
+                    $bulanProduksi = $firstRow->bulan_produksi;
+                    if (is_string($bulanProduksi)) {
+                        $bulanProduksi = json_decode($bulanProduksi, true);
+                    }
+                @endphp
+                <table class="info-table" style="margin-bottom: 16px;">
+                    <tr><td colspan="2"><strong>Data Pemasaran #{{ (int) $sectionIndex + 1 }}</strong></td></tr>
+                    <tr><td>Kapasitas Terpasang</td><td>: {{ $firstRow->kapasitas_terpasang ? $firstRow->kapasitas_terpasang . ' Kg' : '-' }}</td></tr>
+                    <tr><td>Hasil Produksi (Kg)</td><td>: {{ $firstRow->hasil_produksi_kg ?? '-' }}</td></tr>
+                    <tr><td>Hasil Produksi (Rp)</td><td>: {{ $firstRow->hasil_produksi_rp ? 'Rp. ' . number_format($firstRow->hasil_produksi_rp, 2, ',', '.') : '-' }}</td></tr>
+                    <tr>
+                        <td>Bulan Produksi</td>
+                        <td>: {{ is_array($bulanProduksi) ? implode(', ', $bulanProduksi) : '-' }}</td>
+                    </tr>
+                    <tr><td>Distribusi Pemasaran</td><td>: {{ $firstRow->distribusi_pemasaran ?? '-' }}</td></tr>
+                </table>
+            @endforeach
+        @endif
 
         <!-- Data Pemasaran -->
-        @if($pemasar->data_pemasaran)
-            @php
-                $dataPemasaran = is_string($pemasar->data_pemasaran) ? json_decode($pemasar->data_pemasaran, true) : $pemasar->data_pemasaran;
-            @endphp
-            @if(is_array($dataPemasaran) && count($dataPemasaran) > 0)
+        @php
+            $dataPemasaran = [];
+            if (method_exists($pemasar, 'pemasaran') && $pemasar->relationLoaded('pemasaran')) {
+                $dataPemasaran = $pemasar->pemasaran->toArray();
+            } elseif (!empty($pemasar->data_pemasaran)) {
+                $decoded = is_string($pemasar->data_pemasaran) ? json_decode($pemasar->data_pemasaran, true) : $pemasar->data_pemasaran;
+                if (is_array($decoded)) {
+                    $dataPemasaran = $decoded;
+                }
+            }
+        @endphp
+        @if(is_array($dataPemasaran) && count($dataPemasaran) > 0)
                 <div class="subsection-title">Data Pemasaran</div>
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Jenis Ikan</th>
+                            <th>Komoditas Ikan</th>
                             <th>Kebutuhan Min (Kg)</th>
                             <th>Kebutuhan Max (Kg)</th>
                             <th>Asal Ikan</th>
@@ -265,7 +276,7 @@
                     <tbody>
                         @foreach($dataPemasaran as $row)
                         <tr>
-                            <td>{{ $row['jenis_ikan'] ?? '-' }}</td>
+                            <td>{{ $row['komoditas'] ?? $row['jenis_ikan'] ?? '-' }}</td>
                             <td>{{ isset($row['kebutuhan_min']) ? number_format($row['kebutuhan_min'], 2, ',', '.') : '-' }}</td>
                             <td>{{ isset($row['kebutuhan_max']) ? number_format($row['kebutuhan_max'], 2, ',', '.') : '-' }}</td>
                             <td>{{ $row['asal_ikan'] ?? '-' }}</td>
@@ -275,7 +286,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            @endif
         @endif
     </div>
 
@@ -375,8 +385,6 @@
                 'foto_sertifikat' => 'Foto Sertifikat',
                 'foto_cpib_cbib' => 'Foto CPIB/CBIB',
                 'foto_unit_usaha' => 'Foto Unit Usaha',
-                'foto_kusuka' => 'Foto KUSUKA',
-                'foto_nib' => 'Foto NIB',
             ];
             $hasLampiran = false;
         @endphp

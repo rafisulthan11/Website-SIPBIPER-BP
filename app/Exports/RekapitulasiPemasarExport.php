@@ -25,16 +25,12 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
 
     public function collection()
     {
-        $query = Pemasar::with(['kecamatan', 'desa', 'kecamatanUsaha', 'desaUsaha'])
+        $query = Pemasar::with(['kecamatan', 'desa', 'kecamatanUsaha', 'desaUsaha', 'pemasaran'])
             ->where('status', 'verified'); // Hanya data yang sudah diverifikasi
 
         // Apply filters
         if (!empty($this->filters['kecamatan'])) {
             $query->where('id_kecamatan', $this->filters['kecamatan']);
-        }
-
-        if (!empty($this->filters['komoditas'])) {
-            $query->where('komoditas', 'like', '%' . $this->filters['komoditas'] . '%');
         }
 
         if (!empty($this->filters['kategori'])) {
@@ -80,6 +76,12 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
                     }
                 }
 
+                $pemasaranRows = [];
+                if (isset($data['pemasaran']) && is_array($data['pemasaran'])) {
+                    $pemasaranRows = $data['pemasaran'];
+                    unset($data['pemasaran']);
+                }
+
                 $pemasar = new Pemasar();
                 $pemasar->forceFill($data);
                 $pemasar->exists = true;
@@ -110,6 +112,18 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
                     $pemasar->setRelation('desaUsaha', $desaUsaha);
                 }
 
+                if (!empty($pemasaranRows)) {
+                    $pemasar->setRelation(
+                        'pemasaran',
+                        collect($pemasaranRows)->map(function ($item) {
+                            $pemasaran = new \App\Models\PemasarPemasaran();
+                            $pemasaran->forceFill((array) $item);
+                            $pemasaran->exists = true;
+                            return $pemasaran;
+                        })
+                    );
+                }
+
                 return $pemasar;
             })
             ->filter(function ($item) {
@@ -118,9 +132,6 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
                 }
 
                 if (!empty($this->filters['kecamatan']) && (string) ($item->id_kecamatan ?? '') !== (string) $this->filters['kecamatan']) {
-                    return false;
-                }
-                if (!empty($this->filters['komoditas']) && !str_contains(strtolower((string) ($item->komoditas ?? '')), strtolower((string) $this->filters['komoditas']))) {
                     return false;
                 }
                 if (!empty($this->filters['kategori']) && (string) ($item->skala_usaha ?? '') !== (string) $this->filters['kategori']) {
@@ -186,8 +197,6 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             'LATITUDE',
             'LONGITUDE',
             'JENIS KEGIATAN USAHA',
-            'KOMODITAS',
-            'WILAYAH PEMASARAN',
             'IZIN NIB',
             'IZIN NPWP',
             'IZIN KUSUKA',
@@ -218,14 +227,10 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             'LUAS BANGUNAN (M²)',
             'NILAI BANGUNAN',
             'MESIN PERALATAN (Jenis | Kapasitas | Jumlah | Asal)',
-            'BIAYA PRODUKSI',
-            'HARGA JUAL PRODUKSI',
             'KAPASITAS TERPASANG (KG)',
             'HASIL PRODUKSI (KG)',
             'HASIL PRODUKSI (RP)',
-            'KAPASITAS TERPASANG SETAHUN',
             'BULAN PRODUKSI',
-            'JUMLAH HARI PRODUKSI',
             'DISTRIBUSI PEMASARAN',
             'DATA PEMASARAN (Jenis Ikan | Kebutuhan Min-Max | Asal | Harga Beli | Harga Jual)',
             'TENAGA KERJA WNI LAKI-LAKI TETAP',
@@ -273,10 +278,16 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             }
         }
 
+        $pemasaranSection = null;
+        if ($pemasar->relationLoaded('pemasaran') && $pemasar->pemasaran->isNotEmpty()) {
+            $pemasaranSection = $pemasar->pemasaran->sortBy('section_index')->first();
+        }
+
         // Format Bulan Produksi
         $bulanProduksi = '-';
-        if ($pemasar->bulan_produksi) {
-            $decoded = is_string($pemasar->bulan_produksi) ? json_decode($pemasar->bulan_produksi, true) : $pemasar->bulan_produksi;
+        $bulanProduksiRaw = $pemasaranSection->bulan_produksi ?? $pemasar->bulan_produksi ?? null;
+        if ($bulanProduksiRaw) {
+            $decoded = is_string($bulanProduksiRaw) ? json_decode($bulanProduksiRaw, true) : $bulanProduksiRaw;
             if (is_array($decoded)) {
                 $bulanProduksi = implode(', ', $decoded);
             }
@@ -300,28 +311,35 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             }
         }
 
-        // Format Data Pemasaran Detail
-        $dataPemasaranDetail = '-';
-        if ($pemasar->data_pemasaran) {
+        $dataPemasaranRows = [];
+        if (method_exists($pemasar, 'pemasaran') && $pemasar->relationLoaded('pemasaran')) {
+            $dataPemasaranRows = $pemasar->pemasaran->toArray();
+        } elseif ($pemasar->data_pemasaran) {
             $decoded = is_string($pemasar->data_pemasaran) ? json_decode($pemasar->data_pemasaran, true) : $pemasar->data_pemasaran;
-            if (is_array($decoded) && count($decoded) > 0) {
-                $dataPemasaranDetail = collect($decoded)->map(function($d, $idx) {
-                    return sprintf(
-                        '[%d: %s | Kebutuhan: %s-%s kg | Asal: %s | Harga Beli: Rp %s | Harga Jual: Rp %s]',
-                        $idx + 1,
-                        $d['jenis_ikan'] ?? '-',
-                        isset($d['kebutuhan_min']) ? number_format($d['kebutuhan_min'], 2, ',', '.') : '-',
-                        isset($d['kebutuhan_max']) ? number_format($d['kebutuhan_max'], 2, ',', '.') : '-',
-                        $d['asal_ikan'] ?? '-',
-                        isset($d['harga_beli']) ? number_format($d['harga_beli'], 0, ',', '.') : '-',
-                        isset($d['harga_jual']) ? number_format($d['harga_jual'], 0, ',', '.') : '-'
-                    );
-                })->implode(' ; ');
+            if (is_array($decoded)) {
+                $dataPemasaranRows = $decoded;
             }
         }
 
+        // Format Data Pemasaran Detail
+        $dataPemasaranDetail = '-';
+        if (is_array($dataPemasaranRows) && count($dataPemasaranRows) > 0) {
+            $dataPemasaranDetail = collect($dataPemasaranRows)->map(function($d, $idx) {
+                return sprintf(
+                    '[%d: %s | Kebutuhan: %s-%s kg | Asal: %s | Harga Beli: Rp %s | Harga Jual: Rp %s]',
+                    $idx + 1,
+                    $d['komoditas'] ?? $d['jenis_ikan'] ?? '-',
+                    isset($d['kebutuhan_min']) ? number_format($d['kebutuhan_min'], 2, ',', '.') : '-',
+                    isset($d['kebutuhan_max']) ? number_format($d['kebutuhan_max'], 2, ',', '.') : '-',
+                    $d['asal_ikan'] ?? '-',
+                    isset($d['harga_beli']) ? number_format($d['harga_beli'], 0, ',', '.') : '-',
+                    isset($d['harga_jual']) ? number_format($d['harga_jual'], 0, ',', '.') : '-'
+                );
+            })->implode(' ; ');
+        }
+
         // Lampiran files
-        $lampiranKeys = ['foto_ktp','foto_sertifikat','foto_cpib_cbib','foto_unit_usaha','foto_npwp','foto_izin_usaha','foto_produk','foto_kusuka','foto_nib','foto_sertifikat_pirt','foto_sertifikat_halal'];
+        $lampiranKeys = ['foto_ktp','foto_sertifikat','foto_cpib_cbib','foto_unit_usaha','foto_npwp','foto_izin_usaha','foto_produk','foto_sertifikat_pirt','foto_sertifikat_halal'];
         $lampiranFiles = [];
         foreach($lampiranKeys as $k){
             if (!empty($pemasar->{$k})) {
@@ -331,15 +349,9 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
 
         // Hitung total harga jual dari data_pemasaran
         $totalHargaJual = 0;
-        if ($pemasar->data_pemasaran) {
-            $dataPemasaran = is_string($pemasar->data_pemasaran) 
-                ? json_decode($pemasar->data_pemasaran, true) 
-                : $pemasar->data_pemasaran;
-            
-            if (is_array($dataPemasaran)) {
-                foreach ($dataPemasaran as $item) {
-                    $totalHargaJual += floatval($item['harga_jual'] ?? 0);
-                }
+        if (is_array($dataPemasaranRows)) {
+            foreach ($dataPemasaranRows as $item) {
+                $totalHargaJual += floatval($item['harga_jual'] ?? 0);
             }
         }
 
@@ -375,8 +387,6 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             $pemasar->latitude ?? '-',
             $pemasar->longitude ?? '-',
             $pemasar->jenis_kegiatan_usaha ?? '-',
-            $pemasar->komoditas ?? '-',
-            $pemasar->wilayah_pemasaran ?? '-',
             $pemasar->nib ?? '-',
             $pemasar->npwp_izin ?? '-',
             $pemasar->kusuka ?? '-',
@@ -407,15 +417,11 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             $pemasar->luas_bangunan ?? '-',
             $pemasar->nilai_bangunan ? number_format($pemasar->nilai_bangunan, 0, ',', '.') : '-',
             $mesinPeralatanDetail,
-            $pemasar->biaya_produksi ? number_format($pemasar->biaya_produksi, 0, ',', '.') : '-',
-            $pemasar->harga_jual_produksi ? number_format($pemasar->harga_jual_produksi, 0, ',', '.') : '-',
-            $pemasar->kapasitas_terpasang ?? '-',
-            $pemasar->hasil_produksi_kg ?? '-',
-            $pemasar->hasil_produksi_rp ? number_format($pemasar->hasil_produksi_rp, 0, ',', '.') : '-',
-            $pemasar->kapasitas_terpasang_setahun ?? '-',
+            $pemasaranSection->kapasitas_terpasang ?? '-',
+            $pemasaranSection->hasil_produksi_kg ?? '-',
+            $pemasaranSection->hasil_produksi_rp ? number_format($pemasaranSection->hasil_produksi_rp, 0, ',', '.') : '-',
             $bulanProduksi,
-            $pemasar->jumlah_hari_produksi ?? '-',
-            $pemasar->distribusi_pemasaran ?? '-',
+            $pemasaranSection->distribusi_pemasaran ?? '-',
             $dataPemasaranDetail,
             $pemasar->wni_laki_tetap ?? 0,
             $pemasar->wni_laki_tidak_tetap ?? 0,

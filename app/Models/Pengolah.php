@@ -85,6 +85,22 @@ class Pengolah extends Model
         'tenaga_kerja_data' => 'array',
     ];
 
+    public function getKomoditasAttribute($value)
+    {
+        $komoditas = collect($this->produksi_data ?? [])
+            ->pluck('komoditas')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (!empty($komoditas)) {
+            return implode(', ', $komoditas);
+        }
+
+        return $value;
+    }
+
     /**
      * Relasi ke Kecamatan
      */

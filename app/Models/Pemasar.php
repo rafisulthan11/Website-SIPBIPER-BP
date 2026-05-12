@@ -38,7 +38,6 @@ class Pemasar extends Model
         'id_kecamatan',
         'id_desa',
         'jenis_kegiatan_usaha',
-        'jenis_pemasaran',
         'nama_usaha',
         'nama_kelompok',
         'npwp_usaha',
@@ -50,8 +49,6 @@ class Pemasar extends Model
         'tahun_mulai_usaha',
         'aset_pribadi',
         'kontak',
-        'komoditas',
-        'wilayah_pemasaran',
         'latitude',
         'longitude',
         'id_kecamatan_usaha',
@@ -92,18 +89,7 @@ class Pemasar extends Model
         'luas_bangunan',
         'nilai_bangunan',
         // Kapasitas dan Produksi
-        'kapasitas_terpasang_setahun',
-        'bulan_produksi',
-        'jumlah_hari_produksi',
-        'distribusi_pemasaran',
         'mesin_peralatan',
-        // Production Fields
-        'biaya_produksi',
-        'harga_jual_produksi',
-        'kapasitas_terpasang',
-        'hasil_produksi_kg',
-        'hasil_produksi_rp',
-        'data_pemasaran',
         // Tenaga Kerja - WNI
         'wni_laki_tetap',
         'wni_laki_tidak_tetap',
@@ -126,8 +112,6 @@ class Pemasar extends Model
         'foto_npwp',
         'foto_izin_usaha',
         'foto_produk',
-        'foto_kusuka',
-        'foto_nib',
         'foto_sertifikat_pirt',
         'foto_sertifikat_halal',
     ];
@@ -162,6 +146,63 @@ class Pemasar extends Model
     public function desaUsaha()
     {
         return $this->belongsTo(MasterDesa::class, 'id_desa_usaha', 'id_desa');
+    }
+
+    public function pemasaran()
+    {
+        return $this->hasMany(PemasarPemasaran::class, 'id_pemasar', 'id_pemasar');
+    }
+
+    public function getKomoditasAttribute()
+    {
+        if (! $this->relationLoaded('pemasaran')) {
+            $this->loadMissing('pemasaran');
+        }
+
+        $komoditas = $this->pemasaran
+            ->pluck('komoditas')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return $komoditas->isNotEmpty() ? $komoditas->implode(', ') : '-';
+    }
+
+    public function getPemasaranSectionsAttribute()
+    {
+        if (! $this->relationLoaded('pemasaran')) {
+            $this->loadMissing('pemasaran');
+        }
+
+        return $this->pemasaran
+            ->groupBy(function ($row) {
+                return $row->section_index ?? 0;
+            })
+            ->values();
+    }
+
+    public function getTotalVolumePemasaranAttribute()
+    {
+        if (! $this->relationLoaded('pemasaran')) {
+            $this->loadMissing('pemasaran');
+        }
+
+        return $this->pemasaranSections->sum(function ($sectionRows) {
+            $firstRow = $sectionRows->first();
+            return (float) ($firstRow->hasil_produksi_kg ?? 0);
+        });
+    }
+
+    public function getTotalNilaiPemasaranAttribute()
+    {
+        if (! $this->relationLoaded('pemasaran')) {
+            $this->loadMissing('pemasaran');
+        }
+
+        return $this->pemasaranSections->sum(function ($sectionRows) {
+            $firstRow = $sectionRows->first();
+            return (float) ($firstRow->hasil_produksi_rp ?? 0);
+        });
     }
     
     public function verifiedBy()

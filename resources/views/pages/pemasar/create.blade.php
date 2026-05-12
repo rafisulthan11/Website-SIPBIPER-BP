@@ -9,11 +9,12 @@
         // Tentukan step awal berdasarkan error pertama (agar user langsung diarahkan ke bagian yang perlu diperbaiki)
         $stepMap = [
             'jenis_kegiatan_usaha' => 0,
-            'jenis_pemasaran' => 0,
             'nama_lengkap' => 1,
             'nik_pemasar' => 1,
             'id_kecamatan' => 1,
             'id_desa' => 1,
+            'kontak' => 1,
+            'email' => 1,
         ];
         $initialStep = 0;
         if ($errors->any()) {
@@ -48,7 +49,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('pemasar.store') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('pemasar.store') }}" enctype="multipart/form-data" novalidate data-skip-multistep-validation="1">
                     @csrf
                     <!-- Step panels -->
                     <div class="px-6 pb-6">
@@ -74,7 +75,7 @@
 
                                 <!-- Jenis Kegiatan Usaha -->
                                 <div>
-                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha')" />
+                                    <x-input-label for="jenis_kegiatan_usaha" :value="__('Jenis Kegiatan Usaha*')" />
                                     <select name="jenis_kegiatan_usaha" id="jenis_kegiatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Pilih Jenis Kegiatan Usaha</option>
                                         <option value="Pemasar Ikan Segar Pengecer" {{ old('jenis_kegiatan_usaha')=='Pemasar Ikan Segar Pengecer' ? 'selected' : '' }}>Pemasar Ikan Segar Pengecer</option>
@@ -100,7 +101,7 @@
                                 </div>
                                 <div>
                                     <x-input-label for="nik_pemasar" :value="__('NIK (Sesuai KTP)*')" />
-                                    <x-text-input id="nik_pemasar" class="block mt-1 w-full" type="text" name="nik_pemasar" :value="old('nik_pemasar')" required maxlength="16" />
+                                    <x-text-input id="nik_pemasar" class="block mt-1 w-full" type="text" name="nik_pemasar" :value="old('nik_pemasar')" required maxlength="16" inputmode="numeric" pattern="[0-9]*" />
                                     <x-input-error :messages="$errors->get('nik_pemasar')" class="mt-2" />
                                 </div>
                                 <div>
@@ -161,8 +162,8 @@
                                     <p class="text-xs text-gray-500">(Jumlah anggota keluarga yang ditanggung, tidak termasuk diri sendiri)</p>
                                 </div>
                                 <div class="md:col-span-2 lg:col-span-3">
-                                    <x-input-label for="alamat" :value="__('Alamat Lengkap (Sesuai KTP)*')" />
-                                    <textarea id="alamat" name="alamat" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" rows="3" required>{{ old('alamat') }}</textarea>
+                                    <x-input-label for="alamat" :value="__('Alamat Lengkap (Sesuai KTP)')" />
+                                    <textarea id="alamat" name="alamat" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" rows="3">{{ old('alamat') }}</textarea>
                                     <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
                                 </div>
                                 <div>
@@ -316,18 +317,6 @@
                                         </select>
                                         <x-input-error :messages="$errors->get('skala_usaha')" class="mt-2" />
                                     </div>
-                                    <div>
-                                        <x-input-label for="komoditas" :value="__('Komoditas')" />
-                                        <select name="komoditas" id="komoditas" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                                            <option value="">Pilih Komoditas</option>
-                                            @foreach($komoditas as $item)
-                                                <option value="{{ $item->nama_komoditas }}" {{ old('komoditas')==$item->nama_komoditas ? 'selected' : '' }}>
-                                                    {{ $item->nama_komoditas }} ({{ $item->tipe }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <x-input-error :messages="$errors->get('komoditas')" class="mt-2" />
-                                    </div>
                                 </div>
                             </div>
 
@@ -336,7 +325,7 @@
                                 <h4 class="text-base font-semibold text-slate-700 mb-4">Lokasi Usaha</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
-                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha*')" />
+                                        <x-input-label for="kecamatan_usaha" :value="__('Kecamatan Usaha')" />
                                         <select name="kecamatan_usaha" id="kecamatan_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                             <option value="">Pilih Kecamatan</option>
                                             @foreach ($kecamatans as $kecamatan)
@@ -345,7 +334,7 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha*')" />
+                                        <x-input-label for="desa_usaha" :value="__('Desa Usaha')" />
                                         <select name="desa_usaha" id="desa_usaha" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm bg-gray-100" disabled>
                                             <option value="">Pilih Kecamatan Terlebih Dahulu</option>
                                         </select>
@@ -596,14 +585,14 @@
                         <div x-show="step===5" x-transition class="bg-gray-50 rounded-lg border border-gray-200 p-6" x-data="{ 
                             sections: [{
                                 id: 1,
-                                rows: [{ id: 1, jenis_ikan: '', jumlah_volume: '', asal_ikan: '', harga_beli: '', harga_jual: '' }],
+                                rows: [{ id: 1, komoditas: '', jumlah_volume: '', asal_ikan: '', harga_beli: '', harga_jual: '' }],
                                 nextRowId: 2
                             }],
                             nextSectionId: 2,
                             addSection() {
                                 this.sections.push({
                                     id: this.nextSectionId++,
-                                    rows: [{ id: 1, jenis_ikan: '', jumlah_volume: '', asal_ikan: '', harga_beli: '', harga_jual: '' }],
+                                    rows: [{ id: 1, komoditas: '', jumlah_volume: '', asal_ikan: '', harga_beli: '', harga_jual: '' }],
                                     nextRowId: 2
                                 });
                             },
@@ -615,7 +604,7 @@
                             addRow(sectionIndex) {
                                 this.sections[sectionIndex].rows.push({ 
                                     id: this.sections[sectionIndex].nextRowId++, 
-                                    jenis_ikan: '', 
+                                    komoditas: '', 
                                     jumlah_volume: '', 
                                     asal_ikan: '', 
                                     harga_beli: '', 
@@ -728,7 +717,7 @@
                                             <table class="w-full border-collapse border border-gray-300">
                                                 <thead>
                                                     <tr class="bg-gray-100">
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Jenis Ikan</th>
+                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Komoditas Ikan</th>
                                                         <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Asal Ikan</th>
                                                         <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Jumlah / Volume Ikan</th>
                                                         <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Harga beli /kg</th>
@@ -740,7 +729,12 @@
                                                     <template x-for="(row, rowIndex) in section.rows" :key="row.id">
                                                         <tr>
                                                             <td class="border border-gray-300 px-2 py-2">
-                                                                <input type="text" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][jenis_ikan]'" x-model="row.jenis_ikan" class="w-full border-gray-300 rounded text-sm" />
+                                                                <select :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][komoditas]'" x-model="row.komoditas" class="w-full border-gray-300 rounded text-sm">
+                                                                    <option value="">Pilih Komoditas</option>
+                                                                    @foreach($komoditas as $item)
+                                                                        <option value="{{ $item->nama_komoditas }}">{{ $item->nama_komoditas }}</option>
+                                                                    @endforeach
+                                                                </select>
                                                             </td>
                                                             <td class="border border-gray-300 px-2 py-2">
                                                                 <input type="text" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][asal_ikan]'" x-model="row.asal_ikan" class="w-full border-gray-300 rounded text-sm" />
@@ -956,7 +950,7 @@
                             <button type="button" @click="if(step<maxStep) step++" x-show="step<maxStep" class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
                                 Berikutnya
                             </button>
-                            <button type="submit" x-show="step===maxStep" class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                            <button type="submit" x-show="step===maxStep" formnovalidate class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
                                 {{ __('Simpan Data') }}
                             </button>
                         </div>

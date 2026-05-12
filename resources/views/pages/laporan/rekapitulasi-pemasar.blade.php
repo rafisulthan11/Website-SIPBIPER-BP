@@ -128,8 +128,8 @@
                     <div class="md:hidden space-y-3 mb-4">
                         @forelse($pemasars as $p)
                         @php
-                            $totalVolume = floatval($p->hasil_produksi_kg ?? 0);
-                            $totalNilai = floatval($p->hasil_produksi_rp ?? 0);
+                            $totalVolume = (float) ($p->total_volume_pemasaran ?? 0);
+                            $totalNilai = (float) ($p->total_nilai_pemasaran ?? 0);
                         @endphp
                         <div class="rounded-lg border border-slate-200 p-4 bg-white shadow-sm">
                             <div class="flex items-start justify-between gap-3">
@@ -174,11 +174,8 @@
                                 <tbody>
                                     @forelse($pemasars as $p)
                                     @php
-                                        // Ambil total volume pemasaran dari hasil_produksi_kg
-                                        $totalVolume = floatval($p->hasil_produksi_kg ?? 0);
-                                        
-                                        // Ambil total nilai keseluruhan dari hasil_produksi_rp
-                                        $totalNilai = floatval($p->hasil_produksi_rp ?? 0);
+                                        $totalVolume = (float) ($p->total_volume_pemasaran ?? 0);
+                                        $totalNilai = (float) ($p->total_nilai_pemasaran ?? 0);
                                     @endphp
                                     <tr class="border-t border-slate-200">
                                         <td class="px-4 py-3 align-top text-slate-700">{{ $p->nama_lengkap }}</td>
