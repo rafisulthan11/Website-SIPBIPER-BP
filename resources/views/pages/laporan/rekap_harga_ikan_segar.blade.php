@@ -160,8 +160,8 @@
                             <div class="mt-2 text-sm text-slate-700 space-y-1">
                                 <p><span class="font-medium">Pasar:</span> {{ $item->nama_pasar ?? '-' }}</p>
                                 <p><span class="font-medium">Pedagang:</span> {{ $item->nama_pedagang ?? '-' }}</p>
-                                <p><span class="font-medium">Desa:</span> {{ optional($item->desa)->nama_desa ?? '-' }}</p>
-                                <p><span class="font-medium">Kecamatan:</span> {{ optional($item->kecamatan)->nama_kecamatan ?? '-' }}</p>
+                                <p><span class="font-medium">Harga Produsen:</span> {{ $item->harga_produsen ? 'Rp ' . number_format($item->harga_produsen, 0, ',', '.') : '-' }}</p>
+                                <p><span class="font-medium">Harga Konsumen:</span> {{ $item->harga_konsumen ? 'Rp ' . number_format($item->harga_konsumen, 0, ',', '.') : '-' }}</p>
                             </div>
                             <div class="mt-3 flex flex-wrap gap-2">
                                 <a href="{{ route('harga-ikan-segar.show', ['harga_ikan_segar' => $item->id_harga, 'from_report' => 1]) }}" class="inline-flex items-center rounded bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700">Lihat Detail</a>
@@ -184,8 +184,8 @@
                                         <th class="px-4 py-3 text-left font-semibold text-[15px]">Nama Pasar</th>
                                         <th class="px-4 py-3 text-left font-semibold text-[15px]">Nama Pedagang</th>
                                         <th class="px-4 py-3 text-left font-semibold text-[15px]">Jenis Ikan</th>
-                                        <th class="px-4 py-3 text-left font-semibold text-[15px]">Desa</th>
-                                        <th class="px-4 py-3 text-left font-semibold text-[15px]">Kecamatan</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-[15px]">Harga Produsen</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-[15px]">Harga Konsumen</th>
                                         <th class="px-4 py-3 text-left font-semibold text-[15px]">Aksi</th>
                                     </tr>
                                 </thead>
@@ -197,8 +197,8 @@
                                         <td class="px-4 py-3 align-top text-slate-700">{{ $item->nama_pasar ?? '-' }}</td>
                                         <td class="px-4 py-3 align-top text-slate-700">{{ $item->nama_pedagang ?? '-' }}</td>
                                         <td class="px-4 py-3 align-top text-slate-700">{{ $item->jenis_ikan ?? '-' }}</td>
-                                        <td class="px-4 py-3 align-top text-slate-700">{{ optional($item->desa)->nama_desa ?? '-' }}</td>
-                                        <td class="px-4 py-3 align-top text-slate-700">{{ optional($item->kecamatan)->nama_kecamatan ?? '-' }}</td>
+                                        <td class="px-4 py-3 align-top text-slate-700">{{ $item->harga_produsen ? 'Rp ' . number_format($item->harga_produsen, 0, ',', '.') : '-' }}</td>
+                                        <td class="px-4 py-3 align-top text-slate-700">{{ $item->harga_konsumen ? 'Rp ' . number_format($item->harga_konsumen, 0, ',', '.') : '-' }}</td>
                                         <td class="px-4 py-3 align-top">
                                             <div class="flex flex-wrap gap-2">
                                                 <a href="{{ route('harga-ikan-segar.show', ['harga_ikan_segar' => $item->id_harga, 'from_report' => 1]) }}" class="inline-flex items-center rounded bg-green-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-green-700">

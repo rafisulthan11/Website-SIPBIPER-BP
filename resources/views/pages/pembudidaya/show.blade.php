@@ -222,7 +222,7 @@
                                                         <tr>
                                                             <th class="px-4 py-2 text-left border-b">Jenis Kolam</th>
                                                             <th class="px-4 py-2 text-left border-b">Ukuran (m²)</th>
-                                                            <th class="px-4 py-2 text-left border-b">Jumlah</th>
+                                                            <th class="px-4 py-2 text-left border-b">Jumlah Kolam</th>
                                                             <th class="px-4 py-2 text-left border-b">Komoditas</th>
                                                         </tr>
                                                     </thead>
@@ -250,7 +250,7 @@
                                                         <tr>
                                                             <th class="px-4 py-2 text-left border-b">Jenis Ikan</th>
                                                             <th class="px-4 py-2 text-left border-b">Jenis Indukan</th>
-                                                            <th class="px-4 py-2 text-left border-b">Jumlah</th>
+                                                            <th class="px-4 py-2 text-left border-b">Jumlah Produksi</th>
                                                             <th class="px-4 py-2 text-left border-b">Asal</th>
                                                         </tr>
                                                     </thead>

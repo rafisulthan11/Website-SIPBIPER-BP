@@ -5,22 +5,37 @@ namespace App\Exports;
 use App\Models\HargaIkanSegar;
 use App\Models\MasterDesa;
 use App\Models\MasterKecamatan;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class HargaIkanSegarExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths
+class HargaIkanSegarExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithCustomValueBinder
 {
     protected $filters;
 
     public function __construct($filters = [])
     {
         $this->filters = $filters;
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_string($value) && preg_match('/^\d{16,}$/', $value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
     }
 
     public function collection()
@@ -140,51 +155,71 @@ class HargaIkanSegarExport implements FromCollection, WithHeadings, WithMapping,
             $all[$backupItem->id_harga] = $backupItem;
         }
 
-        return $all->values()->sortByDesc('tanggal_input')->values();
+        return $all->values()->sortBy(function ($item) {
+            return sprintf(
+                '%s|%s|%s|%s',
+                strtolower((string) ($item->nama_pedagang ?? '')),
+                strtolower((string) ($item->nik_pedagang ?? '')),
+                (string) ($item->tahun_pendataan ?? ''),
+                (string) ($item->tanggal_input ?? '')
+            );
+        })->values();
     }
 
     public function headings(): array
     {
         return [
             'NO',
-            'TANGGAL INPUT',
-            'NAMA PASAR',
             'NAMA PEDAGANG',
+            'NIK PEDAGANG',
+            'TAHUN PENDATAAN',
+            'TANGGAL INPUT',
             'KECAMATAN',
             'DESA',
+            'NAMA PASAR',
             'ASAL IKAN',
             'JENIS IKAN',
             'UKURAN',
             'SATUAN',
-            'HARGA PRODUSEN (Rp)',
-            'HARGA KONSUMEN (Rp)',
+            'HARGA PRODUSEN',
+            'HARGA KONSUMEN',
             'KUANTITAS PERMINGGU',
-            'KETERANGAN',
-            'TANGGAL DIBUAT'
+            'KETERANGAN/CATATAN PASAR',
         ];
     }
 
     public function map($item): array
     {
         static $no = 0;
+        static $previousGroupKey = null;
         $no++;
+
+        $groupKey = implode('|', [
+            strtolower((string) ($item->nama_pedagang ?? '')),
+            strtolower((string) ($item->nik_pedagang ?? '')),
+            (string) ($item->tahun_pendataan ?? ''),
+        ]);
+
+        $isNewGroup = $previousGroupKey !== $groupKey;
+        $previousGroupKey = $groupKey;
 
         return [
             $no,
+            $isNewGroup ? ($item->nama_pedagang ?? '-') : '',
+            $isNewGroup ? ($item->nik_pedagang ?? '-') : '',
+            $isNewGroup ? ($item->tahun_pendataan ?? '-') : '',
             $item->tanggal_input ? Carbon::parse($item->tanggal_input)->format('d/m/Y') : '-',
-            $item->nama_pasar ?? '-',
-            $item->nama_pedagang ?? '-',
             optional($item->kecamatan)->nama_kecamatan ?? '-',
             optional($item->desa)->nama_desa ?? '-',
+            $item->nama_pasar ?? '-',
             $item->asal_ikan ?? '-',
             $item->jenis_ikan ?? '-',
             $item->ukuran ?? '-',
             $item->satuan ?? '-',
-            $item->harga_produsen ? number_format($item->harga_produsen, 0, ',', '.') : '-',
-            $item->harga_konsumen ? number_format($item->harga_konsumen, 0, ',', '.') : '-',
+            is_null($item->harga_produsen) ? '-' : $item->harga_produsen,
+            is_null($item->harga_konsumen) ? '-' : $item->harga_konsumen,
             $item->kuantitas_perminggu ?? '-',
             $item->keterangan ?? '-',
-            $item->created_at ? Carbon::parse($item->created_at)->toDateTimeString() : '-',
         ];
     }
 

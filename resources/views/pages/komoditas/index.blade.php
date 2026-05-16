@@ -50,6 +50,18 @@
                                  :style="isMobile
                                     ? 'display:flex; align-items:center; gap:0.5rem; width:100%;'
                                     : 'display:flex; align-items:center; gap:0.5rem;'">
+                                <label>Tipe:</label>
+                                <select name="tipe" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-blue-500 focus:border-blue-500 bg-white w-full sm:w-48" onchange="this.form.submit()">
+                                    <option value="">Semua Tipe</option>
+                                    <option value="Pembudidaya" {{ ($tipe ?? '') === 'Pembudidaya' ? 'selected' : '' }}>Pembudidaya</option>
+                                    <option value="Pengolah" {{ ($tipe ?? '') === 'Pengolah' ? 'selected' : '' }}>Pengolah</option>
+                                    <option value="Pemasar" {{ ($tipe ?? '') === 'Pemasar' ? 'selected' : '' }}>Pemasar</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-slate-700"
+                                 :style="isMobile
+                                    ? 'display:flex; align-items:center; gap:0.5rem; width:100%;'
+                                    : 'display:flex; align-items:center; gap:0.5rem;'">
                                 <label>Search:</label>
                                 <div class="relative"
                                      :style="isMobile

@@ -27,10 +27,10 @@ return new class extends Migration
         });
 
         // Add composite unique index to harga_ikan_segars
-        // Combination: nama_pedagang + nama_pasar + jenis_ikan + tanggal_input + tahun_pendataan
+        // Combination: tahun_pendataan + tanggal_input + nik_pedagang + nama_pasar
         Schema::table('harga_ikan_segars', function (Blueprint $table) {
             $table->unique(
-                ['nama_pedagang', 'nama_pasar', 'jenis_ikan', 'tanggal_input', 'tahun_pendataan'], 
+                ['tahun_pendataan', 'tanggal_input', 'nik_pedagang', 'nama_pasar'], 
                 'harga_ikan_unique'
             );
         });

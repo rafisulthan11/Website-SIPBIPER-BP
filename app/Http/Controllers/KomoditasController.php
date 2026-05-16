@@ -53,8 +53,12 @@ class KomoditasController extends Controller
         $allowedPerPage = [10, 25, 50, 100];
         $perPage = in_array($request->per_page, $allowedPerPage) ? $request->per_page : 10;
         $q = $request->q;
+        $tipe = $request->tipe;
 
         $komoditas = Komoditas::query()
+            ->when($tipe, function ($query, $tipe) {
+                return $query->where('tipe', $tipe);
+            })
             ->when($q, function ($query, $q) {
                 return $query->where('nama_komoditas', 'like', '%' . $q . '%')
                     ->orWhere('tipe', 'like', '%' . $q . '%')
@@ -63,9 +67,9 @@ class KomoditasController extends Controller
             })
             ->orderBy('nama_komoditas')
             ->paginate($perPage)
-            ->appends(['per_page' => $perPage, 'q' => $q]);
+            ->appends(['per_page' => $perPage, 'q' => $q, 'tipe' => $tipe]);
 
-        return view('pages.komoditas.index', compact('komoditas', 'allowedPerPage', 'perPage', 'q'));
+        return view('pages.komoditas.index', compact('komoditas', 'allowedPerPage', 'perPage', 'q', 'tipe'));
     }
 
     /**

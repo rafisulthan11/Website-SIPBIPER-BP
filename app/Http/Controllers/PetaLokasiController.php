@@ -64,7 +64,7 @@ class PetaLokasiController extends Controller
                     ],
                     'alamat' => $item->alamat_lengkap_usaha ?? $item->alamat,
                     'komoditas' => $komoditas,
-                    'jenis_kegiatan' => $item->jenis_budidaya,
+                    'jenis_kegiatan' => $item->jenis_kegiatan_usaha ?: $item->jenis_budidaya,
                     'skala_usaha' => $item->skala_usaha,
                     'status_usaha' => $item->status_usaha,
                     'kontak' => $item->kontak,

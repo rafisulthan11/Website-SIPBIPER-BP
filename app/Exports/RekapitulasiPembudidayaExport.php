@@ -6,21 +6,36 @@ use App\Models\Pembudidaya;
 use App\Models\MasterDesa;
 use App\Models\MasterKecamatan;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
+class RekapitulasiPembudidayaExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithCustomValueBinder
 {
     protected $filters;
 
     public function __construct($filters = [])
     {
         $this->filters = $filters;
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_string($value) && preg_match('/^\d{16,}$/', $value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
     }
 
     public function collection()
@@ -212,8 +227,48 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
             ->values();
 
         // Hitung total produksi dan luas kolam untuk setiap pembudidaya
-        $pembudidayas->each(function($item) {
+        $komoditasFilter = !empty($this->filters['komoditas']) ? strtolower(trim((string) $this->filters['komoditas'])) : null;
+
+        $pembudidayas->each(function($item) use ($komoditasFilter) {
+            $normalizeText = function ($value): string {
+                return strtolower(trim((string) $value));
+            };
+
             $isBackup = (bool) ($item->from_backup_snapshot ?? false);
+            $kolams = collect($item->kolam ?? []);
+            $ikans = collect($item->ikan ?? []);
+
+            if ($komoditasFilter) {
+                $matchedKolams = $kolams
+                    ->filter(function ($kolam) use ($normalizeText, $komoditasFilter) {
+                        return $normalizeText(data_get($kolam, 'komoditas')) === $komoditasFilter;
+                    })
+                    ->groupBy(function ($kolam) use ($normalizeText) {
+                        return $normalizeText(data_get($kolam, 'komoditas')) . '|' . $normalizeText(data_get($kolam, 'jenis_kolam'));
+                    })
+                    ->map->first()
+                    ->values();
+
+                $item->detail_kolam = $matchedKolams;
+                $item->total_luas_kolam = $matchedKolams->sum(function ($kolam) {
+                    $ukuran = floatval(data_get($kolam, 'ukuran', 0));
+                    $jumlah = floatval(data_get($kolam, 'jumlah', 0));
+                    return $ukuran * $jumlah;
+                });
+
+                $matchedIkans = $ikans
+                    ->filter(function ($ikan) use ($normalizeText, $komoditasFilter) {
+                        return $normalizeText(data_get($ikan, 'jenis_ikan')) === $komoditasFilter;
+                    })
+                    ->values();
+
+                $item->detail_produksi = $matchedIkans;
+                $item->total_produksi = $matchedIkans->sum(function ($ikan) {
+                    return floatval(data_get($ikan, 'jumlah', 0));
+                });
+
+                return;
+            }
 
             // Ambil semua data produksi
             if ($isBackup) {
@@ -228,7 +283,7 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
                     return floatval($row->total_produksi ?? 0);
                 });
 
-                $kolams = collect($item->kolam ?? []);
+                $item->detail_kolam = $kolams;
             } else {
                 $produksiQuery = DB::table('pembudidaya_produksis')
                     ->where('id_pembudidaya', $item->id_pembudidaya);
@@ -240,19 +295,16 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
                 $item->detail_produksi = $produksiQuery->get();
                 $item->total_produksi = $item->detail_produksi->sum('total_produksi');
 
-                $kolams = DB::table('pembudidaya_kolams')
+                $item->detail_kolam = DB::table('pembudidaya_kolams')
                     ->where('id_pembudidaya', $item->id_pembudidaya)
                     ->get();
             }
 
-            $item->detail_kolam = $kolams;
-            $totalLuasKolam = 0;
-            foreach ($kolams as $kolam) {
+            $item->total_luas_kolam = $item->detail_kolam->sum(function ($kolam) {
                 $ukuran = floatval(is_array($kolam) ? ($kolam['ukuran'] ?? 0) : ($kolam->ukuran ?? 0));
-                $jumlah = intval(is_array($kolam) ? ($kolam['jumlah'] ?? 0) : ($kolam->jumlah ?? 0));
-                $totalLuasKolam += ($ukuran * $jumlah);
-            }
-            $item->total_luas_kolam = $totalLuasKolam;
+                $jumlah = floatval(is_array($kolam) ? ($kolam['jumlah'] ?? 0) : ($kolam->jumlah ?? 0));
+                return $ukuran * $jumlah;
+            });
         });
 
         return $pembudidayas;
@@ -269,7 +321,6 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
             'TEMPAT LAHIR',
             'TANGGAL LAHIR',
             'STATUS PERKAWINAN',
-            'JUMLAH TANGGUNGAN',
             'ALAMAT LENGKAP',
             'KECAMATAN',
             'DESA',
@@ -344,7 +395,7 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
             return implode(' | ', [
                 'Jenis: ' . ($k->jenis_kolam ?? '-'),
                 'Ukuran: ' . number_format($ukuran, 2, ',', '.') . ' m²',
-                'Jumlah: ' . $jumlah,
+                'Jumlah Kolam: ' . $jumlah,
                 'Luas Total: ' . number_format($luasKolam, 2, ',', '.') . ' m²',
                 'Komoditas: ' . ($k->komoditas ?? '-')
             ]);
@@ -357,6 +408,7 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
                 'Tahun: ' . ($p->tahun ?? '-'),
                 'Total Produksi: ' . number_format($p->total_produksi ?? 0, 2, ',', '.') . ' kg',
                 'Satuan: ' . ($p->satuan_produksi ?? '-'),
+                'Total Luas Kolam: ' . number_format($p->total_luas_kolam ?? 0, 2, ',', '.') . ' m²',
                 'Harga: Rp ' . number_format($p->harga_per_satuan ?? 0, 0, ',', '.')
             ]);
         })->implode(' ; ');
@@ -366,7 +418,7 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
             return implode(' | ', [
                 'Jenis: ' . ($i->jenis_ikan ?? '-'),
                 'Indukan: ' . ($i->jenis_indukan ?? '-'),
-                'Jumlah: ' . ($i->jumlah ?? '-'),
+                'Jumlah Produksi: ' . ($i->jumlah ?? '-'),
                 'Asal: ' . ($i->asal ?? '-')
             ]);
         })->implode(' ; ');
@@ -411,13 +463,12 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
         return [
             $no,
             $isNewNIK ? ($pembudidaya->nama_lengkap ?? '-') : '',
-            $isNewNIK ? ($pembudidaya->nik_pembudidaya ?? ($pembudidaya->nik ?? '-')) : '',
+            $isNewNIK ? (string) ($pembudidaya->getRawOriginal('nik_pembudidaya') ?? $pembudidaya->nik_pembudidaya ?? $pembudidaya->nik ?? '-') : '',
             $pembudidaya->tahun_pendataan ?? '-',
             $isNewNIK ? ($pembudidaya->jenis_kelamin ?? '-') : '',
             $isNewNIK ? ($pembudidaya->tempat_lahir ?? '-') : '',
             $isNewNIK ? ($pembudidaya->tanggal_lahir ? Carbon::parse($pembudidaya->tanggal_lahir)->format('d-m-Y') : '-') : '',
             $isNewNIK ? ($pembudidaya->status_perkawinan ?? '-') : '',
-            $isNewNIK ? ($pembudidaya->jumlah_tanggungan ?? '-') : '',
             $isNewNIK ? ($pembudidaya->alamat ?? '-') : '',
             $isNewNIK ? (optional($pembudidaya->kecamatan)->nama_kecamatan ?? '-') : '',
             $isNewNIK ? (optional($pembudidaya->desa)->nama_desa ?? '-') : '',
@@ -449,14 +500,14 @@ class RekapitulasiPembudidayaExport implements FromCollection, WithHeadings, Wit
             $izin->imb ?? '-',
             $izin->sup_perikanan ?? '-',
             $izin->sup_perdagangan ?? '-',
-            $inv->nilai_asset ? number_format($inv->nilai_asset, 0, ',', '.') : '-',
-            $inv->laba_ditanam ? number_format($inv->laba_ditanam, 0, ',', '.') : '-',
-            $inv->sewa ? number_format($inv->sewa, 0, ',', '.') : '-',
-            $inv->pinjaman ? number_format($inv->pinjaman, 0, ',', '.') : '-',
-            $inv->modal_sendiri ? number_format($inv->modal_sendiri, 0, ',', '.') : '-',
+            is_null($inv->nilai_asset) ? '-' : $inv->nilai_asset,
+            is_null($inv->laba_ditanam) ? '-' : $inv->laba_ditanam,
+            is_null($inv->sewa) ? '-' : $inv->sewa,
+            is_null($inv->pinjaman) ? '-' : $inv->pinjaman,
+            is_null($inv->modal_sendiri) ? '-' : $inv->modal_sendiri,
             $inv->status_lahan ?? '-',
-            $inv->luas_lahan ? number_format($inv->luas_lahan, 2, ',', '.') : '-',
-            $inv->nilai_bangunan ? number_format($inv->nilai_bangunan, 0, ',', '.') : '-',
+            is_null($inv->luas_lahan) ? '-' : $inv->luas_lahan,
+            is_null($inv->nilai_bangunan) ? '-' : $inv->nilai_bangunan,
             $inv->bangunan ?? '-',
             $inv->sertifikat ?? '-',
             count($pembudidaya->detail_kolam ?? []),

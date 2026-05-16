@@ -677,7 +677,7 @@
                         <!-- Step 6: Lampiran -->
                         <div x-show="step===6" x-transition class="bg-gray-50 rounded-lg border border-gray-200 p-6">
                             <h3 class="text-lg font-semibold mb-4">Lampiran</h3>
-                            <p class="text-slate-600 mb-6">Unggah dokumentasi berikut (format: JPG, PNG, PDF. Maksimal 2MB per file)</p>
+                            <p class="text-slate-600 mb-6">Unggah dokumentasi berikut (format: JPG, PNG, PDF. Maksimal 1MB per file)</p>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Foto KTP -->

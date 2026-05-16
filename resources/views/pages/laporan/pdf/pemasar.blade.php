@@ -72,7 +72,6 @@
             <tr><td>Skala Usaha</td><td>: {{ $pemasar->skala_usaha ?? '-' }}</td></tr>
             <tr><td>Status Usaha</td><td>: {{ $pemasar->status_usaha ?? '-' }}</td></tr>
             <tr><td>Tahun Mulai Usaha</td><td>: {{ $pemasar->tahun_mulai_usaha ?? '-' }}</td></tr>
-            <tr><td>Komoditas</td><td>: {{ $pemasar->komoditas ?? '-' }}</td></tr>
         </table>
 
         <div class="subsection-title">Lokasi Usaha</div>
@@ -211,9 +210,9 @@
         </table>
     </div>
 
-    <!-- Produksi -->
+    <!-- Pemasaran -->
     <div class="section">
-        <div class="section-title">PRODUKSI</div>
+        <div class="section-title">PEMASARAN</div>
         
         @php
             $pemasaranSections = collect();
@@ -225,7 +224,7 @@
         @endphp
 
         @if($pemasaranSections->count() > 0)
-            <div class="subsection-title">Informasi Produksi</div>
+            <div class="subsection-title">Informasi Pemasaran</div>
             @foreach($pemasaranSections as $sectionIndex => $rows)
                 @php
                     $firstRow = $rows->first();
@@ -237,10 +236,10 @@
                 <table class="info-table" style="margin-bottom: 16px;">
                     <tr><td colspan="2"><strong>Data Pemasaran #{{ (int) $sectionIndex + 1 }}</strong></td></tr>
                     <tr><td>Kapasitas Terpasang</td><td>: {{ $firstRow->kapasitas_terpasang ? $firstRow->kapasitas_terpasang . ' Kg' : '-' }}</td></tr>
-                    <tr><td>Hasil Produksi (Kg)</td><td>: {{ $firstRow->hasil_produksi_kg ?? '-' }}</td></tr>
-                    <tr><td>Hasil Produksi (Rp)</td><td>: {{ $firstRow->hasil_produksi_rp ? 'Rp. ' . number_format($firstRow->hasil_produksi_rp, 2, ',', '.') : '-' }}</td></tr>
+                    <tr><td>Hasil Pemasaran (Kg)</td><td>: {{ $firstRow->hasil_produksi_kg ?? '-' }}</td></tr>
+                    <tr><td>Hasil Pemasaran (Rp)</td><td>: {{ $firstRow->hasil_produksi_rp ? 'Rp. ' . number_format($firstRow->hasil_produksi_rp, 2, ',', '.') : '-' }}</td></tr>
                     <tr>
-                        <td>Bulan Produksi</td>
+                        <td>Bulan Pemasaran</td>
                         <td>: {{ is_array($bulanProduksi) ? implode(', ', $bulanProduksi) : '-' }}</td>
                     </tr>
                     <tr><td>Distribusi Pemasaran</td><td>: {{ $firstRow->distribusi_pemasaran ?? '-' }}</td></tr>
@@ -260,15 +259,43 @@
                 }
             }
         @endphp
-        @if(is_array($dataPemasaran) && count($dataPemasaran) > 0)
-                <div class="subsection-title">Data Pemasaran</div>
+        @if($pemasaranSections->count() > 0)
+                <div class="subsection-title">Detail Pemasaran</div>
+                @foreach($pemasaranSections as $sectionIndex => $rows)
+                    <table class="data-table" style="margin-bottom: 16px;">
+                        <thead>
+                            <tr>
+                                <th colspan="5">Detail Pemasaran #{{ (int) $sectionIndex + 1 }}</th>
+                            </tr>
+                            <tr>
+                                <th>Komoditas Ikan</th>
+                                <th>Asal Ikan</th>
+                                <th>Jumlah Ikan</th>
+                                <th>Harga Beli/Kg</th>
+                                <th>Harga Jual/Kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($rows as $row)
+                            <tr>
+                                <td>{{ $row->komoditas ?? $row->jenis_ikan ?? '-' }}</td>
+                                <td>{{ $row->asal_ikan ?? '-' }}</td>
+                                <td>{{ $row->jumlah_ikan ?? $row->jumlah_volume ?? '-' }}</td>
+                                <td>{{ isset($row->harga_beli) ? 'Rp. ' . number_format($row->harga_beli, 0, ',', '.') : '-' }}</td>
+                                <td>{{ isset($row->harga_jual) ? 'Rp. ' . number_format($row->harga_jual, 0, ',', '.') : '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endforeach
+        @elseif(is_array($dataPemasaran) && count($dataPemasaran) > 0)
+                <div class="subsection-title">Detail Pemasaran</div>
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Komoditas Ikan</th>
-                            <th>Kebutuhan Min (Kg)</th>
-                            <th>Kebutuhan Max (Kg)</th>
                             <th>Asal Ikan</th>
+                            <th>Jumlah Ikan</th>
                             <th>Harga Beli/Kg</th>
                             <th>Harga Jual/Kg</th>
                         </tr>
@@ -277,9 +304,8 @@
                         @foreach($dataPemasaran as $row)
                         <tr>
                             <td>{{ $row['komoditas'] ?? $row['jenis_ikan'] ?? '-' }}</td>
-                            <td>{{ isset($row['kebutuhan_min']) ? number_format($row['kebutuhan_min'], 2, ',', '.') : '-' }}</td>
-                            <td>{{ isset($row['kebutuhan_max']) ? number_format($row['kebutuhan_max'], 2, ',', '.') : '-' }}</td>
                             <td>{{ $row['asal_ikan'] ?? '-' }}</td>
+                            <td>{{ $row['jumlah_ikan'] ?? $row['jumlah_volume'] ?? '-' }}</td>
                             <td>{{ isset($row['harga_beli']) ? 'Rp. ' . number_format($row['harga_beli'], 0, ',', '.') : '-' }}</td>
                             <td>{{ isset($row['harga_jual']) ? 'Rp. ' . number_format($row['harga_jual'], 0, ',', '.') : '-' }}</td>
                         </tr>

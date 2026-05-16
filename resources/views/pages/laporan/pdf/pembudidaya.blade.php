@@ -146,10 +146,6 @@
                 <td>: {{ $pembudidaya->status_perkawinan ?? '-' }}</td>
             </tr>
             <tr>
-                <td>Jumlah Tanggungan</td>
-                <td>: {{ $pembudidaya->jumlah_tanggungan ?? '-' }}</td>
-            </tr>
-            <tr>
                 <td>Alamat Lengkap</td>
                 <td>: {{ $pembudidaya->alamat ?? '-' }}</td>
             </tr>
@@ -355,6 +351,10 @@
             <div class="subsection-title">Total Keseluruhan</div>
             <table class="info-table">
                 <tr>
+                    <td>Bulan Produksi</td>
+                    <td>: {{ $prod->bulan ?? ($prod->bulan_produksi ?? '-') }}</td>
+                </tr>
+                <tr>
                     <td>Total Luas Kolam</td>
                     <td>: {{ $prod->total_luas_kolam ?? '-' }} m²</td>
                 </tr>
@@ -378,7 +378,7 @@
                     <tr>
                         <th>Jenis Kolam</th>
                         <th>Ukuran (m²)</th>
-                        <th>Jumlah</th>
+                        <th>Jumlah Kolam</th>
                         <th>Komoditas</th>
                     </tr>
                 </thead>
@@ -402,7 +402,7 @@
                     <tr>
                         <th>Jenis Ikan</th>
                         <th>Jenis Indukan</th>
-                        <th>Jumlah</th>
+                        <th>Jumlah Produksi</th>
                         <th>Asal</th>
                     </tr>
                 </thead>

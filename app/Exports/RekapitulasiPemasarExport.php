@@ -6,17 +6,105 @@ use App\Models\Pemasar;
 use App\Models\MasterDesa;
 use App\Models\MasterKecamatan;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
+class RekapitulasiPemasarExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithCustomValueBinder
 {
     protected $filters;
+
+    protected function cleanText($value, int $limit = 32000): string
+    {
+        $text = trim((string) ($value ?? '-'));
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', $text) ?? '';
+
+        if (function_exists('mb_substr')) {
+            return mb_substr($text, 0, $limit);
+        }
+
+        return substr($text, 0, $limit);
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_string($value) && preg_match('/^\d{16,}$/', $value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
+    }
+
+    protected function formatPemasaranSummary($pemasar): string
+    {
+        $sections = collect();
+        if ($pemasar->relationLoaded('pemasaran') && $pemasar->pemasaran->isNotEmpty()) {
+            $sections = $pemasar->pemasaran->groupBy(function ($row) {
+                return $row->section_index ?? 0;
+            });
+        }
+
+        if ($sections->isEmpty()) {
+            return '-';
+        }
+
+        $summary = $sections->map(function ($rows, $sectionIndex) {
+            $firstRow = $rows->first();
+            $bulanPemasaran = $firstRow->bulan_produksi ?? null;
+            if (is_string($bulanPemasaran)) {
+                $bulanPemasaran = json_decode($bulanPemasaran, true);
+            }
+
+            if (is_array($bulanPemasaran)) {
+                $bulanPemasaran = implode(', ', $bulanPemasaran);
+            }
+
+            return sprintf(
+                '[Data Pemasaran #%d: Kapasitas Terpasang: %s Kg | Hasil Pemasaran (Kg): %s | Hasil Pemasaran (Rp): %s | Bulan Pemasaran: %s | Distribusi Pemasaran: %s]',
+                (int) $sectionIndex + 1,
+                $firstRow->kapasitas_terpasang ?? '-',
+                $firstRow->hasil_produksi_kg ?? '-',
+                is_null($firstRow->hasil_produksi_rp) ? '-' : $firstRow->hasil_produksi_rp,
+                $bulanPemasaran ?: '-',
+                $firstRow->distribusi_pemasaran ?? '-'
+            );
+        })->implode(' ; ');
+
+        return $this->cleanText($summary);
+    }
+
+    protected function formatDetailPemasaran(array $rows): string
+    {
+        if (count($rows) === 0) {
+            return '-';
+        }
+
+        $detail = collect($rows)->map(function ($row, $index) {
+            $jumlahIkan = data_get($row, 'jumlah_ikan', data_get($row, 'jumlah_volume', '-'));
+
+            return sprintf(
+                '[%d: %s | Asal: %s | Jumlah Ikan: %s | Harga Beli: Rp %s | Harga Jual: Rp %s]',
+                $index + 1,
+                $row['komoditas'] ?? $row['jenis_ikan'] ?? '-',
+                $row['asal_ikan'] ?? '-',
+                $jumlahIkan === null || $jumlahIkan === '' ? '-' : $jumlahIkan,
+                isset($row['harga_beli']) ? number_format($row['harga_beli'], 0, ',', '.') : '-',
+                isset($row['harga_jual']) ? number_format($row['harga_jual'], 0, ',', '.') : '-'
+            );
+        })->implode(' ; ');
+
+        return $this->cleanText($detail);
+    }
 
     public function __construct($filters = [])
     {
@@ -227,12 +315,8 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             'LUAS BANGUNAN (M²)',
             'NILAI BANGUNAN',
             'MESIN PERALATAN (Jenis | Kapasitas | Jumlah | Asal)',
-            'KAPASITAS TERPASANG (KG)',
-            'HASIL PRODUKSI (KG)',
-            'HASIL PRODUKSI (RP)',
-            'BULAN PRODUKSI',
-            'DISTRIBUSI PEMASARAN',
-            'DATA PEMASARAN (Jenis Ikan | Kebutuhan Min-Max | Asal | Harga Beli | Harga Jual)',
+            'DATA PEMASARAN (kapasitas terpasang | hasil pemasaran (Kg) | hasil pemasaran (Rp) | bulan pemasaran | distribusi pemasaran)',
+            'DETAIL PEMASARAN (Komoditas | Asal | Jumlah Ikan | Harga Beli | Harga Jual)',
             'TENAGA KERJA WNI LAKI-LAKI TETAP',
             'TENAGA KERJA WNI LAKI-LAKI TIDAK TETAP',
             'TENAGA KERJA WNI LAKI-LAKI KELUARGA',
@@ -265,7 +349,7 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
         if ($pemasar->sertifikat_lahan) {
             $decoded = is_string($pemasar->sertifikat_lahan) ? json_decode($pemasar->sertifikat_lahan, true) : $pemasar->sertifikat_lahan;
             if (is_array($decoded)) {
-                $sertifikatLahan = implode(', ', $decoded);
+                $sertifikatLahan = $this->cleanText(implode(', ', $decoded));
             }
         }
 
@@ -274,22 +358,7 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
         if ($pemasar->sertifikat_bangunan) {
             $decoded = is_string($pemasar->sertifikat_bangunan) ? json_decode($pemasar->sertifikat_bangunan, true) : $pemasar->sertifikat_bangunan;
             if (is_array($decoded)) {
-                $sertifikatBangunan = implode(', ', $decoded);
-            }
-        }
-
-        $pemasaranSection = null;
-        if ($pemasar->relationLoaded('pemasaran') && $pemasar->pemasaran->isNotEmpty()) {
-            $pemasaranSection = $pemasar->pemasaran->sortBy('section_index')->first();
-        }
-
-        // Format Bulan Produksi
-        $bulanProduksi = '-';
-        $bulanProduksiRaw = $pemasaranSection->bulan_produksi ?? $pemasar->bulan_produksi ?? null;
-        if ($bulanProduksiRaw) {
-            $decoded = is_string($bulanProduksiRaw) ? json_decode($bulanProduksiRaw, true) : $bulanProduksiRaw;
-            if (is_array($decoded)) {
-                $bulanProduksi = implode(', ', $decoded);
+                $sertifikatBangunan = $this->cleanText(implode(', ', $decoded));
             }
         }
 
@@ -308,6 +377,8 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
                         $m['asal'] ?? '-'
                     );
                 })->implode(' ; ');
+
+                $mesinPeralatanDetail = $this->cleanText($mesinPeralatanDetail);
             }
         }
 
@@ -321,29 +392,15 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             }
         }
 
-        // Format Data Pemasaran Detail
-        $dataPemasaranDetail = '-';
-        if (is_array($dataPemasaranRows) && count($dataPemasaranRows) > 0) {
-            $dataPemasaranDetail = collect($dataPemasaranRows)->map(function($d, $idx) {
-                return sprintf(
-                    '[%d: %s | Kebutuhan: %s-%s kg | Asal: %s | Harga Beli: Rp %s | Harga Jual: Rp %s]',
-                    $idx + 1,
-                    $d['komoditas'] ?? $d['jenis_ikan'] ?? '-',
-                    isset($d['kebutuhan_min']) ? number_format($d['kebutuhan_min'], 2, ',', '.') : '-',
-                    isset($d['kebutuhan_max']) ? number_format($d['kebutuhan_max'], 2, ',', '.') : '-',
-                    $d['asal_ikan'] ?? '-',
-                    isset($d['harga_beli']) ? number_format($d['harga_beli'], 0, ',', '.') : '-',
-                    isset($d['harga_jual']) ? number_format($d['harga_jual'], 0, ',', '.') : '-'
-                );
-            })->implode(' ; ');
-        }
+        $dataPemasaranSummary = $this->formatPemasaranSummary($pemasar);
+        $dataPemasaranDetail = $this->formatDetailPemasaran(is_array($dataPemasaranRows) ? $dataPemasaranRows : []);
 
         // Lampiran files
         $lampiranKeys = ['foto_ktp','foto_sertifikat','foto_cpib_cbib','foto_unit_usaha','foto_npwp','foto_izin_usaha','foto_produk','foto_sertifikat_pirt','foto_sertifikat_halal'];
         $lampiranFiles = [];
         foreach($lampiranKeys as $k){
             if (!empty($pemasar->{$k})) {
-                $lampiranFiles[] = $pemasar->{$k};
+                $lampiranFiles[] = $this->cleanText($pemasar->{$k});
             }
         }
 
@@ -366,7 +423,7 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             $isNewNIK ? ($pemasar->pendidikan_terakhir ?? '-') : '',
             $isNewNIK ? ($pemasar->status_perkawinan ?? '-') : '',
             $isNewNIK ? ($pemasar->jumlah_tanggungan ?? '-') : '',
-            $isNewNIK ? ($pemasar->aset_pribadi ? number_format($pemasar->aset_pribadi, 0, ',', '.') : '-') : '',
+            $isNewNIK ? ($pemasar->aset_pribadi ?? '-') : '',
             $isNewNIK ? ($pemasar->alamat ?? '-') : '',
             $isNewNIK ? (optional($pemasar->kecamatan)->nama_kecamatan ?? '-') : '',
             $isNewNIK ? (optional($pemasar->desa)->nama_desa ?? '-') : '',
@@ -399,29 +456,25 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             $pemasar->siup_perikanan ?? '-',
             $pemasar->ukl_upl ?? '-',
             $pemasar->amdal ?? '-',
-            $pemasar->investasi_tanah ? number_format($pemasar->investasi_tanah, 0, ',', '.') : '-',
-            $pemasar->investasi_gedung ? number_format($pemasar->investasi_gedung, 0, ',', '.') : '-',
-            $pemasar->investasi_mesin_peralatan ? number_format($pemasar->investasi_mesin_peralatan, 0, ',', '.') : '-',
-            $pemasar->investasi_kendaraan ? number_format($pemasar->investasi_kendaraan, 0, ',', '.') : '-',
-            $pemasar->investasi_lain_lain ? number_format($pemasar->investasi_lain_lain, 0, ',', '.') : '-',
-            $pemasar->investasi_sub_jumlah ? number_format($pemasar->investasi_sub_jumlah, 0, ',', '.') : '-',
-            $pemasar->modal_kerja_1_bulan ? number_format($pemasar->modal_kerja_1_bulan, 0, ',', '.') : '-',
-            $pemasar->modal_kerja_sub_jumlah ? number_format($pemasar->modal_kerja_sub_jumlah, 0, ',', '.') : '-',
-            $pemasar->modal_sendiri ? number_format($pemasar->modal_sendiri, 0, ',', '.') : '-',
-            $pemasar->laba_ditanam ? number_format($pemasar->laba_ditanam, 0, ',', '.') : '-',
-            $pemasar->modal_pinjam ? number_format($pemasar->modal_pinjam, 0, ',', '.') : '-',
+            is_null($pemasar->investasi_tanah) ? '-' : $pemasar->investasi_tanah,
+            is_null($pemasar->investasi_gedung) ? '-' : $pemasar->investasi_gedung,
+            is_null($pemasar->investasi_mesin_peralatan) ? '-' : $pemasar->investasi_mesin_peralatan,
+            is_null($pemasar->investasi_kendaraan) ? '-' : $pemasar->investasi_kendaraan,
+            is_null($pemasar->investasi_lain_lain) ? '-' : $pemasar->investasi_lain_lain,
+            is_null($pemasar->investasi_sub_jumlah) ? '-' : $pemasar->investasi_sub_jumlah,
+            is_null($pemasar->modal_kerja_1_bulan) ? '-' : $pemasar->modal_kerja_1_bulan,
+            is_null($pemasar->modal_kerja_sub_jumlah) ? '-' : $pemasar->modal_kerja_sub_jumlah,
+            is_null($pemasar->modal_sendiri) ? '-' : $pemasar->modal_sendiri,
+            is_null($pemasar->laba_ditanam) ? '-' : $pemasar->laba_ditanam,
+            is_null($pemasar->modal_pinjam) ? '-' : $pemasar->modal_pinjam,
             $sertifikatLahan,
             $pemasar->luas_lahan ?? '-',
-            $pemasar->nilai_lahan ? number_format($pemasar->nilai_lahan, 0, ',', '.') : '-',
+            is_null($pemasar->nilai_lahan) ? '-' : $pemasar->nilai_lahan,
             $sertifikatBangunan,
             $pemasar->luas_bangunan ?? '-',
-            $pemasar->nilai_bangunan ? number_format($pemasar->nilai_bangunan, 0, ',', '.') : '-',
+            is_null($pemasar->nilai_bangunan) ? '-' : $pemasar->nilai_bangunan,
             $mesinPeralatanDetail,
-            $pemasaranSection->kapasitas_terpasang ?? '-',
-            $pemasaranSection->hasil_produksi_kg ?? '-',
-            $pemasaranSection->hasil_produksi_rp ? number_format($pemasaranSection->hasil_produksi_rp, 0, ',', '.') : '-',
-            $bulanProduksi,
-            $pemasaranSection->distribusi_pemasaran ?? '-',
+            $dataPemasaranSummary,
             $dataPemasaranDetail,
             $pemasar->wni_laki_tetap ?? 0,
             $pemasar->wni_laki_tidak_tetap ?? 0,
@@ -435,7 +488,7 @@ class RekapitulasiPemasarExport implements FromCollection, WithHeadings, WithMap
             $pemasar->wna_perempuan_tetap ?? 0,
             $pemasar->wna_perempuan_tidak_tetap ?? 0,
             $pemasar->wna_perempuan_keluarga ?? 0,
-            $totalHargaJual > 0 ? number_format($totalHargaJual, 0, ',', '.') : '-',
+            $totalHargaJual > 0 ? $totalHargaJual : '-',
             implode(' ; ', $lampiranFiles) ?: '-',
         ];
     }

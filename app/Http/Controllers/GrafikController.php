@@ -216,6 +216,32 @@ class GrafikController extends Controller
         $tahun = $request->input('tahun');
         $kecamatan = $request->input('kecamatan');
         $komoditas = $request->input('komoditas');
+
+        $normalizeText = function ($value): string {
+            return strtolower(trim((string) $value));
+        };
+
+        $matchesKomoditas = function ($candidate, $filter) use ($normalizeText): bool {
+            $candidateText = $normalizeText($candidate);
+            $filterText = $normalizeText($filter);
+
+            if ($candidateText === '' || $filterText === '') {
+                return false;
+            }
+
+            if (str_contains($candidateText, $filterText)) {
+                return true;
+            }
+
+            $parts = preg_split('/\s*,\s*/', $candidateText) ?: [];
+            foreach ($parts as $part) {
+                if ($part !== '' && ($part === $filterText || str_contains($part, $filterText) || str_contains($filterText, $part))) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
         
         // Mapping nama bulan ke angka
         $bulanMap = [
@@ -265,11 +291,39 @@ class GrafikController extends Controller
             $queryPengolah->where('id_kecamatan', $kecamatan);
         }
         
-        if ($komoditas) {
-            $queryPengolah->where('komoditas', 'LIKE', '%' . $komoditas . '%');
-        }
-        
         $pengolahData = $queryPengolah->get();
+
+        if ($komoditas) {
+            $pengolahData = $pengolahData->filter(function ($pengolah) use ($komoditas, $matchesKomoditas) {
+                $produksiData = is_array($pengolah->produksi_data) ? $pengolah->produksi_data : [];
+
+                foreach ($produksiData as $produksi) {
+                    if (!is_array($produksi)) {
+                        continue;
+                    }
+
+                    $komoditasProduksi = $produksi['komoditas'] ?? null;
+                    if (is_array($komoditasProduksi)) {
+                        foreach ($komoditasProduksi as $komoditasItem) {
+                            if ($matchesKomoditas($komoditasItem, $komoditas)) {
+                                return true;
+                            }
+                        }
+                        continue;
+                    }
+
+                    if ($matchesKomoditas($komoditasProduksi, $komoditas)) {
+                        return true;
+                    }
+
+                    if ($matchesKomoditas($pengolah->komoditas ?? '', $komoditas)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })->values();
+        }
         
         // Inisialisasi array untuk 12 bulan
         $pembudidayaPerBulan = array_fill(1, 12, 0);
@@ -359,14 +413,7 @@ class GrafikController extends Controller
                 })
                 ->distinct('id_pembudidaya')
                 ->count('id_pembudidaya'),
-            'jumlah_pengolah' => Pengolah::whereNotNull('produksi_data')
-                ->when($tahun, function($q) use ($tahun) {
-                    return $q->where('tahun_pendataan', $tahun);
-                })
-                ->when($kecamatan, function($q) use ($kecamatan) {
-                    return $q->where('id_kecamatan', $kecamatan);
-                })
-                ->count(),
+            'jumlah_pengolah' => $pengolahData->count(),
         ];
         
         // Rata-rata produksi per bulan

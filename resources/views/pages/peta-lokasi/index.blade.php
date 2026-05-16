@@ -76,10 +76,9 @@
                             </label>
                             <select id="filter-jenis" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Semua Jenis</option>
-                                <optgroup label="Budidaya">
-                                    <option value="Kolam">Kolam</option>
-                                    <option value="Mina Padi">Mina Padi</option>
-                                    <option value="Keramba">Keramba</option>
+                                <optgroup label="Pembudidaya">
+                                    <option value="Pembenihan/Pembibitan">Pembenihan/Pembibitan</option>
+                                    <option value="Pembesaran">Pembesaran</option>
                                     <option value="Tambak">Tambak</option>
                                 </optgroup>
                                 <optgroup label="Pengolahan">
@@ -568,6 +567,23 @@
             const jenisFilter = document.getElementById('filter-jenis').value;
             const statusFilter = document.getElementById('filter-status').value;
 
+            const normalizeText = (value) => (value || '')
+                .toString()
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, ' ');
+
+            const matchesJenisKegiatan = (itemValue, filterValue) => {
+                const itemText = normalizeText(itemValue);
+                const filterText = normalizeText(filterValue);
+
+                if (!itemText || !filterText) {
+                    return false;
+                }
+
+                return itemText === filterText || itemText.includes(filterText) || filterText.includes(itemText);
+            };
+
             let filteredData = pembudidayaData;
 
             // Filter berdasarkan tab aktif
@@ -587,7 +603,7 @@
 
             if (jenisFilter) {
                 filteredData = filteredData.filter(p => 
-                    p.jenis_kegiatan && p.jenis_kegiatan === jenisFilter
+                    matchesJenisKegiatan(p.jenis_kegiatan, jenisFilter)
                 );
             }
 
@@ -610,38 +626,10 @@
             const notificationMessage = document.getElementById('no-data-message');
             
             // Cek apakah ada filter yang aktif
-            const hasActiveFilter = bidangFilter || kecamatanFilter || komoditasFilter || jenisFilter || statusFilter;
+            const hasActiveFilter = activeTab !== 'semua' || kecamatanFilter || komoditasFilter || jenisFilter || statusFilter;
             
             if (hasActiveFilter && filteredData.length === 0) {
-                // Buat pesan yang lebih spesifik
-                let message = 'Tidak ada data pelaku usaha';
-                let filters = [];
-                
-                if (bidangFilter) {
-                    const bidangText = bidangFilter === 'pembudidaya' ? 'Pembudidaya' : 
-                                      bidangFilter === 'pengolah' ? 'Pengolah' : 'Pemasar';
-                    filters.push(bidangText);
-                }
-                
-                if (kecamatanFilter) {
-                    const kecamatanName = kecamatanCoordinates[kecamatanFilter]?.name || '';
-                    if (kecamatanName) filters.push('Kecamatan ' + kecamatanName);
-                }
-                
-                if (komoditasFilter) {
-                    filters.push('komoditas ' + komoditasFilter);
-                }
-                
-                if (jenisFilter) {
-                    filters.push(jenisFilter);
-                }
-                
-                if (filters.length > 0) {
-                    message += ' untuk ' + filters.join(', ');
-                }
-                
-                message += '. Silakan ubah filter atau pilih kategori lain.';
-                notificationMessage.textContent = message;
+                notificationMessage.textContent = 'Data lokasi tidak ditemukan.';
                 notification.classList.remove('hidden');
             } else {
                 notification.classList.add('hidden');

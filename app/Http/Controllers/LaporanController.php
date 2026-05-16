@@ -199,14 +199,44 @@ class LaporanController extends Controller
         $allPembudidayas = $allPembudidayas->values();
         
         // Hitung total produksi keseluruhan
-        $totalProduksiKeseluruhan = 0;
-        $totalLuasKolam = 0;
+        $normalizeText = function ($value): string {
+            return strtolower(trim((string) $value));
+        };
 
-        foreach ($allPembudidayas as $pembudidayaItem) {
-            $isBackup = (bool) ($pembudidayaItem->from_backup_snapshot ?? false);
+        $calculatePembudidayaTotals = function ($pembudidayaItem) use ($request, $normalizeText): array {
+            $komoditasFilter = $request->filled('komoditas') ? $normalizeText($request->komoditas) : null;
+            $kolamRows = collect($pembudidayaItem->kolam ?? []);
+            $ikanRows = collect($pembudidayaItem->ikan ?? []);
+            $produksiRows = collect($pembudidayaItem->produksi ?? []);
 
-            if ($isBackup && $pembudidayaItem->relationLoaded('produksi')) {
-                $produksiRows = collect($pembudidayaItem->produksi ?? []);
+            if ($komoditasFilter) {
+                $matchingKolamRows = $kolamRows
+                    ->filter(function ($row) use ($normalizeText, $komoditasFilter) {
+                        return $normalizeText(data_get($row, 'komoditas')) === $komoditasFilter;
+                    })
+                    ->groupBy(function ($row) use ($normalizeText) {
+                        return $normalizeText(data_get($row, 'komoditas')) . '|' . $normalizeText(data_get($row, 'jenis_kolam'));
+                    })
+                    ->map->first();
+
+                $totalLuasKolamFiltered = $matchingKolamRows->sum(function ($row) {
+                    $ukuran = floatval(data_get($row, 'ukuran', 0));
+                    $jumlah = floatval(data_get($row, 'jumlah', 0));
+                    return $ukuran * $jumlah;
+                });
+
+                $matchingIkanRows = $ikanRows->filter(function ($row) use ($normalizeText, $komoditasFilter) {
+                    return $normalizeText(data_get($row, 'jenis_ikan')) === $komoditasFilter;
+                });
+
+                $totalProduksiKgFiltered = $matchingIkanRows->sum(function ($row) {
+                    return floatval(data_get($row, 'jumlah', 0));
+                });
+
+                return [$totalLuasKolamFiltered, $totalProduksiKgFiltered];
+            }
+
+            if ($pembudidayaItem->relationLoaded('produksi')) {
                 if ($request->filled('bulan')) {
                     $produksiRows = $produksiRows->filter(function ($row) use ($request) {
                         $bulan = is_array($row) ? ($row['bulan'] ?? null) : ($row->bulan ?? null);
@@ -214,36 +244,47 @@ class LaporanController extends Controller
                     });
                 }
 
-                $totalProduksiKeseluruhan += $produksiRows->sum(function ($row) {
+                $totalProduksiKg = $produksiRows->sum(function ($row) {
                     $produksi = floatval(is_array($row) ? ($row['total_produksi'] ?? 0) : ($row->total_produksi ?? 0));
                     $satuan = strtolower(is_array($row) ? ($row['satuan_produksi'] ?? 'kg') : ($row->satuan_produksi ?? 'kg'));
                     return str_contains($satuan, 'ton') ? $produksi * 1000 : $produksi;
                 });
 
-                $totalLuasKolam += $produksiRows->sum(function ($row) {
+                $totalLuasKolam = $produksiRows->sum(function ($row) {
                     return floatval(is_array($row) ? ($row['total_luas_kolam'] ?? 0) : ($row->total_luas_kolam ?? 0));
                 });
 
-                continue;
+                return [$totalLuasKolam, $totalProduksiKg];
             }
 
-            $produksiRows = DB::table('pembudidaya_produksis')
+            $produksiQuery = DB::table('pembudidaya_produksis')
                 ->select('total_produksi', 'satuan_produksi', 'total_luas_kolam')
                 ->where('id_pembudidaya', $pembudidayaItem->id_pembudidaya);
 
             if ($request->filled('bulan')) {
-                $produksiRows->where('bulan', $request->bulan);
+                $produksiQuery->where('bulan', $request->bulan);
             }
 
-            $rows = $produksiRows->get();
+            $rows = $produksiQuery->get();
 
-            $totalProduksiKeseluruhan += $rows->sum(function ($row) {
+            $totalProduksiKg = $rows->sum(function ($row) {
                 $produksi = floatval($row->total_produksi ?? 0);
                 $satuan = strtolower($row->satuan_produksi ?? 'kg');
                 return str_contains($satuan, 'ton') ? $produksi * 1000 : $produksi;
             });
 
-            $totalLuasKolam += $rows->sum('total_luas_kolam');
+            $totalLuasKolam = $rows->sum('total_luas_kolam');
+
+            return [$totalLuasKolam, $totalProduksiKg];
+        };
+
+        $totalProduksiKeseluruhan = 0;
+        $totalLuasKolam = 0;
+
+        foreach ($allPembudidayas as $pembudidayaItem) {
+            [$totalLuasKolamItem, $totalProduksiKgItem] = $calculatePembudidayaTotals($pembudidayaItem);
+            $totalProduksiKeseluruhan += $totalProduksiKgItem;
+            $totalLuasKolam += $totalLuasKolamItem;
         }
         
         // Konversi satuan untuk display: jika >= 1000 kg, ubah ke ton
@@ -272,46 +313,11 @@ class LaporanController extends Controller
         );
         
         // Tambahkan total luas kolam dan total produksi untuk setiap pembudidaya
-        $pembudidayas->getCollection()->transform(function($pembudidaya) use ($request) {
-            $isBackup = (bool) ($pembudidaya->from_backup_snapshot ?? false);
+        $pembudidayas->getCollection()->transform(function($pembudidaya) use ($request, $calculatePembudidayaTotals) {
+            [$totalLuasKolamItem, $totalProduksiKg] = $calculatePembudidayaTotals($pembudidaya);
 
-            if ($isBackup && $pembudidaya->relationLoaded('produksi')) {
-                $records = collect($pembudidaya->produksi ?? []);
-                if ($request->filled('bulan')) {
-                    $records = $records->filter(function ($row) use ($request) {
-                        $bulan = is_array($row) ? ($row['bulan'] ?? null) : ($row->bulan ?? null);
-                        return $bulan == $request->bulan;
-                    });
-                }
-            } else {
-                $produksiRecords = DB::table('pembudidaya_produksis')
-                    ->select('total_produksi', 'satuan_produksi', 'total_luas_kolam')
-                    ->where('id_pembudidaya', $pembudidaya->id_pembudidaya);
+            $pembudidaya->total_luas_kolam_pembudidaya = $totalLuasKolamItem;
 
-                if ($request->filled('bulan')) {
-                    $produksiRecords->where('bulan', $request->bulan);
-                }
-
-                $records = $produksiRecords->get();
-            }
-            
-            // Hitung total produksi dalam Kg dengan konversi satuan
-            $totalProduksiKg = $records->sum(function($record) {
-                $produksi = is_array($record) ? ($record['total_produksi'] ?? 0) : ($record->total_produksi ?? 0);
-                $satuan = strtolower(is_array($record) ? ($record['satuan_produksi'] ?? 'kg') : ($record->satuan_produksi ?? 'kg'));
-                
-                // Konversi ke Kg jika satuannya Ton
-                if (str_contains($satuan, 'ton')) {
-                    return $produksi * 1000; // Ton ke Kg
-                }
-                
-                return $produksi; // Sudah dalam Kg
-            });
-            
-            $pembudidaya->total_luas_kolam_pembudidaya = $records->sum(function($record) {
-                return floatval(is_array($record) ? ($record['total_luas_kolam'] ?? 0) : ($record->total_luas_kolam ?? 0));
-            });
-            
             // Konversi display: jika >= 1000 Kg, ubah ke Ton untuk display
             if ($totalProduksiKg >= 1000) {
                 $pembudidaya->total_produksi_pembudidaya = $totalProduksiKg / 1000;
@@ -320,7 +326,7 @@ class LaporanController extends Controller
                 $pembudidaya->total_produksi_pembudidaya = $totalProduksiKg;
                 $pembudidaya->satuan_produksi = 'Kg';
             }
-            
+
             return $pembudidaya;
         });
 

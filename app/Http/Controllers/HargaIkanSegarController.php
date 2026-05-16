@@ -6,7 +6,6 @@ use App\Models\HargaIkanSegar;
 use App\Models\MasterKecamatan;
 use App\Models\MasterDesa;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +80,9 @@ class HargaIkanSegarController extends Controller
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('jenis_ikan', 'like', "%{$search}%")
+                  ->orWhere('nik_pedagang', 'like', "%{$search}%")
+                  ->orWhere('nama_pedagang', 'like', "%{$search}%")
+                  ->orWhere('nama_pasar', 'like', "%{$search}%")
                   ->orWhere('ukuran', 'like', "%{$search}%")
                   ->orWhere('satuan', 'like', "%{$search}%")
                   ->orWhereHas('kecamatan', function ($qq) use ($search) {
@@ -128,16 +130,45 @@ class HargaIkanSegarController extends Controller
             'tanggal_input' => 'required|date',
             'nama_pasar' => 'required|string|max:100',
             'nama_pedagang' => 'required|string|max:100',
+            'nik_pedagang' => 'required|digits:16',
             'asal_ikan' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string',
             'ikan' => 'required|array|min:1',
             'ikan.*.jenis_ikan' => 'required|string|max:100',
             'ikan.*.ukuran' => 'nullable|string|max:50',
             'ikan.*.satuan' => 'required|string|max:20',
-            'ikan.*.harga_produsen' => 'nullable|numeric|min:0',
-            'ikan.*.harga_konsumen' => 'nullable|numeric|min:0',
-            'ikan.*.kuantitas_perminggu' => 'nullable|numeric|min:0',
+            'ikan.*.harga_produsen' => 'required|numeric|min:0',
+            'ikan.*.harga_konsumen' => 'required|numeric|min:0',
+            'ikan.*.kuantitas_perminggu' => 'required|numeric|min:0',
+        ], [
+            'tahun_pendataan.required' => 'Tahun pendataan wajib diisi.',
+            'id_kecamatan.required' => 'Kecamatan wajib diisi.',
+            'id_desa.required' => 'Desa wajib diisi.',
+            'tanggal_input.required' => 'Tanggal input wajib diisi.',
+            'nama_pasar.required' => 'Nama pasar wajib diisi.',
+            'nama_pedagang.required' => 'Nama pedagang wajib diisi.',
+            'nik_pedagang.required' => 'NIK wajib diisi.',
+            'nik_pedagang.digits' => 'Penulisan NIK salah atau tidak sesuai format.',
+            'asal_ikan.required' => 'Asal ikan wajib diisi.',
+            'ikan.required' => 'Detail ikan wajib diisi.',
+            'ikan.*.jenis_ikan.required' => 'Jenis ikan wajib diisi.',
+            'ikan.*.satuan.required' => 'Satuan wajib diisi.',
+            'ikan.*.harga_produsen.required' => 'Harga produsen wajib diisi.',
+            'ikan.*.harga_konsumen.required' => 'Harga konsumen wajib diisi.',
+            'ikan.*.kuantitas_perminggu.required' => 'Kuantitas perminggu wajib diisi.',
         ]);
+
+        $exists = HargaIkanSegar::where('nik_pedagang', $validated['nik_pedagang'])
+            ->where('nama_pasar', $validated['nama_pasar'])
+            ->where('tanggal_input', $validated['tanggal_input'])
+            ->where('tahun_pendataan', $validated['tahun_pendataan'])
+            ->exists();
+
+        if ($exists) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'nik_pedagang' => 'data Harga ikan dengan tahun pendataan, tanggal input, nik pedagang, dan nama pasar yang anda masukan sudah terdaftar'
+            ]);
+        }
 
         // Loop through each ikan data and create separate records atomically
         $lastCreatedRecord = null;
@@ -146,26 +177,13 @@ class HargaIkanSegarController extends Controller
                 $lastRecord = null;
 
                 foreach ($validated['ikan'] as $ikanData) {
-                    // Check if this combination already exists for the same year
-                    $exists = HargaIkanSegar::where('nama_pedagang', $validated['nama_pedagang'])
-                        ->where('nama_pasar', $validated['nama_pasar'])
-                        ->where('jenis_ikan', $ikanData['jenis_ikan'])
-                        ->where('tanggal_input', $validated['tanggal_input'])
-                        ->where('tahun_pendataan', $validated['tahun_pendataan'])
-                        ->exists();
-
-                    if ($exists) {
-                        throw \Illuminate\Validation\ValidationException::withMessages([
-                            'ikan' => "Data untuk jenis ikan '{$ikanData['jenis_ikan']}' dari pedagang '{$validated['nama_pedagang']}' di pasar '{$validated['nama_pasar']}' pada tanggal dan tahun ini sudah ada."
-                        ]);
-                    }
-
                     $lastRecord = HargaIkanSegar::create([
                         'id_kecamatan' => $validated['id_kecamatan'],
                         'id_desa' => $validated['id_desa'],
                         'tanggal_input' => $validated['tanggal_input'],
                         'nama_pasar' => $validated['nama_pasar'],
                         'nama_pedagang' => $validated['nama_pedagang'],
+                        'nik_pedagang' => $validated['nik_pedagang'],
                         'asal_ikan' => $validated['asal_ikan'] ?? null,
                         'keterangan' => $validated['keterangan'] ?? null,
                         'jenis_ikan' => $ikanData['jenis_ikan'],
@@ -273,6 +291,12 @@ class HargaIkanSegarController extends Controller
     public function update(Request $request, string $id)
     {
         $hargaIkanSegar = HargaIkanSegar::findOrFail($id);
+        $originalUniqueKey = [
+            'tahun_pendataan' => $hargaIkanSegar->tahun_pendataan,
+            'tanggal_input' => $hargaIkanSegar->tanggal_input,
+            'nik_pedagang' => $hargaIkanSegar->nik_pedagang,
+            'nama_pasar' => $hargaIkanSegar->nama_pasar,
+        ];
 
         $validated = $request->validate([
             'tahun_pendataan' => 'required|integer|min:2026|max:' . (date('Y') + 5),
@@ -281,32 +305,56 @@ class HargaIkanSegarController extends Controller
             'tanggal_input' => 'required|date',
             'nama_pasar' => 'required|string|max:100',
             'nama_pedagang' => 'required|string|max:100',
+            'nik_pedagang' => 'required|digits:16',
             'asal_ikan' => 'nullable|string|max:255',
-            'jenis_ikan' => 'required|string|max:100',
-            'ukuran' => 'nullable|string|max:50',
-            'harga_produsen' => 'nullable|numeric|min:0',
-            'harga_konsumen' => 'nullable|numeric|min:0',
-            'satuan' => 'required|string|max:20',
-            'kuantitas_perminggu' => 'nullable|numeric|min:0',
             'keterangan' => 'nullable|string',
+            'ikan' => 'required|array|min:1',
+            'ikan.*.jenis_ikan' => 'required|string|max:100',
+            'ikan.*.ukuran' => 'nullable|string|max:50',
+            'ikan.*.satuan' => 'required|string|max:20',
+            'ikan.*.harga_produsen' => 'required|numeric|min:0',
+            'ikan.*.harga_konsumen' => 'required|numeric|min:0',
+            'ikan.*.kuantitas_perminggu' => 'required|numeric|min:0',
+        ], [
+            'tahun_pendataan.required' => 'Tahun pendataan wajib diisi.',
+            'id_kecamatan.required' => 'Kecamatan wajib diisi.',
+            'id_desa.required' => 'Desa wajib diisi.',
+            'tanggal_input.required' => 'Tanggal input wajib diisi.',
+            'nama_pasar.required' => 'Nama pasar wajib diisi.',
+            'nama_pedagang.required' => 'Nama pedagang wajib diisi.',
+            'nik_pedagang.required' => 'NIK wajib diisi.',
+            'nik_pedagang.digits' => 'Penulisan NIK salah atau tidak sesuai format.',
+            'ikan.required' => 'Detail ikan wajib diisi.',
+            'ikan.*.jenis_ikan.required' => 'Jenis ikan wajib diisi.',
+            'ikan.*.harga_produsen.required' => 'Harga produsen wajib diisi.',
+            'ikan.*.harga_konsumen.required' => 'Harga konsumen wajib diisi.',
+            'ikan.*.satuan.required' => 'Satuan wajib diisi.',
+            'ikan.*.kuantitas_perminggu.required' => 'Kuantitas perminggu wajib diisi.',
         ]);
 
-        DB::transaction(function () use ($validated, $id, $hargaIkanSegar) {
-            // Check if this combination already exists for the same year (excluding current record)
-            $exists = HargaIkanSegar::where('nama_pedagang', $validated['nama_pedagang'])
+        $currentUniqueKey = [
+            'tahun_pendataan' => $validated['tahun_pendataan'],
+            'tanggal_input' => $validated['tanggal_input'],
+            'nik_pedagang' => $validated['nik_pedagang'],
+            'nama_pasar' => $validated['nama_pasar'],
+        ];
+
+        if ($currentUniqueKey !== $originalUniqueKey) {
+            $exists = HargaIkanSegar::where('nik_pedagang', $validated['nik_pedagang'])
                 ->where('nama_pasar', $validated['nama_pasar'])
-                ->where('jenis_ikan', $validated['jenis_ikan'])
                 ->where('tanggal_input', $validated['tanggal_input'])
                 ->where('tahun_pendataan', $validated['tahun_pendataan'])
-                ->where('id_harga', '!=', $id)
+                ->where('id_harga', '!=', $hargaIkanSegar->id_harga)
                 ->exists();
 
             if ($exists) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'jenis_ikan' => "Data untuk jenis ikan '{$validated['jenis_ikan']}' dari pedagang '{$validated['nama_pedagang']}' di pasar '{$validated['nama_pasar']}' pada tanggal dan tahun ini sudah ada."
+                    'nik_pedagang' => 'data Harga ikan dengan tahun pendataan, tanggal input, nik pedagang, dan nama pasar yang anda masukan sudah terdaftar'
                 ]);
             }
+        }
 
+        DB::transaction(function () use ($validated, $hargaIkanSegar) {
             // Ensure verification and audit fields are never overwritten
             unset($validated['created_by'], $validated['verified_by'], $validated['verified_at']);
 
@@ -326,14 +374,54 @@ class HargaIkanSegarController extends Controller
                 );
             }
 
-            $hargaIkanSegar->update(array_merge(
-                $validated,
-                [
+            $rows = $validated['ikan'];
+
+            $hargaIkanSegar->update([
+                'id_kecamatan' => $validated['id_kecamatan'],
+                'id_desa' => $validated['id_desa'],
+                'tanggal_input' => $validated['tanggal_input'],
+                'nama_pasar' => $validated['nama_pasar'],
+                'nama_pedagang' => $validated['nama_pedagang'],
+                'nik_pedagang' => $validated['nik_pedagang'],
+                'asal_ikan' => $validated['asal_ikan'] ?? null,
+                'keterangan' => $validated['keterangan'] ?? null,
+                'jenis_ikan' => $rows[0]['jenis_ikan'],
+                'ukuran' => $rows[0]['ukuran'] ?? null,
+                'satuan' => $rows[0]['satuan'],
+                'harga_produsen' => $rows[0]['harga_produsen'],
+                'harga_konsumen' => $rows[0]['harga_konsumen'],
+                'kuantitas_perminggu' => $rows[0]['kuantitas_perminggu'],
+                'tahun_pendataan' => $validated['tahun_pendataan'],
+                'status' => 'pending',
+                'catatan_perbaikan' => null,
+                'updated_by' => auth()->user()->id_user,
+            ]);
+
+            for ($index = 1; $index < count($rows); $index++) {
+                $ikanData = $rows[$index];
+
+                HargaIkanSegar::create([
+                    'id_kecamatan' => $validated['id_kecamatan'],
+                    'id_desa' => $validated['id_desa'],
+                    'tanggal_input' => $validated['tanggal_input'],
+                    'nama_pasar' => $validated['nama_pasar'],
+                    'nama_pedagang' => $validated['nama_pedagang'],
+                    'nik_pedagang' => $validated['nik_pedagang'],
+                    'asal_ikan' => $validated['asal_ikan'] ?? null,
+                    'keterangan' => $validated['keterangan'] ?? null,
+                    'jenis_ikan' => $ikanData['jenis_ikan'],
+                    'ukuran' => $ikanData['ukuran'] ?? null,
+                    'satuan' => $ikanData['satuan'],
+                    'harga_produsen' => $ikanData['harga_produsen'],
+                    'harga_konsumen' => $ikanData['harga_konsumen'],
+                    'kuantitas_perminggu' => $ikanData['kuantitas_perminggu'],
+                    'tahun_pendataan' => $validated['tahun_pendataan'],
                     'status' => 'pending',
                     'catatan_perbaikan' => null,
-                    'updated_by' => auth()->user()->id_user
-                ]
-            ));
+                    'created_by' => auth()->user()->id_user,
+                    'updated_by' => auth()->user()->id_user,
+                ]);
+            }
         });
 
         // Notify all admins about data update

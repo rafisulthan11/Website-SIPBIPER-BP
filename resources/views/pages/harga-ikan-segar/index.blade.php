@@ -116,11 +116,10 @@
                                 </div>
 
                                 <div class="text-sm text-slate-700 space-y-1">
-                                    <p><span class="font-medium">Ukuran:</span> {{ $harga->ukuran ?? '-' }}</p>
+                                    <p><span class="font-medium">NIK Pedagang:</span> {{ $harga->nik_pedagang ?? '-' }}</p>
                                     <p><span class="font-medium">Harga Produsen:</span> {{ $harga->harga_produsen ? 'Rp ' . number_format($harga->harga_produsen, 0, ',', '.') : '-' }}</p>
                                     <p><span class="font-medium">Harga Konsumen:</span> {{ $harga->harga_konsumen ? 'Rp ' . number_format($harga->harga_konsumen, 0, ',', '.') : '-' }}</p>
-                                    <p><span class="font-medium">Satuan:</span> {{ $harga->satuan ?? '-' }}</p>
-                                    <p><span class="font-medium">Lokasi:</span> {{ $harga->desa->nama_desa ?? '-' }}, {{ $harga->kecamatan->nama_kecamatan ?? '-' }}</p>
+                                    <p><span class="font-medium">Pasar:</span> {{ $harga->nama_pasar ?? '-' }}</p>
                                     @if($harga->status === 'rejected' && $harga->catatan_perbaikan)
                                         <p class="text-xs text-red-700" style="margin-top: 0.25rem; font-size: 0.75rem; line-height: 1.35; color: #b91c1c;"><span class="font-semibold">Catatan:</span> {{ $harga->catatan_perbaikan }}</p>
                                     @endif
@@ -168,12 +167,11 @@
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Tanggal</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Tahun Pendataan</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Status</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Nama Pedagang</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Jenis Ikan</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Ukuran</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Harga Produsen</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Harga Konsumen</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Satuan</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Lokasi</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-[15px]">Pasar</th>
                                     <th class="px-4 py-3 text-left font-semibold text-[15px]">Aksi</th>
                                 </tr>
                             </thead>
@@ -196,12 +194,11 @@
                                             @endif
                                         @endif
                                     </td>
+                                    <td class="px-4 py-3 align-top text-slate-700">{{ $harga->nama_pedagang ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $harga->jenis_ikan ?? '-' }}</td>
-                                    <td class="px-4 py-3 align-top text-slate-700">{{ $harga->ukuran ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $harga->harga_produsen ? 'Rp ' . number_format($harga->harga_produsen, 0, ',', '.') : '-' }}</td>
                                     <td class="px-4 py-3 align-top text-slate-700">{{ $harga->harga_konsumen ? 'Rp ' . number_format($harga->harga_konsumen, 0, ',', '.') : '-' }}</td>
-                                    <td class="px-4 py-3 align-top text-slate-700">{{ $harga->satuan ?? '-' }}</td>
-                                    <td class="px-4 py-3 align-top text-slate-700">{{ $harga->desa->nama_desa ?? '-' }}, {{ $harga->kecamatan->nama_kecamatan ?? '-' }}</td>
+                                    <td class="px-4 py-3 align-top text-slate-700">{{ $harga->nama_pasar ?? '-' }}</td>
                                     <td class="px-4 py-3 align-top">
                                         <div class="flex flex-wrap gap-2">
                                             <a href="{{ route('harga-ikan-segar.show', $harga->id_harga) }}" class="inline-flex items-center rounded bg-green-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-green-700">
@@ -244,7 +241,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="9" class="px-4 py-6 text-center text-slate-500">Belum ada data harga ikan.</td>
+                                    <td colspan="8" class="px-4 py-6 text-center text-slate-500">Belum ada data harga ikan.</td>
                                 </tr>
                                 @endforelse
                             </tbody>

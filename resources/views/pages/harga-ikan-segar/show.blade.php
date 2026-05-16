@@ -97,6 +97,10 @@
                                 <p>{{ $displayData->nama_pedagang ?? '-' }}</p>
                             </div>
                             <div>
+                                <strong class="font-medium text-gray-500 block">NIK Pedagang:</strong>
+                                <p>{{ $displayData->nik_pedagang ?? '-' }}</p>
+                            </div>
+                            <div>
                                 <strong class="font-medium text-gray-500 block">Kecamatan:</strong>
                                 <p>{{ $displayData->kecamatan->nama_kecamatan ?? '-' }}</p>
                             </div>

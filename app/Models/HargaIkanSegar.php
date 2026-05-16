@@ -30,6 +30,7 @@ class HargaIkanSegar extends Model
         'tanggal_input',
         'nama_pasar',
         'nama_pedagang',
+        'nik_pedagang',
         'asal_ikan',
         'jenis_ikan',
         'ukuran',

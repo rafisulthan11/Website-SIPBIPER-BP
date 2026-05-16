@@ -65,7 +65,6 @@
         <table class="info-table">
             <tr><td>Nama Usaha</td><td>: {{ $pengolah->nama_usaha ?? '-' }}</td></tr>
             <tr><td>Nama Kelompok</td><td>: {{ $pengolah->nama_kelompok ?? '-' }}</td></tr>
-            <tr><td>Komoditas</td><td>: {{ $pengolah->komoditas ?? '-' }}</td></tr>
             <tr><td>Skala Usaha</td><td>: {{ $pengolah->skala_usaha ?? '-' }}</td></tr>
             <tr><td>Status Usaha</td><td>: {{ $pengolah->status_usaha ?? '-' }}</td></tr>
             <tr><td>Tahun Mulai Usaha</td><td>: {{ $pengolah->tahun_mulai_usaha ?? '-' }}</td></tr>
@@ -104,11 +103,17 @@
         <div class="section-title">DATA PRODUKSI</div>
         @if($pengolah->produksi_data && is_array($pengolah->produksi_data) && count($pengolah->produksi_data) > 0)
             @foreach($pengolah->produksi_data as $index => $produksi)
-                @if(isset($produksi['nama_merk']) || isset($produksi['periode']))
+                @if(isset($produksi['nama_merk']) || isset($produksi['komoditas']) || isset($produksi['periode']))
                 <div class="subsection-title">Produk {{ $index + 1 }}</div>
                 <table class="info-table">
                     <tr><td>Nama Merk</td><td>: {{ $produksi['nama_merk'] ?? '-' }}</td></tr>
-                    <tr><td>Periode</td><td>: {{ $produksi['periode'] ?? '-' }}</td></tr>
+                    @php
+                        $komoditasProduksi = $produksi['komoditas'] ?? ($produksi['jenis_ikan'] ?? '-');
+                        if (is_array($komoditasProduksi)) {
+                            $komoditasProduksi = implode(', ', array_filter(array_map('strval', $komoditasProduksi)));
+                        }
+                    @endphp
+                    <tr><td>Komoditas</td><td>: {{ $komoditasProduksi ?: '-' }}</td></tr>
                     <tr><td>Kapasitas Terpasang</td><td>: {{ isset($produksi['kapasitas_terpasang']) ? number_format($produksi['kapasitas_terpasang'], 2) . ' Kg' : '-' }}</td></tr>
                     <tr><td>Jumlah Hari Produksi/Bulan</td><td>: {{ $produksi['jumlah_hari_produksi'] ?? '-' }} hari</td></tr>
                     @if(isset($produksi['bulan_produksi']) && is_array($produksi['bulan_produksi']) && count($produksi['bulan_produksi']) > 0)

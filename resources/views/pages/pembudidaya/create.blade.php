@@ -521,7 +521,7 @@
                                                             <input type="number" step="0.01" x-bind:name="'produksi['+product.productIndex+'][kolam]['+kIndex+'][ukuran_m2]'" x-model="kolam.ukuran" @input="calculateTotalLuasKolam(pIndex)" placeholder="0.00" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm text-sm">
                                                         </div>
                                                         <div>
-                                                            <x-input-label :value="__('Jumlah')" />
+                                                            <x-input-label :value="__('Jumlah Kolam')" />
                                                             <input type="number" x-bind:name="'produksi['+product.productIndex+'][kolam]['+kIndex+'][jumlah]'" x-model="kolam.jumlah" @input="calculateTotalLuasKolam(pIndex)" placeholder="0" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm text-sm">
                                                         </div>
                                                         <div>
@@ -575,7 +575,7 @@
                                                             <input type="text" x-bind:name="'produksi['+product.productIndex+'][ikan]['+iIndex+'][jenis_indukan]'" x-model="ikan.jenis_indukan" placeholder="Misal: Lokal, Unggul" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm text-sm">
                                                         </div>
                                                         <div>
-                                                            <x-input-label :value="__('Jumlah')" />
+                                                            <x-input-label :value="__('Jumlah Produksi')" />
                                                             <input type="number" x-bind:name="'produksi['+product.productIndex+'][ikan]['+iIndex+'][jumlah]'" x-model="ikan.jumlah" placeholder="0" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm text-sm">
                                                         </div>
                                                         <div>
@@ -695,7 +695,7 @@
                         <!-- Step 7: Lampiran -->
                         <div x-show="step===7" x-transition class="bg-gray-50 rounded-lg border border-gray-200 p-6">
                             <h3 class="text-lg font-semibold mb-4">Lampiran</h3>
-                            <p class="text-slate-600 mb-6">Unggah dokumentasi berikut (format: JPG, PNG, PDF. Maksimal 2MB per file)</p>
+                            <p class="text-slate-600 mb-6">Unggah dokumentasi berikut (format: JPG, PNG, PDF. Maksimal 1MB per file)</p>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Foto KTP -->

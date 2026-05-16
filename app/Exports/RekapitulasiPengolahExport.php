@@ -6,21 +6,36 @@ use App\Models\Pengolah;
 use App\Models\MasterDesa;
 use App\Models\MasterKecamatan;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class RekapitulasiPengolahExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
+class RekapitulasiPengolahExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithCustomValueBinder
 {
     protected $filters;
 
     public function __construct($filters = [])
     {
         $this->filters = $filters;
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_string($value) && preg_match('/^\d{16,}$/', $value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
     }
 
     public function collection()
@@ -235,7 +250,7 @@ class RekapitulasiPengolahExport implements FromCollection, WithHeadings, WithMa
             'IZIN UKL-UPL',
             'IZIN AMDAL',
             'JUMLAH PRODUK',
-            'DETAIL PRODUKSI (Nama Merk | Periode | Kapasitas | Hari Produksi | Bulan | Sertifikat | Biaya Produksi | Biaya Lain | Harga Jual | Hasil Produksi | Pemasaran | Harga Jual/Pack | Bahan Baku)',
+            'DETAIL PRODUKSI (Nama Merk | Komoditas | Kapasitas | Hari Produksi | Bulan | Sertifikat | Biaya Produksi | Biaya Lain | Harga Jual | Hasil Produksi | Pemasaran | Harga Jual/Pack | Bahan Baku)',
             'TOTAL PRODUKSI (KG)',
             'TENAGA KERJA WNI LAKI-LAKI TETAP',
             'TENAGA KERJA WNI LAKI-LAKI TIDAK TETAP',
@@ -267,6 +282,13 @@ class RekapitulasiPengolahExport implements FromCollection, WithHeadings, WithMa
         $produksiDetail = collect($pengolah->detail_produksi ?? [])->map(function($p) {
             $bulanList = is_array($p['bulan_produksi'] ?? null) ? implode(', ', $p['bulan_produksi']) : '-';
             $sertifikatList = is_array($p['sertifikat_lahan'] ?? null) ? implode(', ', $p['sertifikat_lahan']) : '-';
+            $komoditasList = $p['komoditas'] ?? ($p['jenis_ikan'] ?? '-');
+            if (is_array($komoditasList)) {
+                $komoditasList = implode(', ', array_filter(array_map('strval', $komoditasList)));
+            }
+            if ($komoditasList === '' || $komoditasList === null) {
+                $komoditasList = '-';
+            }
             
             // Bahan Baku Detail
             $bahanBakuDetail = '';
@@ -291,7 +313,7 @@ class RekapitulasiPengolahExport implements FromCollection, WithHeadings, WithMa
             
             return implode(' | ', [
                 'Nama Merk: ' . ($p['nama_merk'] ?? '-'),
-                'Periode: ' . ($p['periode'] ?? '-'),
+                'Komoditas: ' . $komoditasList,
                 'Kapasitas: ' . (isset($p['kapasitas_terpasang']) ? number_format($p['kapasitas_terpasang'], 2, ',', '.') . ' Kg' : '-'),
                 'Hari Produksi: ' . ($p['jumlah_hari_produksi'] ?? '-') . ' hari',
                 'Bulan: ' . $bulanList,

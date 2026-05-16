@@ -12,6 +12,7 @@
             'id_desa' => 0,
             'nama_pasar' => 0,
             'nama_pedagang' => 0,
+            'nik_pedagang' => 0,
             'tanggal_input' => 1,
             'ikan' => 1,
         ];
@@ -108,6 +109,14 @@
                                     <x-input-label for="nama_pedagang" :value="__('Nama Pedagang*')" />
                                     <x-text-input id="nama_pedagang" class="block mt-1 w-full" type="text" name="nama_pedagang" :value="old('nama_pedagang')" required placeholder="Nama penjual ikan" />
                                     <x-input-error :messages="$errors->get('nama_pedagang')" class="mt-2" />
+                                </div>
+
+                                <!-- NIK Pedagang -->
+                                <div>
+                                    <x-input-label for="nik_pedagang" :value="__('NIK Pedagang*')" />
+                                    <x-text-input id="nik_pedagang" class="block mt-1 w-full" type="text" name="nik_pedagang" :value="old('nik_pedagang')" required maxlength="16" inputmode="numeric" pattern="[0-9]*" placeholder="16 digit" />
+                                    <p class="text-xs text-gray-500 mt-1">Masukkan 16 digit angka.</p>
+                                    <x-input-error :messages="$errors->get('nik_pedagang')" class="mt-2" />
                                 </div>
 
                                 <!-- Kecamatan -->
@@ -209,21 +218,21 @@
                                         <!-- Harga Produsen -->
                                         <div>
                                             <x-input-label :value="__('Harga Produsen (Rp)')" class="font-semibold" />
-                                            <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][harga_produsen]'" x-model="ikan.harga_produsen" min="0" step="0.01" placeholder="0" />
+                                            <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][harga_produsen]'" x-model="ikan.harga_produsen" min="0" step="0.01" placeholder="0" required />
                                             <p class="mt-1 text-xs text-gray-500">Harga jual dari produsen/pembudidaya</p>
                                         </div>
 
                                         <!-- Harga Konsumen -->
                                         <div>
                                             <x-input-label :value="__('Harga Konsumen (Rp)')" class="font-semibold" />
-                                            <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][harga_konsumen]'" x-model="ikan.harga_konsumen" min="0" step="0.01" placeholder="0" />
+                                            <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][harga_konsumen]'" x-model="ikan.harga_konsumen" min="0" step="0.01" placeholder="0" required />
                                             <p class="mt-1 text-xs text-gray-500">Harga beli untuk konsumen akhir</p>
                                         </div>
 
                                         <!-- Kuantitas Perminggu -->
                                         <div>
                                             <x-input-label :value="__('Kuantitas Perminggu')" class="font-semibold" />
-                                            <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][kuantitas_perminggu]'" x-model="ikan.kuantitas_perminggu" min="0" step="0.01" placeholder="0" />
+                                            <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][kuantitas_perminggu]'" x-model="ikan.kuantitas_perminggu" min="0" step="0.01" placeholder="0" required />
                                             <p class="mt-1 text-xs text-gray-500">Jumlah ikan per minggu</p>
                                         </div>
                                     </div>
