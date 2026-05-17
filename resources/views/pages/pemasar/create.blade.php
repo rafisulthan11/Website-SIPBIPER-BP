@@ -582,7 +582,7 @@
                         </div>
 
                         <!-- Step 5: Pemasaran -->
-                        <div x-show="step===5" x-transition class="bg-gray-50 rounded-lg border border-gray-200 p-6" x-data="{ 
+                        <div x-show="step===5" x-transition class="bg-gray-50 rounded-lg border border-gray-200 p-4 sm:p-6" x-data="{
                             sections: [{
                                 id: 1,
                                 rows: [{ id: 1, komoditas: '', jumlah_volume: '', asal_ikan: '', harga_beli: '', harga_jual: '' }],
@@ -602,13 +602,13 @@
                                 }
                             },
                             addRow(sectionIndex) {
-                                this.sections[sectionIndex].rows.push({ 
-                                    id: this.sections[sectionIndex].nextRowId++, 
-                                    komoditas: '', 
-                                    jumlah_volume: '', 
-                                    asal_ikan: '', 
-                                    harga_beli: '', 
-                                    harga_jual: '' 
+                                this.sections[sectionIndex].rows.push({
+                                    id: this.sections[sectionIndex].nextRowId++,
+                                    komoditas: '',
+                                    jumlah_volume: '',
+                                    asal_ikan: '',
+                                    harga_beli: '',
+                                    harga_jual: ''
                                 });
                             },
                             removeRow(sectionIndex, rowId) {
@@ -620,163 +620,250 @@
                                 const section = this.sections[sectionIndex];
                                 let totalKg = 0;
                                 let totalRp = 0;
-                                
                                 section.rows.forEach(row => {
-                                    const volume = parseFloat(row.jumlah_volume) || 0;
-                                    const hargaJual = parseFloat(row.harga_jual) || 0;
-                                    
+                                    const volume    = parseFloat(row.jumlah_volume) || 0;
+                                    const hargaJual = parseFloat(row.harga_jual)    || 0;
                                     totalKg += volume;
                                     totalRp += (volume * hargaJual);
                                 });
-                                
-                                return {
-                                    kg: totalKg.toFixed(2),
-                                    rp: totalRp.toFixed(2)
-                                };
+                                return { kg: totalKg.toFixed(2), rp: totalRp.toFixed(2) };
                             }
                         }">
-                            <div class="flex justify-between items-center mb-4">
+                        
+                            {{-- ── Header ── --}}
+                            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                                 <h3 class="text-lg font-semibold">Pemasaran</h3>
-                                <button type="button" @click="addSection()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                <button type="button"
+                                        @click="addSection()"
+                                        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition whitespace-nowrap">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                     </svg>
                                     Tambah Pemasaran
                                 </button>
                             </div>
-
-                            <!-- Loop through sections -->
+                        
+                            {{-- ── Loop Sections ── --}}
                             <template x-for="(section, sectionIndex) in sections" :key="section.id">
-                                <div class="mb-6 p-4 bg-white rounded-lg border-2 border-blue-200 relative">
-                                    <!-- Remove Section Button -->
-                                    <div class="flex justify-between items-center mb-4" x-show="sections.length > 1">
-                                        <span class="text-sm font-semibold text-blue-600" x-text="'Data Pemasaran #' + (sectionIndex + 1)"></span>
-                                        <button type="button" @click="removeSection(section.id)" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                        
+                                {{--
+                                    PERUBAHAN #1 — kontainer putih berlapis DIHAPUS.
+                                    Sebelumnya: <div class="mb-6 p-4 bg-white rounded-lg border-2 border-blue-200 relative">
+                                    Sekarang konten langsung di dalam <div class="mb-6"> tanpa border putih.
+                                --}}
+                                <div class="mb-8">
+                        
+                                    {{-- Label + tombol hapus section --}}
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4" x-show="sections.length > 1">
+                                        <span class="text-sm font-semibold text-blue-600"
+                                            x-text="'Data Pemasaran #' + (sectionIndex + 1)"></span>
+                                        <button type="button"
+                                                @click="removeSection(section.id)"
+                                                class="text-red-600 hover:text-red-800 text-sm font-medium">
                                             Hapus Data Pemasaran
                                         </button>
                                     </div>
-
-                                    <!-- Basic Production Info -->
-                                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        
+                                    {{-- ════════════════════════════════════════════════
+                                        PERUBAHAN #2 — bg-gray-50 → bg-white
+                                        Kontainer Informasi Umum (Kapasitas, Hasil, Bulan)
+                                    ════════════════════════════════════════════════ --}}
+                                    <div class="mb-4 p-4 bg-white rounded-lg border border-gray-200">
+                        
+                                        {{-- Kapasitas & Hasil Pemasaran --}}
+                                        {{--
+                                            PERUBAHAN #3 — grid-cols-1 di mobile, md:grid-cols-2 di desktop
+                                            Sebelumnya: grid-cols-1 md:grid-cols-2 (sudah benar tapi field Hasil
+                                            Pemasaran masih overflow di mobile karena Kg + Rp sejajar)
+                                        --}}
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                            <!-- Kapasitas Terpasang -->
+                        
+                                            {{-- Kapasitas Terpasang --}}
                                             <div>
                                                 <label class="block text-sm font-medium text-slate-700 mb-2">
                                                     Kapasitas Terpasang
                                                 </label>
                                                 <div class="flex items-center gap-2">
-                                                    <input class="block w-full border-gray-300 rounded-md shadow-sm" type="number" :name="'pemasaran[' + sectionIndex + '][kapasitas_terpasang]'" step="0.01" />
+                                                    <input class="block w-full border-gray-300 rounded-md shadow-sm"
+                                                        type="number"
+                                                        :name="'pemasaran[' + sectionIndex + '][kapasitas_terpasang]'"
+                                                        step="0.01" />
                                                     <span class="text-sm text-gray-600 whitespace-nowrap">Kg</span>
                                                 </div>
                                             </div>
-
-                                            <!-- Hasil Pemasaran -->
+                        
+                                            {{-- Hasil Pemasaran --}}
                                             <div>
                                                 <label class="block text-sm font-medium text-slate-700 mb-2">
-                                                    Hasil Pemasaran <span class="text-xs text-gray-500">(Otomatis Terhitung)</span>
+                                                    Hasil Pemasaran
+                                                    <span class="text-xs text-gray-500">(Otomatis Terhitung)</span>
                                                 </label>
-                                                <div class="flex items-center gap-2">
-                                                    <div class="flex-1">
-                                                        <input class="block w-full border-gray-300 rounded-md shadow-sm bg-gray-100" type="number" :name="'pemasaran[' + sectionIndex + '][hasil_produksi_kg]'" :value="calculateHasilPemasaran(sectionIndex).kg" step="0.01" readonly />
+                                                {{--
+                                                    PERUBAHAN #4 — Kg dan Rp ditumpuk vertikal di mobile
+                                                    flex-col gap-2 sm:flex-row agar tidak overflow layar kecil
+                                                --}}
+                                                <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                                    <div class="flex items-center gap-2 flex-1">
+                                                        <input class="block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
+                                                            type="number"
+                                                            :name="'pemasaran[' + sectionIndex + '][hasil_produksi_kg]'"
+                                                            :value="calculateHasilPemasaran(sectionIndex).kg"
+                                                            step="0.01"
+                                                            readonly />
+                                                        <span class="text-sm text-gray-600 whitespace-nowrap">Kg</span>
                                                     </div>
-                                                    <span class="text-sm text-gray-600 whitespace-nowrap">Kg</span>
-                                                    <div class="relative flex-1">
-                                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">Rp.</span>
-                                                        <input class="block w-full pl-12 border-gray-300 rounded-md shadow-sm bg-gray-100" type="number" :name="'pemasaran[' + sectionIndex + '][hasil_produksi_rp]'" :value="calculateHasilPemasaran(sectionIndex).rp" step="0.01" readonly />
+                                                    <div class="flex items-center gap-2 flex-1">
+                                                        <span class="text-sm text-gray-600 whitespace-nowrap">Rp.</span>
+                                                        <input class="block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
+                                                            type="number"
+                                                            :name="'pemasaran[' + sectionIndex + '][hasil_produksi_rp]'"
+                                                            :value="calculateHasilPemasaran(sectionIndex).rp"
+                                                            step="0.01"
+                                                            readonly />
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <!-- Bulan Pemasaran -->
-                                        <div class="mb-4">
+                        
+                                        {{-- Bulan Pemasaran --}}
+                                        <div>
                                             <label class="block text-sm font-medium text-slate-700 mb-3">
-                                                Bulan Pemasaran <span class="text-xs text-gray-500">(Pilih bulan pemasaran)</span>
+                                                Bulan Pemasaran
+                                                <span class="text-xs text-gray-500">(Pilih bulan pemasaran)</span>
                                             </label>
-                                            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                                @foreach(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] as $index => $bulan)
+                                            {{--
+                                                PERUBAHAN #5 — grid-cols-2 di mobile (sebelumnya 1 kolom di mobile
+                                                karena hanya ada md:grid-cols-4 lg:grid-cols-6)
+                                            --}}
+                                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                                                @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $bulan)
                                                     <label class="flex items-center p-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer">
-                                                        <input type="checkbox" :name="'pemasaran[' + sectionIndex + '][bulan_produksi][]'" value="{{ $bulan }}" class="rounded border-gray-300 text-blue-600">
+                                                        <input type="checkbox"
+                                                            :name="'pemasaran[' + sectionIndex + '][bulan_produksi][]'"
+                                                            value="{{ $bulan }}"
+                                                            class="rounded border-gray-300 text-blue-600">
                                                         <span class="ml-2 text-sm">{{ $bulan }}</span>
                                                     </label>
                                                 @endforeach
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- PEMASARAN Table -->
-                                    <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                        <div class="flex justify-between items-center mb-4">
+                                    </div>{{-- /Informasi Umum --}}
+                        
+                                    {{-- ════════════════════════════════════════════════
+                                        PERUBAHAN #2 — bg-gray-50 → bg-white
+                                        Kontainer Tabel Pemasaran
+                                    ════════════════════════════════════════════════ --}}
+                                    <div class="mb-4 p-4 bg-white rounded-lg border border-gray-200">
+                        
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                                             <h4 class="font-semibold text-slate-800">TABEL PEMASARAN</h4>
-                                            <button type="button" @click="addRow(sectionIndex)" class="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">
+                                            <button type="button"
+                                                    @click="addRow(sectionIndex)"
+                                                    class="px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 whitespace-nowrap">
                                                 + Tambah Baris
                                             </button>
                                         </div>
-
-                                        <div class="overflow-x-auto">
-                                            <table class="w-full border-collapse border border-gray-300">
-                                                <thead>
-                                                    <tr class="bg-gray-100">
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Komoditas Ikan</th>
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Asal Ikan</th>
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Jumlah / Volume Ikan</th>
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Harga beli /kg</th>
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-left">Harga jual/kg</th>
-                                                        <th class="border border-gray-300 px-3 py-2 text-sm font-semibold text-center">Aksi</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <template x-for="(row, rowIndex) in section.rows" :key="row.id">
-                                                        <tr>
-                                                            <td class="border border-gray-300 px-2 py-2">
-                                                                <select :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][komoditas]'" x-model="row.komoditas" class="w-full border-gray-300 rounded text-sm">
-                                                                    <option value="">Pilih Komoditas</option>
-                                                                    @foreach($komoditas as $item)
-                                                                        <option value="{{ $item->nama_komoditas }}">{{ $item->nama_komoditas }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </td>
-                                                            <td class="border border-gray-300 px-2 py-2">
-                                                                <input type="text" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][asal_ikan]'" x-model="row.asal_ikan" class="w-full border-gray-300 rounded text-sm" />
-                                                            </td>
-                                                            <td class="border border-gray-300 px-2 py-2">
-                                                                <input type="number" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][jumlah_volume]'" x-model="row.jumlah_volume" class="w-full border-gray-300 rounded text-sm" step="0.01" />
-                                                            </td>
-                                                            <td class="border border-gray-300 px-2 py-2">
-                                                                <div class="flex items-center gap-1">
-                                                                    <span class="text-sm">Rp.</span>
-                                                                    <input type="number" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][harga_beli]'" x-model="row.harga_beli" class="w-full border-gray-300 rounded text-sm" step="0.01" />
-                                                                </div>
-                                                            </td>
-                                                            <td class="border border-gray-300 px-2 py-2">
-                                                                <div class="flex items-center gap-1">
-                                                                    <span class="text-sm">Rp.</span>
-                                                                    <input type="number" :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][harga_jual]'" x-model="row.harga_jual" class="w-full border-gray-300 rounded text-sm" step="0.01" />
-                                                                </div>
-                                                            </td>
-                                                            <td class="border border-gray-300 px-2 py-2 text-center">
-                                                                <button type="button" @click="removeRow(sectionIndex, row.id)" class="text-red-600 hover:text-red-800 text-sm" x-show="section.rows.length > 1">
-                                                                    Hapus
-                                                                </button>
-                                                            </td>
+                        
+                                        {{--
+                                            PERUBAHAN #6 — min-w-[600px] pada <table>
+                                            Tabel tetap bisa di-scroll horizontal di mobile tanpa layout rusak.
+                                            overflow-x-auto sudah ada di parent — kombinasi ini yang benar.
+                                        --}}
+                                        <div class="overflow-x-auto -mx-4 sm:mx-0">
+                                            <div class="inline-block min-w-full px-4 sm:px-0">
+                                                <table class="min-w-[600px] w-full border-collapse border border-gray-300 text-xs sm:text-sm">
+                                                    <thead>
+                                                        <tr class="bg-gray-100">
+                                                            <th class="border border-gray-300 px-2 sm:px-3 py-2 font-semibold text-left whitespace-nowrap">Komoditas Ikan</th>
+                                                            <th class="border border-gray-300 px-2 sm:px-3 py-2 font-semibold text-left whitespace-nowrap">Asal Ikan</th>
+                                                            <th class="border border-gray-300 px-2 sm:px-3 py-2 font-semibold text-left whitespace-nowrap">Jumlah / Volume (Kg)</th>
+                                                            <th class="border border-gray-300 px-2 sm:px-3 py-2 font-semibold text-left whitespace-nowrap">Harga Beli /kg</th>
+                                                            <th class="border border-gray-300 px-2 sm:px-3 py-2 font-semibold text-left whitespace-nowrap">Harga Jual /kg</th>
+                                                            <th class="border border-gray-300 px-2 sm:px-3 py-2 font-semibold text-center whitespace-nowrap">Aksi</th>
                                                         </tr>
-                                                    </template>
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        <template x-for="(row, rowIndex) in section.rows" :key="row.id">
+                                                            <tr>
+                                                                <td class="border border-gray-300 px-2 py-1.5">
+                                                                    <select :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][komoditas]'"
+                                                                            x-model="row.komoditas"
+                                                                            class="w-full border-gray-300 rounded text-xs sm:text-sm min-w-[120px]">
+                                                                        <option value="">Pilih Komoditas</option>
+                                                                        @foreach($komoditas as $item)
+                                                                            <option value="{{ $item->nama_komoditas }}">{{ $item->nama_komoditas }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </td>
+                                                                <td class="border border-gray-300 px-2 py-1.5">
+                                                                    <input type="text"
+                                                                        :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][asal_ikan]'"
+                                                                        x-model="row.asal_ikan"
+                                                                        class="w-full border-gray-300 rounded text-xs sm:text-sm min-w-[100px]" />
+                                                                </td>
+                                                                <td class="border border-gray-300 px-2 py-1.5">
+                                                                    <input type="number"
+                                                                        :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][jumlah_volume]'"
+                                                                        x-model="row.jumlah_volume"
+                                                                        class="w-full border-gray-300 rounded text-xs sm:text-sm min-w-[80px]"
+                                                                        step="0.01" />
+                                                                </td>
+                                                                <td class="border border-gray-300 px-2 py-1.5">
+                                                                    <div class="flex items-center gap-1 min-w-[110px]">
+                                                                        <span class="text-xs text-gray-500 whitespace-nowrap">Rp.</span>
+                                                                        <input type="number"
+                                                                            :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][harga_beli]'"
+                                                                            x-model="row.harga_beli"
+                                                                            class="w-full border-gray-300 rounded text-xs sm:text-sm"
+                                                                            step="0.01" />
+                                                                    </div>
+                                                                </td>
+                                                                <td class="border border-gray-300 px-2 py-1.5">
+                                                                    <div class="flex items-center gap-1 min-w-[110px]">
+                                                                        <span class="text-xs text-gray-500 whitespace-nowrap">Rp.</span>
+                                                                        <input type="number"
+                                                                            :name="'pemasaran[' + sectionIndex + '][data_pemasaran][' + rowIndex + '][harga_jual]'"
+                                                                            x-model="row.harga_jual"
+                                                                            class="w-full border-gray-300 rounded text-xs sm:text-sm"
+                                                                            step="0.01" />
+                                                                    </div>
+                                                                </td>
+                                                                <td class="border border-gray-300 px-2 py-1.5 text-center">
+                                                                    <button type="button"
+                                                                            @click="removeRow(sectionIndex, row.id)"
+                                                                            class="text-red-600 hover:text-red-800 text-xs sm:text-sm font-medium px-1"
+                                                                            x-show="section.rows.length > 1">
+                                                                        Hapus
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Distribusi / Pemasaran -->
-                                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    </div>{{-- /Tabel Pemasaran --}}
+                        
+                                    {{-- ════════════════════════════════════════════════
+                                        PERUBAHAN #2 — bg-gray-50 → bg-white
+                                        Kontainer Distribusi / Pemasaran
+                                    ════════════════════════════════════════════════ --}}
+                                    <div class="p-4 bg-white rounded-lg border border-gray-200">
                                         <label class="block text-sm font-medium text-slate-700 mb-2">
                                             Distribusi / Pemasaran
                                         </label>
-                                        <textarea class="block w-full border-gray-300 rounded-md shadow-sm" :name="'pemasaran[' + sectionIndex + '][distribusi_pemasaran]'" rows="3"></textarea>
+                                        <textarea class="block w-full border-gray-300 rounded-md shadow-sm"
+                                                :name="'pemasaran[' + sectionIndex + '][distribusi_pemasaran]'"
+                                                rows="3"></textarea>
                                     </div>
-                                </div>
+                        
+                                    {{-- Garis pemisah antar section --}}
+                                    <div class="mt-6 border-t border-gray-200" x-show="sectionIndex < sections.length - 1"></div>
+                        
+                                </div>{{-- /section --}}
                             </template>
                         </div>
-
+                        
                         <!-- Step 6: Tenaga Kerja -->
                         <div x-show="step===6" x-transition class="bg-gray-50 rounded-lg border border-gray-200 p-6">
                             <h3 class="text-lg font-semibold mb-4">Tenaga Kerja</h3>
