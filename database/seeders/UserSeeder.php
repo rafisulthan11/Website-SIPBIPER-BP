@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             ['email' => 'admin@sincan.com'],
             [
                 'nama_lengkap' => 'Admin SINCAN',
-                'nip' => '222222222222222222',
+                'nip' => '333333333333333333',
                 'password' => Hash::make('password'),
                 'id_role' => $adminRole->id_role,
                 'status' => 'aktif',
