@@ -246,7 +246,7 @@
                                             <div class="py-2" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
                                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-100 flex items-center gap-3">
                                                     <svg class="w-5 h-5 text-gray-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-                                                    <span>Edit Profil</span>
+                                                    <span>{{ auth()->user()->isSuperAdmin() ? 'Informasi Profil' : 'Edit Profil' }}</span>
                                                 </a>
                                             </div>
 

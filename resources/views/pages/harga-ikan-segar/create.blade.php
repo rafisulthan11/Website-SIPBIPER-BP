@@ -217,21 +217,21 @@
 
                                         <!-- Harga Produsen -->
                                         <div>
-                                            <x-input-label :value="__('Harga Produsen (Rp)')" class="font-semibold" />
+                                            <x-input-label :value="__('Harga Produsen (Rp)*')" class="font-semibold" />
                                             <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][harga_produsen]'" x-model="ikan.harga_produsen" min="0" step="0.01" placeholder="0" required />
                                             <p class="mt-1 text-xs text-gray-500">Harga jual dari produsen/pembudidaya</p>
                                         </div>
 
                                         <!-- Harga Konsumen -->
                                         <div>
-                                            <x-input-label :value="__('Harga Konsumen (Rp)')" class="font-semibold" />
+                                            <x-input-label :value="__('Harga Konsumen (Rp)*')" class="font-semibold" />
                                             <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][harga_konsumen]'" x-model="ikan.harga_konsumen" min="0" step="0.01" placeholder="0" required />
                                             <p class="mt-1 text-xs text-gray-500">Harga beli untuk konsumen akhir</p>
                                         </div>
 
                                         <!-- Kuantitas Perminggu -->
                                         <div>
-                                            <x-input-label :value="__('Kuantitas Perminggu')" class="font-semibold" />
+                                            <x-input-label :value="__('Kuantitas Perminggu*')" class="font-semibold" />
                                             <input class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="number" x-bind:name="'ikan['+index+'][kuantitas_perminggu]'" x-model="ikan.kuantitas_perminggu" min="0" step="0.01" placeholder="0" required />
                                             <p class="mt-1 text-xs text-gray-500">Jumlah ikan per minggu</p>
                                         </div>

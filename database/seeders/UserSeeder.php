@@ -16,12 +16,12 @@ class UserSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['nama_role' => 'admin']);
 
         User::updateOrCreate(
-            ['email' => 'superadmin@sincan.com'],
+            ['id_role' => $superAdminRole->id_role],
             [
-                'nama_lengkap' => 'Super Admin SINCAN',
-                'nip' => '111111111111111111',
-                'password' => Hash::make('password'),
-                'id_role' => $superAdminRole->id_role,
+                'email' => 'superadmin@sipbiper.com',
+                'nama_lengkap' => 'Super Admin SIPBIPER',
+                'nip' => '999999999999999999',
+                'password' => Hash::make('SuperAdminIkan'),
                 'status' => 'aktif',
             ]
         );

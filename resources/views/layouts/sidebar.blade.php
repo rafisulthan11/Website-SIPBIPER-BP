@@ -33,7 +33,9 @@
                 </button>
                 <ul x-show="open" x-transition.opacity class="ms-8 mt-1 space-y-1">
                     <li>
-                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('profile.edit') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">Manajemen profil pengguna</a>
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-base rounded {{ request()->routeIs('profile.edit') ? 'bg-blue-100 text-slate-900' : 'text-slate-700 hover:bg-blue-50' }}">
+                            {{ auth()->user()->isSuperAdmin() ? 'Informasi profil pengguna' : 'Manajemen profil pengguna' }}
+                        </a>
                     </li>
                     @if(auth()->user()->isSuperAdmin())
                     <li>

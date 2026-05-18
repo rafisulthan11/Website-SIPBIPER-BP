@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 class UserManagementController extends Controller
@@ -43,7 +44,7 @@ class UserManagementController extends Controller
 
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::whereIn('nama_role', ['admin', 'staff'])->get();
         return view('pages.users.create', compact('roles'));
     }
 
@@ -54,7 +55,10 @@ class UserManagementController extends Controller
             'nip' => ['required', 'digits:18', 'unique:users,nip'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'id_role' => ['required', 'exists:roles,id_role'],
+            'id_role' => [
+                'required',
+                Rule::exists('roles', 'id_role')->whereIn('nama_role', ['admin', 'staff']),
+            ],
             'status' => ['required', 'in:aktif,tidak aktif'],
         ]);
 
@@ -74,7 +78,11 @@ class UserManagementController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::all();
+        if ($user->isSuperAdmin()) {
+            return redirect()->route('users.index')->with('error', 'Akun super admin tidak dapat diubah.');
+        }
+
+        $roles = Role::whereIn('nama_role', ['admin', 'staff'])->get();
         return view('pages.users.edit', compact('user', 'roles'));
     }
 
@@ -83,12 +91,19 @@ class UserManagementController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        if ($user->isSuperAdmin()) {
+            return redirect()->route('users.index')->with('error', 'Akun super admin tidak dapat diubah.');
+        }
+
         // Validasi input
         $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'nip' => ['required', 'digits:18', 'unique:users,nip,'.$user->id_user.',id_user'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id_user.',id_user'],
-            'id_role' => ['required', 'exists:roles,id_role'],
+            'id_role' => [
+                'required',
+                Rule::exists('roles', 'id_role')->whereIn('nama_role', ['admin', 'staff']),
+            ],
             'status' => ['required', 'in:aktif,tidak aktif'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -114,6 +129,10 @@ class UserManagementController extends Controller
 
     public function destroy(User $user)
     {
+        if ($user->isSuperAdmin()) {
+            return back()->with('error', 'Akun super admin tidak dapat dihapus.');
+        }
+
         // Tambahkan logika agar user tidak bisa menghapus dirinya sendiri
         if ($user->id_user === Auth::user()->id_user) {
             return back()->with('error', 'Anda tidak bisa menghapus akun Anda sendiri.');
